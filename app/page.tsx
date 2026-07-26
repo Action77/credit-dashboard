@@ -178,7 +178,16 @@ localStorage.setItem(
 
     reader.readAsBinaryString(file);
   };
-
+const filteredData = data.filter((row) => {
+  return (
+    (!selectedRegion ||
+      row["Region"] === selectedRegion) &&
+    (!selectedCity ||
+      row["City"] === selectedCity) &&
+    (!selectedVan ||
+      row["Van Code."] === selectedVan)
+  );
+});
   return (
     <div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
 
@@ -276,7 +285,7 @@ localStorage.setItem(
             </p>
 
             <h2 className="text-4xl font-bold mt-3">
-              {data.length}
+              {filteredData.length}
             </h2>
           </div>
 
@@ -374,7 +383,7 @@ localStorage.setItem(
             <p className="mt-2">
               Block Records:
               {" "}
-              {data.length}
+              {filteredData.length}
             </p>
           </div>
         )}
@@ -894,7 +903,7 @@ const daysLeft =
         <div className="text-center">
 
           <div className="text-3xl font-bold">
-            {data.length}
+            {filteredData.length}
           </div>
 
           <div className="text-sm text-gray-500">
