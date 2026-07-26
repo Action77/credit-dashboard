@@ -504,6 +504,7 @@ onChange={(e) => {
 <th className="p-3">Trx Date</th>
 <th className="p-3">Credit Amount</th>
 <th className="p-3">Pending CIM</th>
+<th className="p-3">Credit Days</th>
 <th className="p-3">Rejected Count</th>
 <th className="p-3">Status</th>
 
@@ -585,6 +586,10 @@ onChange={(e) => {
 
 <td className="p-3">
   {row["Pending CIM"]}
+</td>
+
+<td className="p-3">
+  {row["Credit_Days"]}
 </td>
 
 <td className="p-3">
