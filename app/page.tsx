@@ -33,6 +33,15 @@ export default function Home() {
 
   const [exceptions, setExceptions] =
     useState<any[]>([]);
+const [exceptions, setExceptions] =
+  useState<any[]>([]);
+
+const [collectedInvoices,
+  setCollectedInvoices] =
+  useState<string[]>([]);
+
+const [invoiceNo, setInvoiceNo] =
+  useState("");
 
 const [invoiceNo, setInvoiceNo] =
   useState("");
@@ -178,8 +187,73 @@ localStorage.setItem(
 
     reader.readAsBinaryString(file);
   };
+  const handleCollectionImport = (
+  event: React.ChangeEvent<HTMLInputElement>
+) => {
+
+  const file =
+    event.target.files?.[0];
+
+  if (!file) return;
+
+  const reader =
+    new FileReader();
+
+  reader.onload = (e) => {
+
+    const workbook =
+      XLSX.read(
+        e.target?.result,
+        { type: "binary" }
+      );
+
+    const sheetName =
+      workbook.SheetNames[0];
+
+    const worksheet =
+      workbook.Sheets[sheetName];
+
+    const rows: any[] =
+      XLSX.utils.sheet_to_json(
+        worksheet,
+        {
+          header: 1,
+        }
+      );
+
+    const invoices =
+      rows
+        .slice(1)
+        .filter((row) => {
+
+          const status =
+            String(
+              row[26] || ""
+            ).trim();
+
+          return (
+            status === "Hold" ||
+            status === "Completed"
+          );
+        })
+        .map((row) =>
+          String(row[1] || "")
+            .trim()
+            .replace(/\s/g, "")
+        );
+
+    setCollectedInvoices(
+      invoices
+    );
+  };
+
+  reader.readAsBinaryString(
+    file
+  );
+};
 const filteredData = data.filter((row) => {
   return (
+    
     (!selectedRegion ||
       row["Region"] === selectedRegion) &&
     (!selectedCity ||
@@ -328,7 +402,7 @@ const filteredData = data.filter((row) => {
 
             <label className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg cursor-pointer">
 
-              Import Excel
+              Import Credit
 
               <input
                 type="file"
@@ -338,9 +412,18 @@ const filteredData = data.filter((row) => {
               />
             </label>
 
-            <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg">
-              Export Excel
-            </button>
+<label className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg cursor-pointer">
+
+  Import Collection
+
+  <input
+    type="file"
+    accept=".xlsx,.xls"
+    className="hidden"
+    onChange={handleCollectionImport}
+  />
+
+</label>
 
             <button className="bg-white border px-5 py-3 rounded-lg">
               Refresh Data
