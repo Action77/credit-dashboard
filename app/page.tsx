@@ -1,5 +1,9 @@
 "use client";
-
+import WhatsAppReport from "@/components/WhatsAppReport";
+import html2canvas from "html2canvas";
+import {
+  openWhatsApp
+} from "@/utils/whatsapp";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
@@ -18,7 +22,8 @@ import {
 
 
 export default function Home() {
-
+const [whatsAppVan, setWhatsAppVan] =
+  useState("");
   const [data, setData] =
     useState<any[]>([]);
     const [selectedRegions,
@@ -404,6 +409,7 @@ localStorage.setItem(
   ).trim();
 
 return (
+  
   status === "Hold" ||
   status === "Completed"
 );
@@ -439,64 +445,119 @@ localStorage.setItem(
     file
   );
 };
-const filteredData = data.filter((row) => {
+const filterBaseData =
+  data.filter((row) => {
 
-  const matchesFilters =
+    const matchesFilters =
+      (
+        selectedRegions.length === 0 ||
+        selectedRegions.includes(
+          row["Region"]
+        )
+      )
+      &&
+      (
+        selectedCities.length === 0 ||
+        selectedCities.includes(
+          row["City"]
+        )
+      )
+      &&
+      (
+        selectedVans.length === 0 ||
+        selectedVans.includes(
+          row["Van Code."]
+        )
+      );
 
-(
-  selectedRegions.length === 0 ||
+    const search =
+      searchText
+        .toLowerCase()
+        .trim();
 
-  selectedRegions.includes(
-    row["Region"]
+    const matchesSearch =
+      !search ||
+      [
+        row["Van Code."],
+        row["Employee Name."],
+        row["Employee ATS Code."],
+        row["Customer Code"],
+        row["Customer Name"],
+        row["Invoice #"],
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(search);
+    return (
+      matchesFilters &&
+      matchesSearch
+    );
+  });
+  const whatsappVanCodes = [
+  ...new Set(
+    filterBaseData
+      .filter((row) => {
+
+        const invoice =
+          String(
+            row["Invoice #"]
+          ).replace(/\s/g, "");
+
+        const isException =
+          exceptions.some(
+            (e) =>
+              String(e.invoice)
+                .replace(/\s/g, "") === invoice
+          );
+
+        const isCollected =
+          collectedInvoices.some(
+            (i) => i === invoice
+          );
+
+        return (
+          !isException &&
+          !isCollected
+        );
+      })
+      .map(
+        (row) => row["Van Code."]
+      )
   )
-)
+].sort();
+const filteredData = filterBaseData.filter(
+  (row) => {
 
-&&
+    const invoice =
+      String(
+        row["Invoice #"]
+      ).replace(/\s/g, "");
 
-(
-  selectedCities.length === 0 ||
+    const isException =
+      exceptions.some(
+        (e) =>
+          String(e.invoice)
+            .replace(/\s/g, "") ===
+          invoice
+      );
 
-  selectedCities.includes(
-    row["City"]
-  )
-)
+    const isCollected =
+      collectedInvoices.some(
+        (i) => i === invoice
+      );
 
-&&
+    const matchesWhatsappVan =
+      !whatsAppVan ||
+      row["Van Code."] === whatsAppVan;
 
-(
-  selectedVans.length === 0 ||
+    return (
+      !isException &&
+      !isCollected &&
+      matchesWhatsappVan
+    );
 
-  selectedVans.includes(
-    row["Van Code."]
-  )
+  }
 );
-
-  const search =
-    searchText
-      .toLowerCase()
-      .trim();
-
-  const matchesSearch =
-  !search ||
-
-  [
-    row["Van Code."],
-    row["Employee Name."],
-    row["Employee ATS Code."],
-    row["Customer Code"],
-    row["Customer Name"],
-    row["Invoice #"],
-  ]
-    .join(" ")
-    .toLowerCase()
-    .includes(search);
-
-  return (
-    matchesFilters &&
-    matchesSearch
-  );
-
-});
 const blockedCount =
   filteredData.filter((row) => {
 
@@ -627,6 +688,91 @@ const toggleCity = (
   );
 
 };
+const generateReportImage =
+  async () => {
+
+    const report =
+      document.getElementById(
+        "whatsapp-report"
+      );
+
+    if (!report) {
+      alert("Report Not Found");
+      return;
+    }
+
+    const canvas =
+  await html2canvas(
+    report,
+    {
+      scale: 2,
+      backgroundColor: "#ffffff",
+    }
+  );
+    const blob =
+  await new Promise<Blob | null>(
+    (resolve) =>
+      canvas.toBlob(
+        (blob) =>
+          resolve(blob),
+        "image/png"
+      )
+  );
+
+if (!blob) {
+  alert(
+    "Failed to create image"
+  );
+  return;
+}
+
+await navigator.clipboard.write([
+  new ClipboardItem({
+    "image/png": blob,
+  }),
+]);
+const response =
+  await fetch("/api/users");
+
+const users =
+  await response.json();
+
+const selectedUser =
+  users.find(
+    (user: any) =>
+      user.van_sub_inventory ===
+      whatsAppVan
+  );
+
+if (!selectedUser) {
+  alert(
+    `Van ${whatsAppVan} not found in Users`
+  );
+  return;
+}
+
+const phoneNumber =
+  String(selectedUser.contact)
+    .replace(/\s/g, "");
+
+const whatsappNumber =
+  phoneNumber.startsWith("05")
+    ? `966${phoneNumber.slice(1)}`
+    : phoneNumber;
+    window.open(
+  `https://wa.me/${whatsappNumber}`,
+  "_blank"
+);
+
+
+
+  };
+const whatsappData =
+  filteredData.filter(
+    (row) =>
+      row["Van Code."] ===
+      whatsAppVan
+  );
   if (!isLoggedIn) {
 
   return (
@@ -705,7 +851,21 @@ const toggleCity = (
 }
 
 return (
-      <div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
+<>
+  <div
+    style={{
+      position: "absolute",
+      left: "-99999px",
+      top: 0,
+    }}
+  >
+    <WhatsAppReport
+      vanCode={whatsAppVan}
+      data={whatsappData}
+    />
+  </div>
+
+  <div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
 
       {/* Sidebar */}
       <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
@@ -1260,10 +1420,49 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
           {/* Table */}
           <div className="col-span-2 bg-white rounded-xl border shadow-sm p-5">
 
-            <h3 className="font-bold text-xl mb-5">
-  Invoices
-</h3>
+            <div className="flex justify-between items-center mb-5">
 
+  <h3 className="font-bold text-xl">
+    Invoices
+  </h3>
+
+  <div className="flex gap-2">
+
+    <select
+      value={whatsAppVan}
+      onChange={(e) =>
+        setWhatsAppVan(
+          e.target.value
+        )
+      }
+      className="border rounded-lg px-3 py-2"
+    >
+      <option value="">
+        Select Van
+      </option>
+
+      {whatsappVanCodes.map(
+        (van) => (
+          <option
+            key={van}
+            value={van}
+          >
+            {van}
+          </option>
+        )
+      )}
+    </select>
+
+<button
+  onClick={generateReportImage}
+  className="bg-green-600 text-white px-4 py-2 rounded-lg"
+>
+  WhatsApp
+</button>
+
+  </div>
+
+</div>
 
             <div className="overflow-auto max-h-[600px]">
 
@@ -1694,5 +1893,6 @@ const daysLeft =
       </main>
 
     </div>
+  </>
   );
 }
