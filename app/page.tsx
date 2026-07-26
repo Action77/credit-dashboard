@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
-
+import Link from "next/link";
 import {
   LayoutDashboard,
   Upload,
@@ -21,16 +21,45 @@ export default function Home() {
 
   const [data, setData] =
     useState<any[]>([]);
+    const [selectedRegions,
+  setSelectedRegions] =
+  useState<string[]>([]);
 
-  const [selectedRegion, setSelectedRegion] =
-    useState("");
+const [selectedCities,
+  setSelectedCities] =
+  useState<string[]>([]);
 
-  const [selectedCity, setSelectedCity] =
-    useState("");
+const [selectedVans,
+  setSelectedVans] =
+  useState<string[]>([]);
 
-  const [selectedVan, setSelectedVan] =
-    useState("");
+const [searchText, setSearchText] =
+  useState("");
+  const [showFilters,
+  setShowFilters] =
+  useState(false);
+  const [currentUser,
+  setCurrentUser] =
+  useState("");
 
+const [isLoggedIn,
+  setIsLoggedIn] =
+  useState(false);
+
+const [username,
+  setUsername] =
+  useState("");
+
+const [password,
+  setPassword] =
+  useState("");
+  const [expandedRegions,
+  setExpandedRegions] =
+  useState<string[]>([]);
+
+const [expandedCities,
+  setExpandedCities] =
+  useState<string[]>([]);
   const [exceptions, setExceptions] =
   useState<any[]>([]);
 
@@ -42,6 +71,13 @@ const [invoiceNo, setInvoiceNo] =
   useState("");
 
 const [tillDate, setTillDate] =
+  useState("");
+  const [creditFileInfo,
+  setCreditFileInfo] =
+  useState("");
+
+const [collectionFileInfo,
+  setCollectionFileInfo] =
   useState("");
 const [loadedExceptions,
   setLoadedExceptions] =
@@ -91,6 +127,81 @@ const [loadedExceptions,
 }, []);
 useEffect(() => {
 
+const saved =
+  localStorage.getItem(
+    `savedFilters_${currentUser}`
+  );
+
+  if (!saved) return;
+
+  const filters =
+    JSON.parse(saved);
+setSelectedRegions(
+  filters.regions || []
+);
+
+setSelectedCities(
+  filters.cities || []
+);
+
+setSelectedVans(
+  filters.vans || []
+);
+  
+}, [currentUser]);
+useEffect(() => {
+
+  const savedUser =
+    localStorage.getItem(
+      "currentUser"
+    );
+
+  if (savedUser) {
+
+    setCurrentUser(savedUser);
+
+    setIsLoggedIn(true);
+
+  }
+
+}, []);
+
+useEffect(() => {
+
+  localStorage.setItem(
+    "currentUser",
+    currentUser
+  );
+
+}, [currentUser]);
+useEffect(() => {
+
+localStorage.setItem(
+  `savedFilters_${currentUser}`,
+
+    JSON.stringify({
+
+      regions:
+        selectedRegions,
+
+      cities:
+        selectedCities,
+
+      vans:
+        selectedVans,
+
+    })
+
+  );
+
+}, [
+  selectedRegions,
+  selectedCities,
+  selectedVans,
+]);
+
+useEffect(() => {
+
   if (!loadedExceptions)
     return;
 
@@ -103,6 +214,54 @@ useEffect(() => {
   exceptions,
   loadedExceptions,
 ]);
+useEffect(() => {
+
+  const loadCollection =
+    async () => {
+
+      const response =
+        await fetch(
+          "/api/collection-data"
+        );
+
+      const data =
+        await response.json();
+
+      setCollectedInvoices(
+        data.invoices || []
+      );
+
+    };
+
+  loadCollection();
+
+}, []);
+
+
+useEffect(() => {
+
+  const savedCreditInfo =
+    localStorage.getItem(
+      "creditFileInfo"
+    );
+
+  if (savedCreditInfo) {
+    setCreditFileInfo(
+      savedCreditInfo
+    );
+  }
+
+  fetch("/api/collection-data")
+    .then(res => res.json())
+    .then(data => {
+
+      setCollectionFileInfo(
+        data.fileInfo || ""
+      );
+
+    });
+
+}, []);
 useEffect(() => {
   const savedData =
     localStorage.getItem("creditData");
@@ -149,7 +308,9 @@ useEffect(() => {
 
       const worksheet =
         workbook.Sheets[sheetName];
-
+const creditFileDate =
+  worksheet["B3"]?.w ||
+  "";
       const jsonData: any[] =
         XLSX.utils.sheet_to_json(
           worksheet,
@@ -168,6 +329,18 @@ useEffect(() => {
         );
 setData(blockedRows);
 
+setCreditFileInfo(
+  `${file.name} | ${creditFileDate}`
+);
+localStorage.setItem(
+  "creditFileInfo",
+  `${file.name} | ${creditFileDate}`
+);
+setCollectedInvoices([]);
+
+localStorage.removeItem(
+  "collectedInvoices"
+);
 localStorage.setItem(
   "creditData",
   JSON.stringify(blockedRows)
@@ -186,8 +359,11 @@ localStorage.setItem(
   event: React.ChangeEvent<HTMLInputElement>
 ) => {
 
+  console.log("BUTTON WORKING");
+
   const file =
     event.target.files?.[0];
+
 
   if (!file) return;
 
@@ -221,15 +397,16 @@ localStorage.setItem(
         .slice(1)
         .filter((row) => {
 
-          const status =
-            String(
-              row[26] || ""
-            ).trim();
+          
+            const status =
+  String(
+    row[26] || ""
+  ).trim();
 
-          return (
-            status === "Hold" ||
-            status === "Completed"
-          );
+return (
+  status === "Hold" ||
+  status === "Completed"
+);
         })
         .map((row) =>
           String(row[1] || "")
@@ -237,14 +414,24 @@ localStorage.setItem(
             .replace(/\s/g, "")
         );
 
-    setCollectedInvoices(
-      invoices
-    );
     console.log("Collection Invoices:");
 console.log(invoices);
 
 setCollectedInvoices(
   invoices
+);
+const now = new Date();
+
+setCollectionFileInfo(
+  `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
+);
+localStorage.setItem(
+  "collectionFileInfo",
+  `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
+);
+localStorage.setItem(
+  "collectedInvoices",
+  JSON.stringify(invoices)
 );
   };
 
@@ -253,82 +440,348 @@ setCollectedInvoices(
   );
 };
 const filteredData = data.filter((row) => {
+
+  const matchesFilters =
+
+(
+  selectedRegions.length === 0 ||
+
+  selectedRegions.includes(
+    row["Region"]
+  )
+)
+
+&&
+
+(
+  selectedCities.length === 0 ||
+
+  selectedCities.includes(
+    row["City"]
+  )
+)
+
+&&
+
+(
+  selectedVans.length === 0 ||
+
+  selectedVans.includes(
+    row["Van Code."]
+  )
+);
+
+  const search =
+    searchText
+      .toLowerCase()
+      .trim();
+
+  const matchesSearch =
+  !search ||
+
+  [
+    row["Van Code."],
+    row["Employee Name."],
+    row["Employee ATS Code."],
+    row["Customer Code"],
+    row["Customer Name"],
+    row["Invoice #"],
+  ]
+    .join(" ")
+    .toLowerCase()
+    .includes(search);
+
   return (
-    
-    (!selectedRegion ||
-      row["Region"] === selectedRegion) &&
-    (!selectedCity ||
-      row["City"] === selectedCity) &&
-    (!selectedVan ||
-      row["Van Code."] === selectedVan)
+    matchesFilters &&
+    matchesSearch
   );
+
 });
+const blockedCount =
+  filteredData.filter((row) => {
+
+    const invoice =
+      String(
+        row["Invoice #"]
+      ).replace(/\s/g, "");
+
+    const isException =
+      exceptions.some(
+        (e) =>
+          String(e.invoice)
+            .replace(/\s/g, "") ===
+          invoice
+      );
+
+    const isCollected =
+      collectedInvoices.some(
+        (i) => i === invoice
+      );
+
+    return (
+      !isException &&
+      !isCollected
+    );
+  }).length;
+const employeeCount =
+  new Set(
+    filteredData.map(
+      (row) => row["Employee Name."]
+    )
+  ).size;
+  const activeEmployees =
+  Object.entries(
+
+    filteredData.reduce(
+      (acc: any, row) => {
+
+        const employee =
+          row["Employee Name."];
+
+        if (!acc[employee]) {
+          acc[employee] = [];
+        }
+
+        acc[employee].push(row);
+
+        return acc;
+
+      },
+      {}
+    )
+
+  ).filter(([_, rows]: any) =>
+
+    rows.every((row: any) => {
+
+      const invoice =
+        String(
+          row["Invoice #"]
+        ).replace(/\s/g, "");
+
+      const isException =
+        exceptions.some(
+          (e) =>
+            String(e.invoice)
+              .replace(/\s/g, "") ===
+            invoice
+        );
+
+      const isCollected =
+        collectedInvoices.some(
+          (i) => i === invoice
+        );
+
+      return (
+        isException ||
+        isCollected
+      );
+
+    })
+
+  ).length;
+  const toggleRegion = (
+  region: string
+) => {
+
+  setExpandedRegions(prev =>
+
+    prev.includes(region)
+
+      ? prev.filter(
+          r => r !== region
+        )
+
+      : [...prev, region]
+
+  );
+
+};
+const users = [
+  {
+    username: "halyousif",
+    password: "123456",
+    id: "user1"
+  },
+  {
+    username: "nelson",
+    password: "123456",
+    id: "user2"
+  }
+];
+
+const toggleCity = (
+  cityKey: string
+) => {
+
+  setExpandedCities(prev =>
+
+    prev.includes(cityKey)
+
+      ? prev.filter(
+          c => c !== cityKey
+        )
+
+      : [...prev, cityKey]
+
+  );
+
+};
+  if (!isLoggedIn) {
+
   return (
-    <div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
+
+    <div className="min-h-screen flex items-center justify-center bg-slate-100">
+
+      <div className="bg-white p-8 rounded-xl shadow-lg w-[400px]">
+
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Login
+        </h2>
+
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) =>
+            setUsername(e.target.value)
+          }
+          className="w-full border p-3 rounded-lg mb-4"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
+          className="w-full border p-3 rounded-lg mb-4"
+        />
+
+        <button
+          className="w-full bg-blue-600 text-white py-3 rounded-lg"
+          onClick={() => {
+
+            const user =
+              users.find(
+                u =>
+                  u.username === username &&
+                  u.password === password
+              );
+
+            if (!user) {
+
+              alert(
+                "Invalid Username or Password"
+              );
+
+              return;
+
+            }
+
+            setCurrentUser(
+              user.id
+            );
+
+            setIsLoggedIn(true);
+
+            localStorage.setItem(
+              "currentUser",
+              user.id
+            );
+
+          }}
+        >
+          Login
+        </button>
+
+      </div>
+
+    </div>
+
+  );
+
+}
+
+return (
+      <div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
 
       {/* Sidebar */}
-      <aside className="w-52 bg-[#071d5c] text-white flex flex-col justify-between">
+      <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
 
-        <div>
-          <div className="p-4">
-            <h1 className="text-xl font-bold leading-tight">
-              Credit With Route Block
-            </h1>
-          </div>
+    <div className="p-4">
+      <h1 className="text-xl font-bold leading-tight">
+        Credit With Route Block
+      </h1>
+    </div>
 
-          <nav className="px-4 space-y-2">
+    <nav className="px-4 space-y-2">
 
-            <div className="flex items-center gap-3 bg-blue-600 px-4 py-3 rounded-xl">
-              <LayoutDashboard size={18} />
-              Dashboard
-            </div>
+  <Link
+  href="/"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <LayoutDashboard size={18} />
+  <span>Dashboard</span>
+</Link>
 
-            <div className="flex items-center gap-3 px-4 py-3">
-              <Upload size={18} />
-              Import File
-            </div>
+  <div className="flex items-center gap-3 px-4 py-3">
+    <Upload size={18} />
+    Import File
+  </div>
 
-            <div className="flex items-center gap-3 px-4 py-3">
-              <FileText size={18} />
-              Invoices
-            </div>
+  <div className="flex items-center gap-3 px-4 py-3">
+    <FileText size={18} />
+    Invoices
+  </div>
 
-            <div className="flex items-center gap-3 px-4 py-3">
-              <AlertCircle size={18} />
-              Exceptions
-            </div>
+  <div className="flex items-center gap-3 px-4 py-3">
+    <AlertCircle size={18} />
+    Exceptions
+  </div>
 
-            <div className="flex items-center gap-3 px-4 py-3">
-              <BarChart3 size={18} />
-              Summary
-            </div>
+  <div className="flex items-center gap-3 px-4 py-3">
+    <BarChart3 size={18} />
+    Summary
+  </div>
 
-            <div className="flex items-center gap-3 px-4 py-3">
-              <BarChart3 size={18} />
-              Reports
-            </div>
+  <div className="flex items-center gap-3 px-4 py-3">
+    <BarChart3 size={18} />
+    Reports
+  </div>
 
-            <div className="flex items-center gap-3 px-4 py-3">
-              <Settings size={18} />
-              Settings
-            </div>
+  <div className="flex items-center gap-3 px-4 py-3">
+    <Settings size={18} />
+    Settings
+  </div>
 
-            <div className="flex items-center gap-3 px-4 py-3">
-              <Users size={18} />
-              Users
-            </div>
+<Link
+  href="/users"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <Users size={18} />
+  Users
+</Link>
 
-          </nav>
-        </div>
-
-        <div className="p-6 border-t border-white/10">
-          <div className="flex items-center gap-3">
-            <LogOut size={18} />
-            Logout
-          </div>
-        </div>
-
-      </aside>
+</nav>
+  <div className="p-6 border-t border-white/10">
+    <div
+      className="flex items-center gap-3 cursor-pointer bg-red-600 p-3 rounded-lg"
+      onClick={() => {
+        localStorage.removeItem("currentUser");
+        setIsLoggedIn(false);
+        setCurrentUser("");
+        setUsername("");
+        setPassword("");
+      }}
+    >
+      <LogOut size={18} />
+      Logout
+    </div>
+  </div>
+  
+</aside>
 
       {/* Content */}
       <main className="flex-1 p-6">
@@ -345,9 +798,20 @@ const filteredData = data.filter((row) => {
               Today: {new Date().toLocaleDateString()}
             </span>
 
-            <span>
-              Admin
-            </span>
+<button
+  onClick={() => {
+    localStorage.removeItem(
+      "currentUser"
+    );
+
+    setIsLoggedIn(false);
+
+    setCurrentUser("");
+  }}
+  className="bg-red-600 text-white px-4 py-2 rounded-lg"
+>
+  Logout
+</button>
           </div>
         </div>
 
@@ -360,7 +824,7 @@ const filteredData = data.filter((row) => {
             </p>
 
             <h2 className="text-4xl font-bold mt-3">
-              {filteredData.length}
+              {blockedCount}
             </h2>
           </div>
 
@@ -370,8 +834,8 @@ const filteredData = data.filter((row) => {
             </p>
 
             <h2 className="text-5xl font-bold text-green-600 mt-3">
-              0
-            </h2>
+  {activeEmployees}
+</h2>
           </div>
 
           <div className="bg-white border rounded-xl p-6 shadow-sm">
@@ -390,8 +854,8 @@ const filteredData = data.filter((row) => {
             </p>
 
             <h2 className="text-5xl font-bold text-purple-600 mt-3">
-              41
-            </h2>
+  {employeeCount}
+</h2>
           </div>
 
         </div>
@@ -432,7 +896,7 @@ const filteredData = data.filter((row) => {
 
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 relative">
 
             <div className="relative">
 
@@ -441,36 +905,355 @@ const filteredData = data.filter((row) => {
                 className="absolute left-3 top-3"
               />
 
-              <input
-                placeholder="Search..."
-                className="bg-white border rounded-lg pl-10 py-3 pr-4"
-              />
+<input
+  value={searchText}
+  onChange={(e) =>
+    setSearchText(e.target.value)
+  }
+  placeholder="Search Invoice, Van, Customer..."
+  className="bg-white border rounded-lg pl-10 py-3 pr-4"
+/>
 
             </div>
 
-            <button className="bg-white border rounded-lg px-4 flex items-center gap-2">
-              <Filter size={16} />
-              Filters
-            </button>
+
+
+<button
+  onClick={() =>
+    setShowFilters(
+      !showFilters
+    )
+  }
+className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
+>
+  <Filter size={16} />
+  Filters
+</button>
+
+{showFilters && (
+  <div className="absolute right-0 top-14 bg-white border shadow-xl rounded-xl w-[380px] z-50 p-4">
+
+    <div className="max-h-[450px] overflow-auto">
+
+      <div className="font-bold mb-3">
+        Saudi
+      </div>
+
+      {[...new Set(data.map(row => row.Region))]
+        .filter(Boolean)
+        .sort()
+        .map(region => (
+
+          <div key={region}>
+
+            <div className="flex items-center gap-2 py-1">
+<input
+  type="checkbox"
+  checked={selectedRegions.includes(region)}
+  onChange={(e) => {
+
+    const regionCities = data
+      .filter(row => row.Region === region)
+      .map(row => row.City)
+      .filter(Boolean);
+
+    const regionVans = data
+      .filter(row => row.Region === region)
+      .map(row => row["Van Code."])
+      .filter(Boolean);
+
+    if (e.target.checked) {
+
+      setSelectedRegions(prev => [
+        ...new Set([...prev, region])
+      ]);
+
+      setSelectedCities(prev => [
+        ...new Set([
+          ...prev,
+          ...regionCities
+        ])
+      ]);
+
+      setSelectedVans(prev => [
+        ...new Set([
+          ...prev,
+          ...regionVans
+        ])
+      ]);
+
+    } else {
+
+      setSelectedRegions(prev =>
+        prev.filter(r => r !== region)
+      );
+
+      setSelectedCities(prev =>
+        prev.filter(
+          city => !regionCities.includes(city)
+        )
+      );
+
+      setSelectedVans(prev =>
+        prev.filter(
+          van => !regionVans.includes(van)
+        )
+      );
+
+    }
+  }}
+/>
+
+  <span
+    className="cursor-pointer"
+    onClick={() => toggleRegion(region)}
+  >
+    {expandedRegions.includes(region) ? "▼" : "▶"}
+  </span>
+
+  <span>{region}</span>
+</div>
+
+            {expandedRegions.includes(region) && (
+
+              <div className="ml-5">
+
+                {[...new Set(
+                  data
+                    .filter(row => row.Region === region)
+                    .map(row => row.City)
+                )]
+                  .filter(Boolean)
+                  .sort()
+                  .map(city => (
+
+                    <div key={`${region}-${city}`}>
+
+                      <div className="flex items-center gap-2 py-1">
+<input
+  type="checkbox"
+  checked={selectedCities.includes(city)}
+  onChange={(e) => {
+
+    const cityVans = data
+      .filter(
+        row =>
+          row.Region === region &&
+          row.City === city
+      )
+      .map(row => row["Van Code."])
+      .filter(Boolean);
+
+    if (e.target.checked) {
+
+      setSelectedCities(prev => [
+        ...new Set([...prev, city])
+      ]);
+
+      setSelectedVans(prev => [
+        ...new Set([
+          ...prev,
+          ...cityVans
+        ])
+      ]);
+
+    } else {
+
+      setSelectedCities(prev =>
+        prev.filter(c => c !== city)
+      );
+
+      setSelectedVans(prev =>
+        prev.filter(
+          van => !cityVans.includes(van)
+        )
+      );
+
+    }
+  }}
+/>
+
+  <span
+    className="cursor-pointer"
+    onClick={() =>
+      toggleCity(`${region}-${city}`)
+    }
+  >
+    {expandedCities.includes(`${region}-${city}`)
+      ? "▼"
+      : "▶"}
+  </span>
+
+  <span>{city}</span>
+</div>
+                      {expandedCities.includes(
+                        `${region}-${city}`
+                      ) && (
+
+                        <div className="ml-5">
+
+                          {[...new Set(
+                            data
+                              .filter(
+                                row =>
+                                  row.Region === region &&
+                                  row.City === city
+                              )
+                              .map(
+                                row => row["Van Code."]
+                              )
+                          )]
+                            .filter(Boolean)
+                            .sort()
+                            .map(van => (
+
+                              <label
+                                key={van}
+                                className="flex gap-2 py-1"
+                              >
+                                <input
+  type="checkbox"
+  checked={selectedCities.includes(city)}
+  onChange={(e) => {
+
+    const cityVans = data
+      .filter(
+        row =>
+          row.Region === region &&
+          row.City === city
+      )
+      .map(row => row["Van Code."])
+      .filter(Boolean);
+
+    if (e.target.checked) {
+
+      setSelectedCities(prev => [
+        ...new Set([...prev, city])
+      ]);
+
+      setSelectedVans(prev => [
+        ...new Set([
+          ...prev,
+          ...cityVans
+        ])
+      ]);
+
+    } else {
+
+      setSelectedCities(prev =>
+        prev.filter(c => c !== city)
+      );
+
+      setSelectedVans(prev =>
+        prev.filter(
+          van => !cityVans.includes(van)
+        )
+      );
+
+    }
+  }}
+/>
+
+                                {van}
+
+                              </label>
+
+                            ))}
+
+                        </div>
+
+                      )}
+
+                    </div>
+
+                  ))}
+
+              </div>
+
+            )}
 
           </div>
 
+        ))}
+
+    </div>
+
+    <div className="flex gap-2 mt-4">
+
+      <button
+        className="bg-red-600 text-white px-4 py-2 rounded-lg"
+        onClick={() => {
+          setSelectedRegions([]);
+          setSelectedCities([]);
+          setSelectedVans([]);
+        }}
+      >
+        Clear
+      </button>
+
+      <button
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+        onClick={() => setShowFilters(false)}
+      >
+        Apply
+      </button>
+
+    </div>
+
+  </div>
+)}
+</div>
+</div>
+
+{/* Alert */}
+        {data.length > 0 && (
+
+  <div className="bg-white border rounded-xl p-5 mb-6">
+
+    <h3 className="font-bold text-lg mb-4">
+      Import Status
+    </h3>
+
+    <div className="space-y-3">
+
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+
+        <div className="font-semibold text-blue-700">
+          Credit File
         </div>
 
-        {/* Alert */}
-        {data.length > 0 && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-            <p className="font-bold text-green-700">
-              File Imported Successfully
-            </p>
+        <div className="text-sm text-slate-600">
+          {creditFileInfo || "Not Imported"}
+        </div>
 
-            <p className="mt-2">
-              Block Records:
-              {" "}
-              {filteredData.length}
-            </p>
-          </div>
-        )}
+      </div>
+
+      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+
+        <div className="font-semibold text-green-700">
+          Collection File
+        </div>
+
+        <div className="text-sm text-slate-600">
+          {collectionFileInfo || "Not Imported"}
+        </div>
+
+      </div>
+
+      <div className="text-sm text-slate-500">
+
+        Active Block Records:
+        <span className="font-bold ml-2">
+          {blockedCount}
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
 
         <div className="grid grid-cols-3 gap-6">
 
@@ -478,106 +1261,10 @@ const filteredData = data.filter((row) => {
           <div className="col-span-2 bg-white rounded-xl border shadow-sm p-5">
 
             <h3 className="font-bold text-xl mb-5">
-              Invoices
-            </h3>
-<div className="flex gap-3 mb-4">
+  Invoices
+</h3>
 
-  <select
-  value={selectedRegion}
-onChange={(e) => {
-  setSelectedRegion(e.target.value);
-  setSelectedCity("");
-  setSelectedVan("");
-}}
-  className="border rounded-lg px-3 py-2"
->
-  <option value="">
-    All Regions
-  </option>
 
-  {[...new Set(data.map((r) => r.Region))]
-    .filter(Boolean)
-    .map((region) => (
-      <option
-        key={region}
-        value={region}
-      >
-        {region}
-      </option>
-    ))}
-</select>
-
-<select
-  value={selectedCity}
-onChange={(e) => {
-  setSelectedCity(e.target.value);
-  setSelectedVan("");
-}}
-  className="border rounded-lg px-3 py-2"
->
-  <option value="">
-    All Cities
-  </option>
-
-  {[
-  ...new Set(
-    data
-      .filter(
-        (r) =>
-          !selectedRegion ||
-          r.Region === selectedRegion
-      )
-      .map((r) => r.City)
-  ),
-]
-    .filter(Boolean)
-    .map((city) => (
-      <option
-        key={city}
-        value={city}
-      >
-        {city}
-      </option>
-    ))}
-</select>
-
-<select
-  value={selectedVan}
-  onChange={(e) =>
-    setSelectedVan(e.target.value)
-  }
-  className="border rounded-lg px-3 py-2"
->
-  <option value="">
-    All Vans
-  </option>
-
-  {[
-  ...new Set(
-    data
-      .filter((r) => {
-        return (
-          (!selectedRegion ||
-            r.Region === selectedRegion) &&
-          (!selectedCity ||
-            r.City === selectedCity)
-        );
-      })
-      .map((r) => r["Van Code."])
-  ),
-]
-    .filter(Boolean)
-    .map((van) => (
-      <option
-        key={van}
-        value={van}
-      >
-        {van}
-      </option>
-    ))}
-</select>
-
-</div>
             <div className="overflow-auto max-h-[600px]">
 
               <table className="min-w-[1700px] text-sm">
@@ -607,35 +1294,36 @@ onChange={(e) => {
 
                 <tbody>
 
-                  {data
-  .filter((row) => {
-    return (
-      (!selectedRegion ||
-        row["Region"] === selectedRegion) &&
-
-      (!selectedCity ||
-        row["City"] === selectedCity) &&
-
-      (!selectedVan ||
-        row["Van Code."] === selectedVan)
-    );
-  })
-  .map((row, index) => (
-<tr
+                 {filteredData.map((row, index) => (
+                  <tr
   key={index}
   className="border-b"
   style={{
-    backgroundColor:
-      exceptions.some(
-  (e) =>
-    String(e.invoice)
-      .replace(/\s/g, "") ===
-    String(row["Invoice #"])
-      .replace(/\s/g, "")
-)
-        ? "#FFCB96"
-        : "",
-  }}
+  backgroundColor:
+
+    collectedInvoices.some(
+      (invoice) =>
+        invoice ===
+        String(
+          row["Invoice #"]
+        ).replace(/\s/g, "")
+    )
+
+      ? "#C6EFCE"
+
+      : exceptions.some(
+          (e) =>
+            String(e.invoice)
+              .replace(/\s/g, "") ===
+            String(
+              row["Invoice #"]
+            ).replace(/\s/g, "")
+        )
+
+      ? "#FFCB96"
+
+      : "",
+}}
 >
                       <td className="p-3">
   {row["Van Code."]}
@@ -987,8 +1675,8 @@ const daysLeft =
         <div className="text-center">
 
           <div className="text-3xl font-bold">
-            {filteredData.length}
-          </div>
+  {blockedCount}
+</div>
 
           <div className="text-sm text-gray-500">
             Block
