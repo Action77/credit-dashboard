@@ -32,16 +32,11 @@ export default function Home() {
     useState("");
 
   const [exceptions, setExceptions] =
-    useState<any[]>([]);
-const [exceptions, setExceptions] =
   useState<any[]>([]);
 
 const [collectedInvoices,
   setCollectedInvoices] =
   useState<string[]>([]);
-
-const [invoiceNo, setInvoiceNo] =
-  useState("");
 
 const [invoiceNo, setInvoiceNo] =
   useState("");
