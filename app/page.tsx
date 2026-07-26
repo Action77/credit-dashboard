@@ -240,6 +240,12 @@ localStorage.setItem(
     setCollectedInvoices(
       invoices
     );
+    console.log("Collection Invoices:");
+console.log(invoices);
+
+setCollectedInvoices(
+  invoices
+);
   };
 
   reader.readAsBinaryString(
