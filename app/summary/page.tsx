@@ -622,15 +622,15 @@ Amount
             }
 
             localStorage.setItem(
-              "currentUser",
-              JSON.stringify(user)
-            );
+  "currentUser",
+  user.id
+);
 
-            setIsLoggedIn(true);
-            setShowLoginModal(false);
+setIsLoggedIn(true);
+setShowLoginModal(false);
 
-            setUsername("");
-            setPassword("");
+setUsername("");
+setPassword("");
           }}
         >
           Login
