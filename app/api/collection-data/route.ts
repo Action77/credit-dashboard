@@ -30,8 +30,10 @@ export async function GET() {
       (row: any) => row.invoice
     ),
     fileInfo:
-      data.length > 0
-        ? `Uploaded By ${data[0].uploaded_by}`
-        : "",
+  data.length > 0
+    ? `Uploaded By ${data[0].uploaded_by} | ${new Date(
+        data[0].created_at
+      ).toLocaleString()}`
+    : "",
   });
 }
