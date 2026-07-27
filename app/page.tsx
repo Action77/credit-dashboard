@@ -285,14 +285,12 @@ useEffect(() => {
   }
 
   fetch("/api/collection-data")
-    .then(res => res.json())
-    .then(data => {
-
-      setCollectionFileInfo(
-        data.fileInfo || ""
-      );
-
-    });
+  .then(res => res.json())
+  .then(data => {
+    setCollectionFileInfo(
+      data.fileInfo || ""
+    );
+  });
 
 }, []);
 useEffect(() => {
@@ -414,7 +412,13 @@ localStorage.setItem(
 
 
   if (!file) return;
+const formData = new FormData();
+formData.append("file", file);
 
+fetch("/api/collection-upload", {
+  method: "POST",
+  body: formData,
+});
   const reader =
     new FileReader();
 
