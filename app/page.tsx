@@ -1043,7 +1043,7 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
         Saudi
       </div>
 
-      {[...new Set(data.map(row => row.Region))]
+      {[...new Set(data.map(row => row["Region"]))]
         .filter(Boolean)
         .sort()
         .map(region => (
@@ -1071,9 +1071,10 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
               <div className="ml-5">
 
                 {[...new Set(
-                  data
-                    .filter(row => row.Region === region)
-                    .map(row => row.City)
+data
+  .filter(row => row["Region"] === region)
+  .map(row => row["City"])
+
                 )]
                   .filter(Boolean)
                   .sort()
@@ -1090,8 +1091,8 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
     const cityVans = data
       .filter(
         row =>
-          row.Region === region &&
-          row.City === city
+          row["Region"] === region &&
+row["City"] === city
       )
       .map(row => row["Van Code."])
       .filter(Boolean);
@@ -1148,8 +1149,8 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
                             data
                               .filter(
                                 row =>
-                                  row.Region === region &&
-                                  row.City === city
+                                  row["Region"] === region &&
+                                  row["City"] === city
                               )
                               .map(
                                 row => row["Van Code."]
@@ -1171,8 +1172,8 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
     const cityVans = data
       .filter(
         row =>
-          row.Region === region &&
-          row.City === city
+          row["Region"] === region &&
+          row["City"] === city
       )
       .map(row => row["Van Code."])
       .filter(Boolean);
