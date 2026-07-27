@@ -917,18 +917,22 @@ return (
     Invoices
   </div>
 
-  <div className="flex items-center gap-3 px-4 py-3">
-    <AlertCircle size={18} />
-    Exceptions
-  </div>
+<Link
+  href="/exceptions"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <AlertCircle size={18} />
+  <span>Exceptions</span>
+</Link>
+
 
 <Link
   href="/summary"
   className="flex items-center gap-3 px-4 py-3"
 >
-<BarChart3 size={18} />
-  Summary
-  </Link>
+  <BarChart3 size={18} />
+  <span>Summary</span>
+</Link>
 
   <div className="flex items-center gap-3 px-4 py-3">
     <BarChart3 size={18} />
