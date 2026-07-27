@@ -507,19 +507,17 @@ const filteredData = filterBaseData.filter(
     const invoice =
       String(
         row["Invoice #"]
-      ).replace(/\s/g, "");
-
-    const isException =
-      exceptions.some(
-        (e) =>
-          String(e.invoice)
-            .replace(/\s/g, "") ===
-          invoice
-      );
+      )
+        .replace(/\s/g, "")
+        .toUpperCase();
 
     const isCollected =
       collectedInvoices.some(
-        (i) => i === invoice
+        (i) =>
+          String(i)
+            .replace(/\s/g, "")
+            .toUpperCase() ===
+          invoice
       );
 
     const matchesWhatsappVan =
@@ -527,7 +525,6 @@ const filteredData = filterBaseData.filter(
       row["Van Code."] === whatsAppVan;
 
     return (
-      !isException &&
       !isCollected &&
       matchesWhatsappVan
     );
@@ -1457,38 +1454,36 @@ await localStorage.setItem(
   key={index}
   className="border-b"
   style={{
-    backgroundColor:
+  backgroundColor:
 
-      collectedInvoices.some(
-        invoice =>
-          String(invoice)
-            .replace(/\s/g, "")
-            .toUpperCase() ===
-          String(
-            row["Invoice #"]
-          )
-            .replace(/\s/g, "")
-            .toUpperCase()
-      )
+    exceptions.some(
+      e =>
+        String(e.invoice)
+          .replace(/\s/g, "")
+          .toUpperCase() ===
+        String(
+          row["Invoice #"]
+        )
+          .replace(/\s/g, "")
+          .toUpperCase()
+    )
+      ? "#FFCB96"
 
-        ? "#C6EFCE"
+      : collectedInvoices.some(
+          invoice =>
+            String(invoice)
+              .replace(/\s/g, "")
+              .toUpperCase() ===
+            String(
+              row["Invoice #"]
+            )
+              .replace(/\s/g, "")
+              .toUpperCase()
+        )
 
-        : exceptions.some(
-            e =>
-              String(e.invoice)
-                .replace(/\s/g, "")
-                .toUpperCase() ===
-              String(
-                row["Invoice #"]
-              )
-                .replace(/\s/g, "")
-                .toUpperCase()
-          )
-
-        ? "#FFCB96"
-
-        : "",
-  }}
+      ? "#C6EFCE"
+      : "",
+}}
 >
                       <td className="p-3">
   {row["Van Code."]}
