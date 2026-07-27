@@ -959,21 +959,25 @@ return (
 
     if (isLoggedIn) {
 
-      localStorage.removeItem("currentUser");
+  localStorage.removeItem("currentUser");
 
-      setIsLoggedIn(false);
+  setIsLoggedIn(false);
 
-      setCurrentUser("");
+  setCurrentUser("");
 
-      setUsername("");
+  setExceptions([]);
 
-      setPassword("");
+  setLoadedExceptions(false);
 
-    } else {
+  setUsername("");
 
-      setShowLoginModal(true);
+  setPassword("");
 
-    }
+} else {
+
+  setShowLoginModal(true);
+
+}
 
   }}
 >
