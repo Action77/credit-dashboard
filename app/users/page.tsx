@@ -16,6 +16,11 @@ import * as XLSX from "xlsx";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
+  const [editingId, setEditingId] =
+  useState<number | null>(null);
+
+const [editData, setEditData] =
+  useState<any>({});
   const [search, setSearch] = useState("");
 
   const [regionFilter, setRegionFilter] =
@@ -29,7 +34,26 @@ export default function UsersPage() {
 
   const [vanFilter, setVanFilter] =
     useState("");
+const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+const [showLoginModal, setShowLoginModal] = useState(false);
+
+const [username, setUsername] = useState("");
+
+const [password, setPassword] = useState("");
+
+const usersLogin = [
+  {
+    username: "halyousif",
+    password: "123456",
+    id: "user1",
+  },
+  {
+    username: "nelson",
+    password: "123456",
+    id: "user2",
+  },
+];
   const loadUsers = async () => {
 
   const response =
@@ -48,8 +72,11 @@ export default function UsersPage() {
 };
 useEffect(() => {
   loadUsers();
+
+  const currentUser = localStorage.getItem("currentUser");
+  setIsLoggedIn(!!currentUser);
 }, []);
-  const handleImport = (
+const handleImport = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
 
@@ -158,38 +185,39 @@ loadUsers();
       loadUsers();
     };
 
-  const handleEdit =
-    async (user: any) => {
+  const handleEdit = (
+  user: any
+) => {
 
-      const contact =
-        prompt(
-          "Contact",
-          user.contact
-        );
+  console.log("USER =", user);
+  console.log("USER ID =", user.id);
+  console.log("USER CODE =", user.user_code);
 
-      if (
-        contact === null
-      )
-        return;
+  setEditingId(user.id);
+  setEditData(user);
+};
+const handleSave =
+  async () => {
 
-      await fetch(
-        "/api/users",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            ...user,
-            contact,
-          }),
-        }
-      );
+    await fetch(
+      "/api/users",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify(
+          editData
+        ),
+      }
+    );
 
-      loadUsers();
-    };
+    setEditingId(null);
+    setEditData({});
 
+    loadUsers();
+  };
   const filteredUsers =
     users.filter((user) => {
 
@@ -228,7 +256,8 @@ loadUsers();
     });
 
 return (
-<div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
+<>
+  <div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
 
       {/* Sidebar */}
       <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
@@ -242,66 +271,113 @@ return (
     <nav className="px-4 space-y-2">
 
   <Link
-  href="/"
-  className="flex items-center gap-3 px-4 py-3"
->
-  <LayoutDashboard size={18} />
-  <span>Dashboard</span>
-</Link>
+    href="/"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <LayoutDashboard size={18} />
+    <span>Dashboard</span>
+  </Link>
 
-  <div className="flex items-center gap-3 px-4 py-3">
+  <Link
+    href="/import"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
     <Upload size={18} />
-    Import File
-  </div>
+    <span>Import File</span>
+  </Link>
 
-  <div className="flex items-center gap-3 px-4 py-3">
+  <Link
+    href="/invoices"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
     <FileText size={18} />
-    Invoices
-  </div>
+    <span>Invoices</span>
+  </Link>
 
-  <div className="flex items-center gap-3 px-4 py-3">
+  <Link
+    href="/exceptions"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
     <AlertCircle size={18} />
-    Exceptions
-  </div>
+    <span>Exceptions</span>
+  </Link>
 
-  <div className="flex items-center gap-3 px-4 py-3">
+  <Link
+    href="/summary"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
     <BarChart3 size={18} />
-    Summary
-  </div>
+    <span>Summary</span>
+  </Link>
 
-  <div className="flex items-center gap-3 px-4 py-3">
+  <Link
+    href="/reports"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
     <BarChart3 size={18} />
-    Reports
-  </div>
+    <span>Reports</span>
+  </Link>
 
-  <div className="flex items-center gap-3 px-4 py-3">
+  <Link
+    href="/settings"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
     <Settings size={18} />
-    Settings
-  </div>
+    <span>Settings</span>
+  </Link>
 
-<Link
-  href="/users"
-  className="flex items-center gap-3 px-4 py-3"
->
-  <Users size={18} />
-  Users
-</Link>
+  <Link
+    href="/users"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"
+  >
+    <Users size={18} />
+    <span>Users</span>
+  </Link>
 
 </nav>
 
 
       <div className="p-6 border-t border-white/10">
-        <div
-          className="flex items-center gap-3 cursor-pointer bg-red-600 p-3 rounded-lg"
-          onClick={() => {
-            localStorage.removeItem("currentUser");
-            window.location.href = "/";
-          }}
-        >
-          <LogOut size={18} />
-          Logout
-        </div>
-      </div>
+
+  {isLoggedIn ? (
+<div
+  className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg ${
+    isLoggedIn ? "bg-red-600" : "bg-blue-600"
+  }`}
+  onClick={() => {
+    if (isLoggedIn) {
+      localStorage.removeItem("currentUser");
+      setIsLoggedIn(false);
+      setUsername("");
+      setPassword("");
+    } else {
+      setShowLoginModal(true);
+    }
+  }}
+>
+  {isLoggedIn ? (
+    <>
+      <LogOut size={18} />
+      Logout
+    </>
+  ) : (
+    <>
+      <Users size={18} />
+      Login
+    </>
+  )}
+</div>
+  ) : (
+<div
+  className="flex items-center gap-3 bg-blue-600 p-3 rounded-lg cursor-pointer"
+  onClick={() => setShowLoginModal(true)}
+>
+  <Users size={18} />
+  Login
+</div>
+  )}
+
+</div>
 
     </aside>
 
@@ -313,18 +389,18 @@ return (
           Users
         </h1>
 
-        <label className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer">
-          Import Users
+        {isLoggedIn && (
+  <label className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer">
+    Import Users
 
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            className="hidden"
-            onChange={
-              handleImport
-            }
-          />
-        </label>
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleImport}
+    />
+  </label>
+)}
 
       </div>
 
@@ -507,54 +583,162 @@ return (
                 className="border-b"
               >
                 <td className="p-2">
-                  {user.region}
-                </td>
+  {editingId === user.id ? (
+    <input
+      value={editData.region || ""}
+      onChange={(e) =>
+        setEditData({
+          ...editData,
+          region: e.target.value,
+        })
+      }
+      className="border p-1 w-full"
+    />
+  ) : (
+    user.region
+  )}
+</td>
 
-                <td className="p-2">
-                  {user.city}
-                </td>
+<td className="p-2">
+  {editingId === user.id ? (
+    <input
+      value={editData.city || ""}
+      onChange={(e) =>
+        setEditData({
+          ...editData,
+          city: e.target.value,
+        })
+      }
+      className="border p-1 w-full"
+    />
+  ) : (
+    user.city
+  )}
+</td>
 
-                <td className="p-2">
-                  {user.organization_code}
-                </td>
+<td className="p-2">
+  {editingId === user.id ? (
+    <input
+      value={editData.organization_code || ""}
+      onChange={(e) =>
+        setEditData({
+          ...editData,
+          organization_code:
+            e.target.value,
+        })
+      }
+      className="border p-1 w-full"
+    />
+  ) : (
+    user.organization_code
+  )}
+</td>
 
-                <td className="p-2">
-                  {user.user_code}
-                </td>
+<td className="p-2">
+  {editingId === user.id ? (
+    <input
+      value={editData.user_code || ""}
+      onChange={(e) =>
+        setEditData({
+          ...editData,
+          user_code:
+            e.target.value,
+        })
+      }
+      className="border p-1 w-full"
+    />
+  ) : (
+    user.user_code
+  )}
+</td>
 
-                <td className="p-2">
-                  {user.organization_name}
-                </td>
+<td className="p-2">
+  {editingId === user.id ? (
+    <input
+      value={
+        editData.organization_name ||
+        ""
+      }
+      onChange={(e) =>
+        setEditData({
+          ...editData,
+          organization_name:
+            e.target.value,
+        })
+      }
+      className="border p-1 w-full"
+    />
+  ) : (
+    user.organization_name
+  )}
+</td>
 
-                <td className="p-2">
-                  {user.van_sub_inventory}
-                </td>
+<td className="p-2">
+  {editingId === user.id ? (
+    <input
+      value={
+        editData.van_sub_inventory ||
+        ""
+      }
+      onChange={(e) =>
+        setEditData({
+          ...editData,
+          van_sub_inventory:
+            e.target.value,
+        })
+      }
+      className="border p-1 w-full"
+    />
+  ) : (
+    user.van_sub_inventory
+  )}
+</td>
 
-                <td className="p-2">
-                  {user.contact}
-                </td>
+<td className="p-2">
+  {editingId === user.id ? (
+    <input
+      value={editData.contact || ""}
+      onChange={(e) =>
+        setEditData({
+          ...editData,
+          contact:
+            e.target.value,
+        })
+      }
+      className="border p-1 w-full"
+    />
+  ) : (
+    user.contact
+  )}
+</td>
 
                 <td className="p-2 flex gap-2">
 
-                  <button
-                    className="bg-blue-600 text-white px-3 py-1 rounded"
-                    onClick={() =>
-                      handleEdit(user)
-                    }
-                  >
-                    Edit
-                  </button>
+                  {isLoggedIn &&
+  (editingId === user.id ? (
+    <button
+      className="bg-green-600 text-white px-3 py-1 rounded"
+      onClick={handleSave}
+    >
+      Save
+    </button>
+  ) : (
+    <button
+      className="bg-blue-600 text-white px-3 py-1 rounded"
+      onClick={() => handleEdit(user)}
+    >
+      Edit
+    </button>
+  ))}
 
-                  <button
-                    className="bg-red-600 text-white px-3 py-1 rounded"
-                    onClick={() =>
-                      handleDelete(
-                        user.id
-                      )
-                    }
-                  >
-                    Delete
-                  </button>
+{isLoggedIn && (
+  <button
+    className="bg-red-600 text-white px-3 py-1 rounded"
+    onClick={() => handleDelete(user.id)}
+  >
+    Delete
+  </button>
+)}
 
                 </td>
 
@@ -571,5 +755,68 @@ return (
     </main>
 
   </div>
+
+  {showLoginModal && (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center">
+
+      <div className="bg-white w-[420px] rounded-2xl shadow-2xl p-8">
+
+        <h2 className="text-3xl font-bold text-center mb-6">
+          Login
+        </h2>
+
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="w-full border p-3 rounded-xl mb-4"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full border p-3 rounded-xl mb-4"
+        />
+
+        <button
+          className="w-full bg-blue-600 text-white py-3 rounded-xl"
+          onClick={() => {
+
+            const user = usersLogin.find(
+              u =>
+                u.username === username &&
+                u.password === password
+            );
+
+            if (!user) {
+              alert("Invalid Username or Password");
+              return;
+            }
+
+            localStorage.setItem("currentUser", user.id);
+            setIsLoggedIn(true);
+            setShowLoginModal(false);
+
+          }}
+        >
+          Login
+        </button>
+
+        <button
+          className="w-full mt-3 border py-3 rounded-xl"
+          onClick={() => setShowLoginModal(false)}
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </div>
+  )}
+
+</>
 );
 }

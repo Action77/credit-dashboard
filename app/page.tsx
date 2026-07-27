@@ -50,7 +50,7 @@ const [searchText, setSearchText] =
 const [isLoggedIn,
   setIsLoggedIn] =
   useState(false);
-
+const [showLoginModal, setShowLoginModal] = useState(false);
 const [username,
   setUsername] =
   useState("");
@@ -70,6 +70,10 @@ const [expandedCities,
 
 const [collectedInvoices,
   setCollectedInvoices] =
+  useState<string[]>([]);
+
+const [lastUpdatedVans,
+  setLastUpdatedVans] =
   useState<string[]>([]);
 
 const [invoiceNo, setInvoiceNo] =
@@ -204,7 +208,31 @@ localStorage.setItem(
   selectedCities,
   selectedVans,
 ]);
+useEffect(() => {
 
+  localStorage.setItem(
+    "summaryFilters",
+
+    JSON.stringify({
+
+      regions:
+        selectedRegions,
+
+      cities:
+        selectedCities,
+
+      vans:
+        selectedVans,
+
+    })
+
+  );
+
+}, [
+  selectedRegions,
+  selectedCities,
+  selectedVans,
+]);
 useEffect(() => {
 
   if (!loadedExceptions)
@@ -325,14 +353,29 @@ const creditFileDate =
         );
 
       const blockedRows =
-        jsonData.filter((row) =>
-          String(
-            row["Status User Block"] || ""
-          )
-            .trim()
-            .toLowerCase() === "block"
-        );
-setData(blockedRows);
+  jsonData.filter((row) => {
+
+    const userBlock =
+      String(
+        row["Status User Block"] || ""
+      )
+        .trim()
+        .toLowerCase();
+
+    const invoiceStatus =
+      String(
+        row["Invoice status (Due/ Overdue)"] || ""
+      )
+        .trim()
+        .toLowerCase();
+
+    return (
+      userBlock === "block" &&
+      !invoiceStatus.includes("legal")
+    );
+
+  });
+  setData(blockedRows);
 
 setCreditFileInfo(
   `${file.name} | ${creditFileDate}`
@@ -422,7 +465,48 @@ return (
 
     console.log("Collection Invoices:");
 console.log(invoices);
+const previousInvoices =
+  JSON.parse(
+    localStorage.getItem(
+      "collectedInvoices"
+    ) || "[]"
+  );
 
+const newCollected =
+  invoices.filter(
+    (invoice) =>
+      !previousInvoices.includes(
+        invoice
+      )
+  );
+
+const affectedVans = [
+  ...new Set(
+    data
+      .filter((row) =>
+        newCollected.includes(
+          String(
+            row["Invoice #"]
+          ).replace(/\s/g, "")
+        )
+      )
+      .map(
+        (row) =>
+          row["Van Code."]
+      )
+  ),
+];
+
+setLastUpdatedVans(
+  affectedVans
+);
+
+localStorage.setItem(
+  "lastUpdatedVans",
+  JSON.stringify(
+    affectedVans
+  )
+);
 setCollectedInvoices(
   invoices
 );
@@ -773,82 +857,7 @@ const whatsappData =
       row["Van Code."] ===
       whatsAppVan
   );
-  if (!isLoggedIn) {
-
-  return (
-
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-
-      <div className="bg-white p-8 rounded-xl shadow-lg w-[400px]">
-
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Login
-        </h2>
-
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) =>
-            setUsername(e.target.value)
-          }
-          className="w-full border p-3 rounded-lg mb-4"
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          className="w-full border p-3 rounded-lg mb-4"
-        />
-
-        <button
-          className="w-full bg-blue-600 text-white py-3 rounded-lg"
-          onClick={() => {
-
-            const user =
-              users.find(
-                u =>
-                  u.username === username &&
-                  u.password === password
-              );
-
-            if (!user) {
-
-              alert(
-                "Invalid Username or Password"
-              );
-
-              return;
-
-            }
-
-            setCurrentUser(
-              user.id
-            );
-
-            setIsLoggedIn(true);
-
-            localStorage.setItem(
-              "currentUser",
-              user.id
-            );
-
-          }}
-        >
-          Login
-        </button>
-
-      </div>
-
-    </div>
-
-  );
-
-}
+  
 
 return (
 <>
@@ -901,10 +910,13 @@ return (
     Exceptions
   </div>
 
-  <div className="flex items-center gap-3 px-4 py-3">
-    <BarChart3 size={18} />
-    Summary
-  </div>
+<Link
+  href="/summary"
+  className="flex items-center gap-3 px-4 py-3"
+>
+<BarChart3 size={18} />
+  Summary
+  </Link>
 
   <div className="flex items-center gap-3 px-4 py-3">
     <BarChart3 size={18} />
@@ -925,21 +937,47 @@ return (
 </Link>
 
 </nav>
-  <div className="p-6 border-t border-white/10">
-    <div
-      className="flex items-center gap-3 cursor-pointer bg-red-600 p-3 rounded-lg"
-      onClick={() => {
-        localStorage.removeItem("currentUser");
-        setIsLoggedIn(false);
-        setCurrentUser("");
-        setUsername("");
-        setPassword("");
-      }}
-    >
-      <LogOut size={18} />
-      Logout
-    </div>
-  </div>
+  <div
+  className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg ${
+    isLoggedIn
+      ? "bg-red-600"
+      : "bg-blue-600"
+  }`}
+  onClick={() => {
+
+    if (isLoggedIn) {
+
+      localStorage.removeItem("currentUser");
+
+      setIsLoggedIn(false);
+
+      setCurrentUser("");
+
+      setUsername("");
+
+      setPassword("");
+
+    } else {
+
+      setShowLoginModal(true);
+
+    }
+
+  }}
+>
+  {isLoggedIn ? (
+  <>
+    <LogOut size={18} />
+    Logout
+  </>
+) : (
+  <>
+    <Users size={18} />
+    Login
+  </>
+)}
+</div>
+ 
   
 </aside>
 
@@ -958,20 +996,7 @@ return (
               Today: {new Date().toLocaleDateString()}
             </span>
 
-<button
-  onClick={() => {
-    localStorage.removeItem(
-      "currentUser"
-    );
 
-    setIsLoggedIn(false);
-
-    setCurrentUser("");
-  }}
-  className="bg-red-600 text-white px-4 py-2 rounded-lg"
->
-  Logout
-</button>
           </div>
         </div>
 
@@ -1025,35 +1050,39 @@ return (
 
           <div className="flex gap-3">
 
-            <label className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg cursor-pointer">
+            {isLoggedIn && (
 
-              Import Credit
+  <label className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg cursor-pointer">
 
-              <input
-                type="file"
-                accept=".xlsx,.xls"
-                className="hidden"
-                onChange={handleCreditImport}
-              />
-            </label>
+    Import Credit
 
-<label className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg cursor-pointer">
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleCreditImport}
+    />
 
-  Import Collection
+  </label>
 
-  <input
-    type="file"
-    accept=".xlsx,.xls"
-    className="hidden"
-    onChange={handleCollectionImport}
-  />
+)}
+{isLoggedIn && (
 
-</label>
+  <label className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg cursor-pointer">
 
-            <button className="bg-white border px-5 py-3 rounded-lg">
-              Refresh Data
-            </button>
+    Import Collection
 
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleCollectionImport}
+    />
+
+  </label>
+
+)}
+            
           </div>
 
           <div className="flex gap-3 relative">
@@ -1600,28 +1629,35 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
               Exception Invoices
             </h3>
 
-<input
-  value={invoiceNo}
-  onChange={(e) =>
-    setInvoiceNo(e.target.value)
-  }
-  placeholder="Invoice No."
-  className="w-full border rounded-lg p-3 mb-3"
-/>
-<input
-  type="date"
-  value={tillDate}
-  onChange={(e) =>
-    setTillDate(e.target.value)
-  }
-  className="w-full border rounded-lg p-3 mb-3"
-/>
+{isLoggedIn && (
+  <>
+    <input
+      value={invoiceNo}
+      onChange={(e) =>
+        setInvoiceNo(e.target.value)
+      }
+      placeholder="Invoice No."
+      className="w-full border rounded-lg p-3 mb-3"
+    />
+
+    <input
+      type="date"
+      value={tillDate}
+      onChange={(e) =>
+        setTillDate(e.target.value)
+      }
+      className="w-full border rounded-lg p-3 mb-3"
+    />
+  </>
+)}
 
             
 
         
 
-            <button
+{isLoggedIn && (
+
+<button
   className="bg-blue-600 text-white w-full py-3 rounded-lg"
   onClick={() => {
 
@@ -1659,9 +1695,12 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
     setInvoiceNo("");
     setTillDate("");
   }}
+
 >
   Add Exception
 </button>
+
+)}
             <div className="mt-8">
 
               <h4 className="font-bold mb-4">
@@ -1687,9 +1726,11 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
   Days
 </th>
 
-<th className="text-left p-2">
-  Delete
-</th>
+{isLoggedIn && (
+  <th className="text-left p-2">
+    Delete
+  </th>
+)}
 
     </tr>
 
@@ -1732,9 +1773,11 @@ const daysLeft =
             {daysLeft}
           </td>
           <td className="p-2">
-  <button
-    className="bg-red-600 text-white px-2 py-1 rounded"
-    onClick={() =>
+{isLoggedIn && (
+
+<button
+  className="bg-red-600 text-white px-2 py-1 rounded"
+  onClick={() =>
       setExceptions((prev) =>
         prev.filter(
           (_, i) => i !== index
@@ -1744,6 +1787,7 @@ const daysLeft =
   >
     X
   </button>
+  )}
 </td>
         </tr>
       );
@@ -1767,100 +1811,171 @@ const daysLeft =
 
   <div className="col-span-1 bg-white rounded-xl border shadow-sm p-5">
 
-    <h3 className="font-bold mb-4">
-      Summary by Employee
-    </h3>
+  <h3 className="font-bold mb-4">
+    Employees Cleared Today
+  </h3>
 
-    <table className="w-full text-sm">
+  <table className="w-full text-sm">
 
-      <thead>
-        <tr className="border-b">
-          <th className="text-left p-2">
-            Employee
-          </th>
+    <thead>
+      <tr className="border-b">
+        <th className="text-left p-2">
+          Employee
+        </th>
 
-          <th className="text-left p-2">
-            Total
-          </th>
+        <th className="text-left p-2">
+          Cleared
+        </th>
+      </tr>
+    </thead>
 
-          <th className="text-left p-2">
-            Block
-          </th>
-        </tr>
-      </thead>
+    <tbody>
 
-      <tbody>
+      {Object.entries(
 
-        <tr>
-          <td className="p-2">
-            Nelson
-          </td>
+        data.reduce(
+          (acc: any, row) => {
 
-          <td className="p-2">
-            213
-          </td>
+            const invoice =
+              String(
+                row["Invoice #"]
+              ).replace(/\s/g, "");
 
-          <td className="p-2 text-red-600">
-            213
-          </td>
-        </tr>
+            const employee =
+              row["Employee Name."];
 
-        <tr>
-          <td className="p-2">
-            Hossam
-          </td>
+            const isException =
+              exceptions.some(
+                (e) =>
+                  String(e.invoice)
+                    .replace(/\s/g, "") ===
+                  invoice
+              );
 
-          <td className="p-2">
-            187
-          </td>
+            const isCollected =
+              collectedInvoices.some(
+                (i) => i === invoice
+              );
 
-          <td className="p-2 text-red-600">
-            187
-          </td>
-        </tr>
+            if (
+              isException ||
+              isCollected
+            ) {
 
-      </tbody>
+              acc[employee] =
+                (acc[employee] || 0) + 1;
 
-    </table>
+            }
+
+            return acc;
+
+          },
+          {}
+        )
+
+      )
+
+        .sort(
+          (a: any, b: any) =>
+            Number(b[1]) - Number(a[1])
+        )
+
+        .slice(0, 5)
+
+        .map(
+          ([employee, total]: any) => (
+
+            <tr key={employee}>
+
+              <td className="p-2">
+                {employee}
+              </td>
+
+              <td className="p-2 text-green-600 font-semibold">
+                {total}
+              </td>
+
+            </tr>
+
+          )
+        )}
+
+    </tbody>
+
+  </table>
+
+</div>
+<div className="bg-white rounded-xl border shadow-sm p-5">
+
+  <h3 className="font-bold mb-4">
+    Top Vans With Blocks
+  </h3>
+
+  <div className="space-y-4">
+
+    {Object.entries(
+
+      filteredData.reduce(
+        (acc: any, row) => {
+
+          const van =
+            row["Van Code."];
+
+          acc[van] =
+            (acc[van] || 0) + 1;
+
+          return acc;
+
+        },
+        {}
+      )
+
+    )
+
+      .sort(
+        (a: any, b: any) =>
+          Number(b[1]) - Number(a[1])
+      )
+
+      .slice(0, 5)
+
+      .map(
+        ([van, total]: any) => (
+
+          <div key={van}>
+
+            <div className="flex justify-between mb-1">
+
+              <span>{van}</span>
+
+              <span className="font-semibold">
+                {total}
+              </span>
+
+            </div>
+
+            <div className="h-3 bg-slate-200 rounded-full">
+
+              <div
+                className="h-3 bg-blue-600 rounded-full"
+                style={{
+                  width: `${Math.min(
+                    Number(total) * 5,
+                    100
+                  )}%`,
+                }}
+              />
+
+            </div>
+
+          </div>
+
+        )
+      )}
 
   </div>
-    <div className="bg-white rounded-xl border shadow-sm p-5">
 
-    <h3 className="font-bold mb-4">
-      Top Employees
-    </h3>
-
-    <div className="space-y-4">
-
-      <div>
-
-        <div className="flex justify-between">
-          <span>Nelson</span>
-          <span>213</span>
-        </div>
-
-        <div className="h-3 bg-slate-200 rounded">
-          <div className="h-3 w-full bg-blue-600 rounded"></div>
-        </div>
-
-      </div>
-
-      <div>
-
-        <div className="flex justify-between">
-          <span>Hossam</span>
-          <span>187</span>
-        </div>
-
-        <div className="h-3 bg-slate-200 rounded">
-          <div className="h-3 w-4/5 bg-blue-600 rounded"></div>
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
+</div>
     <div className="bg-white rounded-xl border shadow-sm p-5">
 
     <h3 className="font-bold mb-4">
@@ -1890,9 +2005,94 @@ const daysLeft =
   </div>
 
 </div>
-      </main>
+           </main>
 
     </div>
+
+    {showLoginModal && (
+
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center">
+
+        <div className="bg-white w-[420px] rounded-2xl shadow-2xl p-8">
+
+          <div className="text-center mb-6">
+
+            <h2 className="text-3xl font-bold text-slate-800">
+              Welcome Back
+            </h2>
+
+            <p className="text-slate-500 mt-2">
+              Sign in to access management features
+            </p>
+
+          </div>
+
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) =>
+              setUsername(e.target.value)
+            }
+            className="w-full border p-3 rounded-xl mb-4"
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            className="w-full border p-3 rounded-xl mb-4"
+          />
+
+          <button
+            className="w-full bg-blue-600 text-white py-3 rounded-xl"
+            onClick={() => {
+
+              const user =
+                users.find(
+                  u =>
+                    u.username === username &&
+                    u.password === password
+                );
+
+              if (!user) {
+                alert("Invalid Username or Password");
+                return;
+              }
+
+              setCurrentUser(user.id);
+              setIsLoggedIn(true);
+
+              localStorage.setItem(
+                "currentUser",
+                user.id
+              );
+
+              setShowLoginModal(false);
+
+            }}
+          >
+            Login
+          </button>
+
+          <button
+            className="w-full mt-3 border py-3 rounded-xl"
+            onClick={() =>
+              setShowLoginModal(false)
+            }
+          >
+            Cancel
+          </button>
+
+        </div>
+
+      </div>
+
+       )}
+
   </>
-  );
+);
 }
