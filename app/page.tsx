@@ -92,48 +92,40 @@ const [loadedExceptions,
   setLoadedExceptions] =
   useState(false);
   useEffect(() => {
-  const saved =
-    localStorage.getItem(
-      "exceptions"
-    );
+
+  if (!currentUser) return;
+
+  const saved = localStorage.getItem(
+    `exceptions_${currentUser}`
+  );
 
   if (!saved) {
+    setExceptions([]);
     setLoadedExceptions(true);
     return;
   }
 
   const today = new Date();
-  today.setHours(
-    0,
-    0,
-    0,
-    0
+  today.setHours(0, 0, 0, 0);
+
+  const validExceptions = JSON.parse(saved).filter(
+    (item: any) => {
+
+      const tillDate = new Date(item.tillDate);
+
+      tillDate.setHours(0, 0, 0, 0);
+
+      return tillDate >= today;
+
+    }
   );
 
-  const validExceptions =
-    JSON.parse(saved).filter(
-      (item: any) => {
-        const tillDate =
-          new Date(item.tillDate);
-
-        tillDate.setHours(
-          0,
-          0,
-          0,
-          0
-        );
-
-        return tillDate >= today;
-      }
-    );
-
-  setExceptions(
-    validExceptions
-  );
+  setExceptions(validExceptions);
 
   setLoadedExceptions(true);
 
-}, []);
+}, [currentUser]);
+
 useEffect(() => {
 
 const saved =
@@ -235,18 +227,22 @@ useEffect(() => {
 ]);
 useEffect(() => {
 
-  if (!loadedExceptions)
-    return;
+  if (
+    !loadedExceptions ||
+    !currentUser
+  ) return;
 
   localStorage.setItem(
-    "exceptions",
+    `exceptions_${currentUser}`,
     JSON.stringify(exceptions)
   );
 
 }, [
   exceptions,
   loadedExceptions,
+  currentUser,
 ]);
+
 useEffect(() => {
 
   const loadCollection =
