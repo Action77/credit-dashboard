@@ -423,23 +423,27 @@ setExceptions(
   <td className="p-3">
 
     <button
-      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
-      onClick={() => {
+  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
+  onClick={async () => {
 
-        const updated =
-          exceptions.filter(
-            (_, i) => i !== index
-          );
+    await fetch(
+      `/api/exceptions/${item.id}`,
+      {
+        method: "DELETE",
+      }
+    );
 
-        setExceptions(updated);
+    setExceptions(prev =>
+      prev.filter(
+        exception =>
+          exception.id !== item.id
+      )
+    );
 
-        setExceptions(updated);
-
-      }}
-    >
-      Delete
-    </button>
-
+  }}
+>
+  Delete
+</button>
   </td>
 
 )}

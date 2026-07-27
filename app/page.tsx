@@ -1726,16 +1726,26 @@ const daysLeft =
 
 <button
   className="bg-red-600 text-white px-2 py-1 rounded"
-  onClick={() =>
-      setExceptions((prev) =>
-        prev.filter(
-          (_, i) => i !== index
-        )
+  onClick={async () => {
+
+    await fetch(
+      `/api/exceptions/${item.id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    setExceptions(prev =>
+      prev.filter(
+        exception =>
+          exception.id !== item.id
       )
-    }
-  >
-    X
-  </button>
+    );
+
+  }}
+>
+  X
+</button>
   )}
 </td>
         </tr>
