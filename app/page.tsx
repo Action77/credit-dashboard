@@ -272,10 +272,19 @@ formData.append(
   currentUsername
 );
 
-await fetch("/api/credit-upload", {
+const uploadResponse = await fetch("/api/credit-upload", {
   method: "POST",
   body: formData,
 });
+
+const uploadResult = await uploadResponse.json();
+
+console.log(uploadResult);
+
+if (!uploadResult.success) {
+  alert(uploadResult.error);
+  return;
+}
 const response = await fetch("/api/credit-data");
 const result = await response.json();
 
