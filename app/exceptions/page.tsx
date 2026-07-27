@@ -1,7 +1,17 @@
 
 "use client";
-import Sidebar from "@/components/Sidebar";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+
+import {
+  LayoutDashboard,
+  Upload,
+  FileText,
+  AlertCircle,
+  BarChart3,
+  Settings,
+  Users,
+} from "lucide-react";
 export default function ExceptionsPage() {
   const [exceptions, setExceptions] = useState<any[]>([]);
   const [invoiceText, setInvoiceText] = useState("");
@@ -55,9 +65,74 @@ const [tillDate, setTillDate] = useState("");
 return (
   <div className="min-h-screen bg-[#f4f7fc] flex">
 
-    <Sidebar />
+    <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
 
-    <main className="flex-1 p-6">
+    <div className="p-4">
+      <h1 className="text-xl font-bold leading-tight">
+        Credit With Route Block
+      </h1>
+    </div>
+
+    <nav className="px-4 space-y-2">
+
+  <Link
+  href="/"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <LayoutDashboard size={18} />
+  <span>Dashboard</span>
+</Link>
+
+  <div className="flex items-center gap-3 px-4 py-3">
+    <Upload size={18} />
+    Import File
+  </div>
+
+  <div className="flex items-center gap-3 px-4 py-3">
+    <FileText size={18} />
+    Invoices
+  </div>
+
+<Link
+  href="/exceptions"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <AlertCircle size={18} />
+  <span>Exceptions</span>
+</Link>
+
+
+<Link
+  href="/summary"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <BarChart3 size={18} />
+  <span>Summary</span>
+</Link>
+
+  <div className="flex items-center gap-3 px-4 py-3">
+    <BarChart3 size={18} />
+    Reports
+  </div>
+
+  <div className="flex items-center gap-3 px-4 py-3">
+    <Settings size={18} />
+    Settings
+  </div>
+
+<Link
+  href="/users"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <Users size={18} />
+  Users
+</Link>
+
+</nav>
+
+</aside>
+
+<main className="flex-1 p-6">
 
       <div className="bg-white rounded-xl border p-5 mb-6">
         <h1 className="text-3xl font-bold">
