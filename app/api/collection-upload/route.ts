@@ -1,7 +1,13 @@
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
-import fs from "fs";
-import path from "path";
 
 export async function POST(req: Request) {
   try {
@@ -75,48 +81,19 @@ export async function POST(req: Request) {
             .replace(/\s/g, "")
         );
 
-    const jsonPath = path.join(
-      process.cwd(),
-      "data",
-      "collection.json"
-    );
+    const records = invoices.map(
+  (invoice) => ({
+    invoice,
+  })
+);
 
-    let existingInvoices: string[] = [];
+const { error } = await supabase
+  .from("collection_invoices")
+  .upsert(records);
 
-    if (fs.existsSync(jsonPath)) {
-      try {
-        const existingData = JSON.parse(
-          fs.readFileSync(
-            jsonPath,
-            "utf8"
-          )
-        );
-
-        existingInvoices =
-          existingData.invoices || [];
-      } catch {
-        existingInvoices = [];
-      }
-    }
-
-    const mergedInvoices = [
-      ...new Set([
-        ...existingInvoices,
-        ...invoices,
-      ]),
-    ];
-
-    fs.writeFileSync(
-      jsonPath,
-      JSON.stringify(
-        {
-          invoices: mergedInvoices,
-          fileInfo: `${file.name} | ${new Date().toLocaleString()}`,
-        },
-        null,
-        2
-      )
-    );
+if (error) {
+  throw error;
+}
 
     return NextResponse.json({
       success: true,
