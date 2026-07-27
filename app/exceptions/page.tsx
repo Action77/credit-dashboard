@@ -34,6 +34,7 @@ const [currentUser, setCurrentUser] =
   const [invoiceText, setInvoiceText] = useState("");
 
 const [tillDate, setTillDate] = useState("");
+const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
 
   const currentUser =
@@ -326,6 +327,15 @@ P1316600015512`}
 
   <h3 className="font-bold text-xl">
     Current Exceptions
+    <input
+  type="text"
+  placeholder="Search..."
+  value={searchTerm}
+  onChange={(e) =>
+    setSearchTerm(e.target.value)
+  }
+  className="border rounded-lg px-4 py-2 w-72"
+/>
   </h3>
 
   <div className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg font-semibold">
@@ -354,8 +364,20 @@ P1316600015512`}
 
 <tbody>
 
-  {exceptions.map(
-    (item, index) => {
+  {exceptions
+  .filter(item => {
+
+    const search =
+      searchTerm.toLowerCase();
+
+    return Object.values(item)
+      .join(" ")
+      .toLowerCase()
+      .includes(search);
+
+  })
+  .map(
+        (item, index) => {
 
       const tillDate =
         new Date(item.tillDate);
