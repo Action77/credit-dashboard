@@ -213,13 +213,13 @@ useEffect(() => {
         </h1>
       </div>
 
-      <div className="bg-white rounded-xl border p-5 mb-6">
+      <div className="bg-white rounded-xl border shadow-sm p-5 mb-6 max-w-4xl">
         <h3 className="font-bold text-lg mb-4">
           Add Multiple Exceptions
         </h3>
 
         <textarea
-  rows={10}
+  rows={5}
   value={invoiceText}
   onChange={(e) =>
     setInvoiceText(e.target.value)
@@ -314,6 +314,7 @@ P1316600015512`}
     setInvoiceText("");
 
     setTillDate("");
+    
   }}
 >
   Add Exceptions
@@ -321,24 +322,33 @@ P1316600015512`}
       </div>
 
       <div className="bg-white rounded-xl border p-5">
-        <h3 className="font-bold text-lg mb-4">
-          Current Exceptions
-        </h3>
+        <div className="flex justify-between items-center mb-4">
 
-        <table className="w-full">
+  <h3 className="font-bold text-xl">
+    Current Exceptions
+  </h3>
+
+  <div className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg font-semibold">
+    Total: {exceptions.length}
+  </div>
+
+</div>
+        <div className="overflow-x-auto">
+  <table className="w-full text-sm">
           <thead>
-            <tr>
-              <th>Van Code</th>
-              <th>Employee Name</th>
-              <th>ATS Code</th>
-              <th>Customer Code</th>
-              <th>Customer Name</th>
-              <th>Invoice #</th>
-              <th>Till Date</th>
-              <th>Days</th>
+            <tr className="bg-[#071d5c] text-white">
+              <th className="p-3 text-left">Van Code</th>
+              <th className="p-3 text-left">Employee Name</th>
+              <th className="p-3 text-left">ATS Code</th>
+              <th className="p-3 text-left">Customer Code</th>
+              <th className="p-3 text-left">Customer Name</th>
+              <th className="p-3 text-left">Invoice #</th>
+              <th className="p-3 text-left">Till Date</th>
+              <th className="p-3 text-left">Days</th>
               {isLoggedIn && (
-  <th>Delete</th>
+  <th className="p-3 text-left">Delete</th>
 )}
+
             </tr>
           </thead>
 
@@ -361,39 +371,42 @@ P1316600015512`}
 
       return (
 
-        <tr key={index}>
+        <tr
+  key={index}
+  className="border-b hover:bg-slate-50"
+>
 
-          <td>{item.vanCode}</td>
+          <td className="p-3">{item.vanCode}</td>
 
-          <td>
+          <td className="p-3">
             {item.employeeName}
           </td>
 
-          <td>{item.atsCode}</td>
+          <td className="p-3">{item.atsCode}</td>
 
-          <td>
+          <td className="p-3">
             {item.customerCode}
           </td>
 
-          <td>
+          <td className="p-3">
             {item.customerName}
           </td>
 
-          <td>
+          <td className="p-3">
             {item.invoice}
           </td>
 
-          <td>
+          <td className="p-3">
             {item.tillDate}
           </td>
 
-          <td>
+          <td className="p-3">
             {daysLeft}
           </td>
 
 {isLoggedIn && (
 
-  <td>
+  <td className="p-3">
 
     <button
       className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
@@ -428,6 +441,7 @@ P1316600015512`}
 
 </tbody>
         </table>
+        </div>
             </div>
       </main>
 
