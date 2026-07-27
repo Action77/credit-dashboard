@@ -59,10 +59,15 @@ export async function POST(req: Request) {
       );
     });
 
-    await supabase
-      .from("credit_data")
-      .delete()
-      .neq("invoice", "");
+    const { error: deleteError } = await supabase
+  .from("credit_data")
+  .delete()
+  .neq("invoice", "");
+
+if (deleteError) {
+  console.error("DELETE ERROR:", deleteError);
+  throw deleteError;
+}
 
     const records = blockedRows.map((row) => ({
       invoice: String(row["Invoice #"]).replace(/\s/g, ""),
@@ -85,11 +90,16 @@ export async function POST(req: Request) {
       file_date: creditFileDate,
     }));
 
-    const { error } = await supabase
-      .from("credit_data")
-      .insert(records);
+    const { data, error } = await supabase
+  .from("credit_data")
+  .insert(records)
+  .select();
 
-    if (error) throw error;
+console.log("Rows to insert:", records.length);
+console.log("Inserted:", data);
+console.log("Insert error:", error);
+
+if (error) throw error;
 
     return NextResponse.json({
       success: true,
