@@ -8,20 +8,23 @@ const supabase = createClient(
 
 export async function DELETE(
   request: Request,
-  { params }: {
-    params: { id: string };
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
   }
 ) {
+  const { id } =
+    await context.params;
 
   const { error } =
     await supabase
       .from("exceptions")
       .delete()
-      .eq("id", params.id);
+      .eq("id", id);
 
   return NextResponse.json({
     success: !error,
     error: error?.message,
   });
-
 }
