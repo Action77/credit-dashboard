@@ -504,33 +504,15 @@ const filterBaseData =
 const filteredData = filterBaseData.filter(
   (row) => {
 
-    const invoice =
-      String(
-        row["Invoice #"]
-      )
-        .replace(/\s/g, "")
-        .toUpperCase();
-
-    const isCollected =
-      collectedInvoices.some(
-        (i) =>
-          String(i)
-            .replace(/\s/g, "")
-            .toUpperCase() ===
-          invoice
-      );
-
     const matchesWhatsappVan =
       !whatsAppVan ||
       row["Van Code."] === whatsAppVan;
 
-    return (
-      !isCollected &&
-      matchesWhatsappVan
-    );
+    return matchesWhatsappVan;
 
   }
 );
+
 const blockedCount =
   filteredData.filter((row) => {
 
@@ -1456,9 +1438,9 @@ await localStorage.setItem(
   style={{
   backgroundColor:
 
-    exceptions.some(
-      e =>
-        String(e.invoice)
+    collectedInvoices.some(
+      invoice =>
+        String(invoice)
           .replace(/\s/g, "")
           .toUpperCase() ===
         String(
@@ -1467,11 +1449,12 @@ await localStorage.setItem(
           .replace(/\s/g, "")
           .toUpperCase()
     )
-      ? "#FFCB96"
 
-      : collectedInvoices.some(
-          invoice =>
-            String(invoice)
+      ? "#C6EFCE"
+
+      : exceptions.some(
+          e =>
+            String(e.invoice)
               .replace(/\s/g, "")
               .toUpperCase() ===
             String(
@@ -1481,8 +1464,9 @@ await localStorage.setItem(
               .toUpperCase()
         )
 
-      ? "#C6EFCE"
-      : "",
+      ? "#FFCB96"
+
+      : ""
 }}
 >
                       <td className="p-3">

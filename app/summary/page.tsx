@@ -51,10 +51,19 @@ const usersLogin = [
   const loadData = async () => {
 
     const response = await fetch("/api/credit-data");
-    const result = await response.json();
+const result = await response.json();
 
-    setData(result.data || []);
+setData(result.data || []);
 
+const exceptionsResponse =
+  await fetch("/api/exceptions");
+
+const exceptionsData =
+  await exceptionsResponse.json();
+
+setExceptions(
+  exceptionsData || []
+);
     const currentUser =
       await localStorage.getItem("currentUser");
 
@@ -181,21 +190,40 @@ const filteredData = data.filter((row) => {
 
       acc[van].ids.add(row["Employee ATS Code."]);
 
-      const invoice = String(row["Invoice #"]).replace(/\s/g, "");
+      const invoice =
+  String(
+    row["Invoice #"]
+  )
+    .replace(/\s/g, "")
+    .toUpperCase();
 
-      const isException = exceptions.some(
-        (e: any) =>
-          String(e.invoice).replace(/\s/g, "") === invoice
-      );
+const isException =
+  exceptions.some(
+    (e: any) =>
+      String(e.invoice)
+        .replace(/\s/g, "")
+        .toUpperCase() ===
+      invoice
+  );
 
-      const isCollected = collectedInvoices.includes(invoice);
+const isCollected =
+  collectedInvoices.some(
+    i =>
+      String(i)
+        .replace(/\s/g, "")
+        .toUpperCase() ===
+      invoice
+  );
 
-      if (isException) {
-        acc[van].exceptions++;
-      } else if (!isCollected) {
-        acc[van].remaining++;
-      }
+if (isException) {
 
+  acc[van].exceptions++;
+
+} else if (!isCollected) {
+
+  acc[van].remaining++;
+
+}
       return acc;
     }, {})
 ).sort(([a], [b]) =>
@@ -204,21 +232,33 @@ const filteredData = data.filter((row) => {
   )
 );
 
-  const getStatus = (remaining: number, ex: number) => {
-    if (remaining > 0 && ex > 0) {
-      return `${remaining} Remaining , Ex`;
-    }
+  const getStatus = (
+  remaining: number,
+  ex: number
+) => {
 
-    if (remaining > 0) {
-      return `${remaining} Remaining`;
-    }
+  if (
+    remaining > 0 &&
+    ex > 0
+  ) {
+    return `${remaining} Remaining , Ex ${ex}`;
+  }
 
-    if (ex > 0) {
-      return "Ex & All Collected";
-    }
+  if (
+    remaining > 0
+  ) {
+    return `${remaining} Remaining`;
+  }
 
-    return "All Collected";
-  };
+  if (
+    ex > 0
+  ) {
+    return `Ex ${ex}`;
+  }
+
+  return "All Collected";
+
+};
 const regionSummary = Object.entries(
 
   filteredData.reduce(
