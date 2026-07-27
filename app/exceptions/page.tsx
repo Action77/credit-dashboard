@@ -336,7 +336,9 @@ P1316600015512`}
               <th>Invoice #</th>
               <th>Till Date</th>
               <th>Days</th>
-              <th>Delete</th>
+              {isLoggedIn && (
+  <th>Delete</th>
+)}
             </tr>
           </thead>
 
@@ -389,10 +391,34 @@ P1316600015512`}
             {daysLeft}
           </td>
 
-          <td>
-            Delete
-          </td>
+{isLoggedIn && (
 
+  <td>
+
+    <button
+      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
+      onClick={() => {
+
+        const updated =
+          exceptions.filter(
+            (_, i) => i !== index
+          );
+
+        setExceptions(updated);
+
+        localStorage.setItem(
+          `exceptions_${currentUser}`,
+          JSON.stringify(updated)
+        );
+
+      }}
+    >
+      Delete
+    </button>
+
+  </td>
+
+)}
         </tr>
 
       );
