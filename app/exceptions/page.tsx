@@ -1,4 +1,6 @@
+
 "use client";
+import Sidebar from "@/components/Sidebar";
 import { useEffect, useState } from "react";
 export default function ExceptionsPage() {
   const [exceptions, setExceptions] = useState<any[]>([]);
@@ -50,8 +52,13 @@ const [tillDate, setTillDate] = useState("");
   );
 
 }, []);
-  return (
-    <div className="min-h-screen bg-[#f4f7fc] p-6">
+return (
+  <div className="min-h-screen bg-[#f4f7fc] flex">
+
+    <Sidebar />
+
+    <main className="flex-1 p-6">
+
       <div className="bg-white rounded-xl border p-5 mb-6">
         <h1 className="text-3xl font-bold">
           Exceptions Management
@@ -248,6 +255,7 @@ P1316600015512`}
 </tbody>
         </table>
       </div>
+      </main>
     </div>
   );
 }
