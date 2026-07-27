@@ -12,7 +12,10 @@ export async function POST(req: Request) {
     const formData = await req.formData();
 
     const file = formData.get("file") as File;
-
+const uploadedBy =
+  String(
+    formData.get("uploadedBy") || ""
+  );
     if (!file) {
       return NextResponse.json({
         success: false,
@@ -60,10 +63,11 @@ export async function POST(req: Request) {
       );
 
     const records = invoices.map(
-      (invoice) => ({
-        invoice,
-      })
-    );
+  (invoice) => ({
+    invoice,
+    uploaded_by: uploadedBy,
+  })
+);
 
     const { error } = await supabase
       .from("collection_invoices")

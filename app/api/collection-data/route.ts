@@ -7,13 +7,21 @@ const supabase = createClient(
 );
 
 export async function GET() {
-  const { data, error } = await supabase
+
+  const { data, error } =
+  await supabase
     .from("collection_invoices")
-    .select("invoice");
+    .select(
+      "invoice, uploaded_by, created_at"
+    )
+    .order("created_at", {
+      ascending: false,
+    });
 
   if (error) {
     return NextResponse.json({
       invoices: [],
+      fileInfo: "",
     });
   }
 
@@ -21,5 +29,9 @@ export async function GET() {
     invoices: data.map(
       (row: any) => row.invoice
     ),
+    fileInfo:
+      data.length > 0
+        ? `Uploaded By ${data[0].uploaded_by}`
+        : "",
   });
 }

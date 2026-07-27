@@ -415,7 +415,17 @@ localStorage.setItem(
 
   if (!file) return;
 const formData = new FormData();
+
 formData.append("file", file);
+const currentUsername =
+  users.find(
+    u => u.id === currentUser
+  )?.username || currentUser;
+
+formData.append(
+  "uploadedBy",
+  currentUsername
+);
 
 fetch("/api/collection-upload", {
   method: "POST",
