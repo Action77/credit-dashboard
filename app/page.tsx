@@ -1294,14 +1294,21 @@ row["City"] === city
   className="bg-blue-600 text-white px-4 py-2 rounded-lg"
   onClick={async () => {
 
-    await localStorage.setItem(
-      `savedFilters_${currentUser}`,
-      JSON.stringify({
-        regions: selectedRegions,
-        cities: selectedCities,
-        vans: selectedVans,
-      })
-    );
+    const filterData = {
+  regions: selectedRegions,
+  cities: selectedCities,
+  vans: selectedVans,
+};
+
+await localStorage.setItem(
+  `savedFilters_${currentUser}`,
+  JSON.stringify(filterData)
+);
+
+await localStorage.setItem(
+  "summaryFilters",
+  JSON.stringify(filterData)
+);
 
     setShowFilters(false);
 
