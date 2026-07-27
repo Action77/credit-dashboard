@@ -164,10 +164,8 @@ useEffect(() => {
 
 </nav>
 
-<div className="mt-auto p-4">
-
-  <div
-    className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg ${
+<div
+  className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg ${
     isLoggedIn
       ? "bg-red-600"
       : "bg-blue-600"
@@ -204,8 +202,6 @@ useEffect(() => {
     </>
   )}
 </div>
-  </div>
-
 
 </aside>
 
