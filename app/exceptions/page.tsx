@@ -1,6 +1,55 @@
 "use client";
-
+import { useEffect, useState } from "react";
 export default function ExceptionsPage() {
+  const [exceptions, setExceptions] = useState<any[]>([]);
+  const [invoiceText, setInvoiceText] = useState("");
+
+const [tillDate, setTillDate] = useState("");
+  useEffect(() => {
+
+  const currentUser =
+    localStorage.getItem("currentUser");
+
+  if (!currentUser) return;
+
+  const saved =
+    localStorage.getItem(
+      `exceptions_${currentUser}`
+    );
+
+  if (!saved) return;
+
+  const today = new Date();
+
+  today.setHours(0, 0, 0, 0);
+
+  const validExceptions =
+    JSON.parse(saved).filter(
+      (item: any) => {
+
+        const tillDate =
+          new Date(item.tillDate);
+
+        tillDate.setHours(
+          0,
+          0,
+          0,
+          0
+        );
+
+        return tillDate >= today;
+
+      }
+    );
+
+  setExceptions(validExceptions);
+
+  localStorage.setItem(
+    `exceptions_${currentUser}`,
+    JSON.stringify(validExceptions)
+  );
+
+}, []);
   return (
     <div className="min-h-screen bg-[#f4f7fc] p-6">
       <div className="bg-white rounded-xl border p-5 mb-6">
@@ -15,23 +64,105 @@ export default function ExceptionsPage() {
         </h3>
 
         <textarea
-          rows={10}
-          placeholder={`V1515900001630
-V1672000015189
-V1515900001700`}
-          className="w-full border rounded-lg p-3 mb-4"
-        />
+  rows={10}
+  value={invoiceText}
+  onChange={(e) =>
+    setInvoiceText(e.target.value)
+  }
+  placeholder={`P1316600015510
+P1316600015511
+P1316600015512`}
+  className="w-full border rounded-lg p-3 mb-4"
+/>
 
-        <input
-          type="date"
-          className="border rounded-lg p-3 mb-4 w-full"
-        />
+<input
+  type="date"
+  value={tillDate}
+  onChange={(e) =>
+    setTillDate(e.target.value)
+  }
+  className="border rounded-lg p-3 mb-4 w-full"
+/>
 
-        <button
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg"
-        >
-          Add Exceptions
-        </button>
+<button
+  className="bg-blue-600 text-white px-6 py-3 rounded-lg"
+  onClick={() => {
+
+    const currentUser =
+      localStorage.getItem("currentUser");
+
+    if (
+      !currentUser ||
+      !tillDate ||
+      !invoiceText
+    ) {
+      return;
+    }
+
+    const creditData =
+      JSON.parse(
+        localStorage.getItem(
+          "creditData"
+        ) || "[]"
+      );
+
+    const invoices =
+      invoiceText
+        .split("\n")
+        .map(x => x.trim())
+        .filter(Boolean);
+
+    const newExceptions =
+      invoices.map(invoice => {
+
+        const match =
+          creditData.find(
+            (row: any) =>
+              String(
+                row["Invoice #"]
+              )
+                .replace(/\s/g, "") ===
+              invoice.replace(/\s/g, "")
+          );
+
+        return {
+          invoice,
+          tillDate,
+
+          vanCode:
+            match?.["Van Code."] || "",
+
+          employeeName:
+            match?.["Employee Name."] || "",
+
+          atsCode:
+            match?.["Employee ATS Code."] || "",
+
+          customerCode:
+            match?.["Customer Code"] || "",
+
+          customerName:
+            match?.["Customer Name"] || ""
+        };
+      });
+
+    const updated =
+      [...exceptions, ...newExceptions];
+
+    setExceptions(updated);
+
+    localStorage.setItem(
+      `exceptions_${currentUser}`,
+      JSON.stringify(updated)
+    );
+
+    setInvoiceText("");
+
+    setTillDate("");
+  }}
+>
+  Add Exceptions
+</button>
       </div>
 
       <div className="bg-white rounded-xl border p-5">
@@ -54,8 +185,67 @@ V1515900001700`}
             </tr>
           </thead>
 
-          <tbody>
-          </tbody>
+<tbody>
+
+  {exceptions.map(
+    (item, index) => {
+
+      const tillDate =
+        new Date(item.tillDate);
+
+      const daysLeft =
+        Math.ceil(
+          (
+            tillDate.getTime() -
+            new Date().getTime()
+          ) /
+          (1000 * 60 * 60 * 24)
+        );
+
+      return (
+
+        <tr key={index}>
+
+          <td>{item.vanCode}</td>
+
+          <td>
+            {item.employeeName}
+          </td>
+
+          <td>{item.atsCode}</td>
+
+          <td>
+            {item.customerCode}
+          </td>
+
+          <td>
+            {item.customerName}
+          </td>
+
+          <td>
+            {item.invoice}
+          </td>
+
+          <td>
+            {item.tillDate}
+          </td>
+
+          <td>
+            {daysLeft}
+          </td>
+
+          <td>
+            Delete
+          </td>
+
+        </tr>
+
+      );
+
+    }
+  )}
+
+</tbody>
         </table>
       </div>
     </div>
