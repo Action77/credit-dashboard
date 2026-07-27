@@ -325,7 +325,9 @@ useEffect(() => {
     const file = event.target.files?.[0];
 
     if (!file) return;
-
+fetch("/api/collection-reset", {
+  method: "POST",
+});
     const reader = new FileReader();
 
     reader.onload = (e) => {
