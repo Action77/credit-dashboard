@@ -1,4 +1,5 @@
 "use client";
+import { storage as localStorage } from "@/utils/storage";
 import WhatsAppReport from "@/components/WhatsAppReport";
 import html2canvas from "html2canvas";
 import {
@@ -95,136 +96,96 @@ const [loadedExceptions,
 
   if (!currentUser) return;
 
-  const saved = localStorage.getItem(
-    `exceptions_${currentUser}`
-  );
+  const loadExceptions = async () => {
 
-  if (!saved) {
-    setExceptions([]);
-    setLoadedExceptions(true);
-    return;
-  }
+    const saved = await localStorage.getItem(
+      `exceptions_${currentUser}`
+    );
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const validExceptions = JSON.parse(saved).filter(
-    (item: any) => {
-
-      const tillDate = new Date(item.tillDate);
-
-      tillDate.setHours(0, 0, 0, 0);
-
-      return tillDate >= today;
-
+    if (!saved) {
+      setExceptions([]);
+      setLoadedExceptions(true);
+      return;
     }
-  );
 
-  setExceptions(validExceptions);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  setLoadedExceptions(true);
+    const validExceptions = JSON.parse(saved).filter(
+      (item: any) => {
+
+        const tillDate = new Date(item.tillDate);
+
+        tillDate.setHours(0, 0, 0, 0);
+
+        return tillDate >= today;
+
+      }
+    );
+
+    setExceptions(validExceptions);
+
+    setLoadedExceptions(true);
+
+  };
+
+  loadExceptions();
 
 }, [currentUser]);
 
 useEffect(() => {
 
-const saved =
-  localStorage.getItem(
-    `savedFilters_${currentUser}`
-  );
+  const loadUser = async () => {
 
-  if (!saved) return;
-
-  const filters =
-    JSON.parse(saved);
-setSelectedRegions(
-  filters.regions || []
-);
-
-setSelectedCities(
-  filters.cities || []
-);
-
-setSelectedVans(
-  filters.vans || []
-);
-  
-}, [currentUser]);
-useEffect(() => {
-
-  const savedUser =
-    localStorage.getItem(
+    const savedUser = await localStorage.getItem(
       "currentUser"
     );
 
-  if (savedUser) {
+    if (savedUser) {
+      setCurrentUser(savedUser);
+      setIsLoggedIn(true);
+    }
 
-    setCurrentUser(savedUser);
+  };
 
-    setIsLoggedIn(true);
-
-  }
+  loadUser();
 
 }, []);
 
 useEffect(() => {
 
-  localStorage.setItem(
-    "currentUser",
-    currentUser
-  );
+  if (currentUser) {
+    localStorage.setItem(
+      "currentUser",
+      currentUser
+    );
+  } else {
+    localStorage.removeItem("currentUser");
+  }
 
 }, [currentUser]);
 useEffect(() => {
 
-localStorage.setItem(
-  `savedFilters_${currentUser}`,
+  const loadFilters = async () => {
 
-    JSON.stringify({
+    const saved =
+      await localStorage.getItem(
+        `savedFilters_${currentUser}`
+      );
 
-      regions:
-        selectedRegions,
+    if (!saved) return;
 
-      cities:
-        selectedCities,
+    const filters = JSON.parse(saved);
 
-      vans:
-        selectedVans,
+    setSelectedRegions(filters.regions || []);
+    setSelectedCities(filters.cities || []);
+    setSelectedVans(filters.vans || []);
 
-    })
+  };
 
-  );
+  loadFilters();
 
-}, [
-  selectedRegions,
-  selectedCities,
-  selectedVans,
-]);
-useEffect(() => {
-
-  localStorage.setItem(
-    "summaryFilters",
-
-    JSON.stringify({
-
-      regions:
-        selectedRegions,
-
-      cities:
-        selectedCities,
-
-      vans:
-        selectedVans,
-
-    })
-
-  );
-
-}, [
-  selectedRegions,
-  selectedCities,
-  selectedVans,
-]);
+}, [currentUser]);
 useEffect(() => {
 
   if (
@@ -232,7 +193,7 @@ useEffect(() => {
     !currentUser
   ) return;
 
-  localStorage.setItem(
+   localStorage.setItem(
     `exceptions_${currentUser}`,
     JSON.stringify(exceptions)
   );
@@ -269,50 +230,66 @@ useEffect(() => {
 
 useEffect(() => {
 
-  const savedCreditInfo =
-    localStorage.getItem(
-      "creditFileInfo"
-    );
+  const loadCreditInfo = async () => {
 
-  if (savedCreditInfo) {
-    setCreditFileInfo(
-      savedCreditInfo
-    );
-  }
+    const savedCreditInfo =
+      await localStorage.getItem(
+        "creditFileInfo"
+      );
+
+    if (savedCreditInfo) {
+
+      setCreditFileInfo(
+        savedCreditInfo
+      );
+
+    }
+
+  };
+
+  loadCreditInfo();
 
   fetch("/api/collection-data")
-  .then(res => res.json())
-  .then(data => {
-    setCollectionFileInfo(
-      data.fileInfo || ""
-    );
-  });
+    .then(res => res.json())
+    .then(data => {
+      setCollectionFileInfo(
+        data.fileInfo || ""
+      );
+    });
 
 }, []);
 useEffect(() => {
-  const savedData =
-    localStorage.getItem("creditData");
 
-  const savedDate =
-    localStorage.getItem("creditDate");
+  const loadCreditData = async () => {
 
-  const today =
-    new Date().toDateString();
+    const savedData =
+      await localStorage.getItem("creditData");
 
-  if (
-    savedData &&
-    savedDate === today
-  ) {
-    setData(JSON.parse(savedData));
-  } else {
-    localStorage.removeItem(
-      "creditData"
-    );
+    const savedDate =
+      await localStorage.getItem("creditDate");
 
-    localStorage.removeItem(
-      "creditDate"
-    );
-  }
+    const today =
+      new Date().toDateString();
+
+    if (
+      savedData &&
+      savedDate === today
+    ) {
+
+      setData(JSON.parse(savedData));
+
+    } else {
+
+      await localStorage.removeItem("creditData");
+
+      await localStorage.removeItem("creditDate");
+
+    }
+
+  };
+
+  loadCreditData();
+
 }, []);
 
   const handleCreditImport = (
@@ -326,7 +303,7 @@ fetch("/api/collection-reset", {
 });
     const reader = new FileReader();
 
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const workbook = XLSX.read(
         e.target?.result,
         { type: "binary" }
@@ -376,21 +353,21 @@ const creditFileDate =
 setCreditFileInfo(
   `${file.name} | ${creditFileDate}`
 );
-localStorage.setItem(
+await localStorage.setItem(
   "creditFileInfo",
   `${file.name} | ${creditFileDate}`
 );
 setCollectedInvoices([]);
 
-localStorage.removeItem(
+ localStorage.getItem(
   "collectedInvoices"
 );
-localStorage.setItem(
+await localStorage.setItem(
   "creditData",
   JSON.stringify(blockedRows)
 );
 
-localStorage.setItem(
+await localStorage.setItem(
   "creditDate",
   new Date().toDateString()
 );
@@ -430,7 +407,7 @@ fetch("/api/collection-upload", {
   const reader =
     new FileReader();
 
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
 
     const workbook =
       XLSX.read(
@@ -479,7 +456,7 @@ return (
 console.log(invoices);
 const previousInvoices =
   JSON.parse(
-    localStorage.getItem(
+    await localStorage.getItem(
       "collectedInvoices"
     ) || "[]"
   );
@@ -513,7 +490,7 @@ setLastUpdatedVans(
   affectedVans
 );
 
-localStorage.setItem(
+await localStorage.setItem(
   "lastUpdatedVans",
   JSON.stringify(
     affectedVans
@@ -527,11 +504,11 @@ const now = new Date();
 setCollectionFileInfo(
   `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
 );
-localStorage.setItem(
+await localStorage.setItem(
   "collectionFileInfo",
   `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
 );
-localStorage.setItem(
+await localStorage.setItem(
   "collectedInvoices",
   JSON.stringify(invoices)
 );
@@ -959,11 +936,11 @@ return (
       ? "bg-red-600"
       : "bg-blue-600"
   }`}
-  onClick={() => {
+  onClick={async () => {
 
     if (isLoggedIn) {
 
-  localStorage.removeItem("currentUser");
+  await localStorage.removeItem("currentUser");
 
   setIsLoggedIn(false);
 
@@ -1159,60 +1136,8 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
 <input
   type="checkbox"
   checked={selectedRegions.includes(region)}
-  onChange={(e) => {
-
-    const regionCities = data
-      .filter(row => row.Region === region)
-      .map(row => row.City)
-      .filter(Boolean);
-
-    const regionVans = data
-      .filter(row => row.Region === region)
-      .map(row => row["Van Code."])
-      .filter(Boolean);
-
-    if (e.target.checked) {
-
-      setSelectedRegions(prev => [
-        ...new Set([...prev, region])
-      ]);
-
-      setSelectedCities(prev => [
-        ...new Set([
-          ...prev,
-          ...regionCities
-        ])
-      ]);
-
-      setSelectedVans(prev => [
-        ...new Set([
-          ...prev,
-          ...regionVans
-        ])
-      ]);
-
-    } else {
-
-      setSelectedRegions(prev =>
-        prev.filter(r => r !== region)
-      );
-
-      setSelectedCities(prev =>
-        prev.filter(
-          city => !regionCities.includes(city)
-        )
-      );
-
-      setSelectedVans(prev =>
-        prev.filter(
-          van => !regionVans.includes(van)
-        )
-      );
-
-    }
-  }}
+  onChange={() => {}}
 />
-
   <span
     className="cursor-pointer"
     onClick={() => toggleRegion(region)}
@@ -1322,7 +1247,7 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
                               >
                                 <input
   type="checkbox"
-  checked={selectedCities.includes(city)}
+  
   onChange={(e) => {
 
     const cityVans = data
@@ -1400,12 +1325,25 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
         Clear
       </button>
 
-      <button
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-        onClick={() => setShowFilters(false)}
-      >
-        Apply
-      </button>
+<button
+  className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+  onClick={async () => {
+
+    await localStorage.setItem(
+      `savedFilters_${currentUser}`,
+      JSON.stringify({
+        regions: selectedRegions,
+        cities: selectedCities,
+        vans: selectedVans,
+      })
+    );
+
+    setShowFilters(false);
+
+  }}
+>
+  Apply
+</button>
 
     </div>
 
@@ -2069,7 +2007,7 @@ const daysLeft =
 
           <button
             className="w-full bg-blue-600 text-white py-3 rounded-xl"
-            onClick={() => {
+            onClick={async () => {
 
               const user =
                 users.find(
@@ -2086,7 +2024,7 @@ const daysLeft =
               setCurrentUser(user.id);
               setIsLoggedIn(true);
 
-              localStorage.setItem(
+              await localStorage.setItem(
                 "currentUser",
                 user.id
               );

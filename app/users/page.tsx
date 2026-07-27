@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-
+import { storage as localStorage } from "@/utils/storage";
 import {
   LayoutDashboard,
   Upload,
@@ -71,10 +71,16 @@ const usersLogin = [
 
 };
 useEffect(() => {
-  loadUsers();
+  const load = async () => {
+  await loadUsers();
 
-  const currentUser = localStorage.getItem("currentUser");
+  const currentUser =
+    await localStorage.getItem("currentUser");
+
   setIsLoggedIn(!!currentUser);
+};
+
+  load();
 }, []);
 const handleImport = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -344,16 +350,14 @@ return (
   className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg ${
     isLoggedIn ? "bg-red-600" : "bg-blue-600"
   }`}
-  onClick={() => {
-    if (isLoggedIn) {
-      localStorage.removeItem("currentUser");
-      setIsLoggedIn(false);
-      setUsername("");
-      setPassword("");
-    } else {
-      setShowLoginModal(true);
-    }
-  }}
+  onClick={async () => {
+  await localStorage.removeItem("currentUser");
+
+  setIsLoggedIn(false);
+  setUsername("");
+  setPassword("");
+}}
+
 >
   {isLoggedIn ? (
     <>
@@ -783,7 +787,7 @@ return (
 
         <button
           className="w-full bg-blue-600 text-white py-3 rounded-xl"
-          onClick={() => {
+          onClick={async () => {
 
             const user = usersLogin.find(
               u =>
@@ -796,7 +800,7 @@ return (
               return;
             }
 
-            localStorage.setItem("currentUser", user.id);
+            await localStorage.setItem("currentUser", user.id);
             setIsLoggedIn(true);
             setShowLoginModal(false);
 

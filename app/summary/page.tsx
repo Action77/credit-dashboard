@@ -1,5 +1,5 @@
 "use client";
-
+import { storage as localStorage } from "@/utils/storage";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -47,42 +47,40 @@ const usersLogin = [
   },
 ];
   useEffect(() => {
-    const creditData = localStorage.getItem("creditData");
-    const currentUser =
-  localStorage.getItem("currentUser");
+  const loadData = async () => {
+    const creditData = await localStorage.getItem("creditData");
 
-const savedExceptions =
-  localStorage.getItem(
-    `exceptions_${currentUser}`
-  );
-  if (savedExceptions) {
-  setExceptions(
-    JSON.parse(savedExceptions)
-  );
-}
-    const collected = localStorage.getItem("collectedInvoices");
-    const savedPermissions = localStorage.getItem("vanPermissions");
+    const currentUser =
+      await localStorage.getItem("currentUser");
+
+    const savedExceptions =
+      await localStorage.getItem(
+        `exceptions_${currentUser}`
+      );
+
+    if (savedExceptions) {
+      setExceptions(JSON.parse(savedExceptions));
+    }
+
+    const collected =
+      await localStorage.getItem("collectedInvoices");
+
+    const savedPermissions =
+      await localStorage.getItem("vanPermissions");
 
     const savedUpdatedVans =
-  localStorage.getItem(
-    "lastUpdatedVans"
-  );
+      await localStorage.getItem("lastUpdatedVans");
 
-if (savedUpdatedVans) {
-
-  setLastUpdatedVans(
-    JSON.parse(
-      savedUpdatedVans
-    )
-  );
-
-}
+    if (savedUpdatedVans) {
+      setLastUpdatedVans(
+        JSON.parse(savedUpdatedVans)
+      );
+    }
 
     if (creditData) {
       setData(JSON.parse(creditData));
     }
 
-    
     if (collected) {
       setCollectedInvoices(JSON.parse(collected));
     }
@@ -90,18 +88,19 @@ if (savedUpdatedVans) {
     if (savedPermissions) {
       setPermissions(JSON.parse(savedPermissions));
     }
-    const savedFilters =
-  localStorage.getItem(
-    "summaryFilters"
-  );
 
-setIsLoggedIn(!!currentUser);
-if (savedFilters) {
-  setFilters(
-    JSON.parse(savedFilters)
-  );
-}
-  }, []);
+    const savedFilters =
+      await localStorage.getItem("summaryFilters");
+
+    setIsLoggedIn(!!currentUser);
+
+    if (savedFilters) {
+      setFilters(JSON.parse(savedFilters));
+    }
+  };
+
+  loadData();
+}, []);
   const getStatusStyle = (
 remaining: number,
 ex: number,
@@ -354,8 +353,8 @@ const regionSummary = Object.entries(
 
     <div
       className="flex items-center gap-3 bg-red-600 p-3 rounded-lg cursor-pointer"
-      onClick={() => {
-        localStorage.removeItem("currentUser");
+      onClick={async () => {
+        await localStorage.removeItem("currentUser");
         setIsLoggedIn(false);
       }}
     >
@@ -480,25 +479,21 @@ lastUpdatedVans.some(
                 checked={
                   permissions[van] ?? false
                 }
-                onChange={(e) => {
+                onChange={async (e) => {
 
-                  const updated = {
-  ...permissions,
-  [van]: e.target.checked,
-};
+  const updated = {
+    ...permissions,
+    [van]: e.target.checked,
+  };
 
-                  setPermissions(
-                    updated
-                  );
+  setPermissions(updated);
 
-                  localStorage.setItem(
-                    "vanPermissions",
-                    JSON.stringify(
-                      updated
-                    )
-                  );
+  await localStorage.setItem(
+    "vanPermissions",
+    JSON.stringify(updated)
+  );
 
-                }}
+}}
               />
             </td>
 
@@ -614,7 +609,7 @@ Amount
 
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded"
-          onClick={() => {
+         onClick={async () => {
 
             const user =
               usersLogin.find(
@@ -628,7 +623,7 @@ Amount
               return;
             }
 
-            localStorage.setItem(
+            await localStorage.setItem(
   "currentUser",
   user.id
 );
