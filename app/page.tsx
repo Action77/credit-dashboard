@@ -471,35 +471,47 @@ const filterBaseData =
   });
   const whatsappVanCodes = [
   ...new Set(
+
     filterBaseData
       .filter((row) => {
 
         const invoice =
           String(
             row["Invoice #"]
-          ).replace(/\s/g, "");
+          )
+            .replace(/\s/g, "")
+            .toUpperCase();
 
         const isException =
           exceptions.some(
-            (e) =>
+            e =>
               String(e.invoice)
-                .replace(/\s/g, "") === invoice
+                .replace(/\s/g, "")
+                .toUpperCase() ===
+              invoice
           );
 
         const isCollected =
           collectedInvoices.some(
-            (i) => i === invoice
+            i =>
+              String(i)
+                .replace(/\s/g, "")
+                .toUpperCase() ===
+              invoice
           );
 
         return (
           !isException &&
           !isCollected
         );
+
       })
       .map(
-        (row) => row["Van Code."]
+        row => row["Van Code."]
       )
+
   )
+
 ].sort();
 const filteredData = filterBaseData.filter(
   (row) => {
@@ -739,11 +751,47 @@ const whatsappNumber =
   };
 const whatsappData =
   filteredData.filter(
-    (row) =>
-      row["Van Code."] ===
-      whatsAppVan
-  );
-  
+    (row) => {
+
+      if (
+        row["Van Code."] !==
+        whatsAppVan
+      ) {
+        return false;
+      }
+
+      const invoice =
+        String(
+          row["Invoice #"]
+        )
+          .replace(/\s/g, "")
+          .toUpperCase();
+
+      const isException =
+        exceptions.some(
+          e =>
+            String(e.invoice)
+              .replace(/\s/g, "")
+              .toUpperCase() ===
+            invoice
+        );
+
+      const isCollected =
+        collectedInvoices.some(
+          i =>
+            String(i)
+              .replace(/\s/g, "")
+              .toUpperCase() ===
+            invoice
+        );
+
+      return (
+        !isException &&
+        !isCollected
+      );
+
+    }
+  );  
 
 return (
 <>
