@@ -245,14 +245,17 @@ const creditData =
       invoices.map(invoice => {
 
         const match =
-          creditData.find(
-            (row: any) =>
-              String(
-                row["Invoice #"]
-              )
-                .replace(/\s/g, "") ===
-              invoice.replace(/\s/g, "")
-          );
+  creditData.find(
+    (row: any) =>
+      String(
+        row["Invoice #"] || ""
+      )
+        .replace(/\s/g, "")
+        .toUpperCase() ===
+      invoice
+        .replace(/\s/g, "")
+        .toUpperCase()
+  );
 
         return {
           invoice,
