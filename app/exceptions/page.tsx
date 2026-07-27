@@ -164,8 +164,10 @@ useEffect(() => {
 
 </nav>
 
-<div
-  className={`mt-auto flex items-center gap-3 cursor-pointer p-4 ${
+<div className="mt-auto p-4">
+
+  <div
+    className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg ${
     isLoggedIn
       ? "bg-red-600"
       : "bg-blue-600"
@@ -202,6 +204,8 @@ useEffect(() => {
     </>
   )}
 </div>
+  </div>
+
 
 </aside>
 
@@ -402,8 +406,98 @@ P1316600015512`}
 
 </tbody>
         </table>
-      </div>
+            </div>
       </main>
+
+      {showLoginModal && (
+
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center">
+
+          <div className="bg-white w-[420px] rounded-2xl shadow-2xl p-8">
+
+            <h2 className="text-3xl font-bold text-slate-800 mb-6">
+              Welcome Back
+            </h2>
+
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) =>
+                setUsername(e.target.value)
+              }
+              className="w-full border p-3 rounded-xl mb-4"
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
+              className="w-full border p-3 rounded-xl mb-4"
+            />
+
+            <button
+              className="w-full bg-blue-600 text-white py-3 rounded-xl"
+              onClick={() => {
+
+                const users = [
+                  {
+                    username: "halyousif",
+                    password: "123456",
+                    id: "user1"
+                  },
+                  {
+                    username: "nelson",
+                    password: "123456",
+                    id: "user2"
+                  }
+                ];
+
+                const user = users.find(
+                  u =>
+                    u.username === username &&
+                    u.password === password
+                );
+
+                if (!user) {
+                  alert("Invalid Username or Password");
+                  return;
+                }
+
+                localStorage.setItem(
+                  "currentUser",
+                  user.id
+                );
+
+                setCurrentUser(user.id);
+
+                setIsLoggedIn(true);
+
+                setShowLoginModal(false);
+
+              }}
+            >
+              Login
+            </button>
+
+            <button
+              className="w-full mt-3 border py-3 rounded-xl"
+              onClick={() =>
+                setShowLoginModal(false)
+              }
+            >
+              Cancel
+            </button>
+
+          </div>
+
+        </div>
+
+      )}
+
     </div>
   );
 }
