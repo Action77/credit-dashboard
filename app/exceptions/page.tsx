@@ -37,50 +37,21 @@ const [tillDate, setTillDate] = useState("");
 const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
 
-  const currentUser =
-    localStorage.getItem("currentUser");
+  const loadExceptions = async () => {
 
-  if (!currentUser) return;
+    const response =
+      await fetch("/api/exceptions");
 
-  const saved =
-    localStorage.getItem(
-      `exceptions_${currentUser}`
-    );
+    const data =
+      await response.json();
 
-  if (!saved) return;
+    setExceptions(data || []);
 
-  const today = new Date();
+  };
 
-  today.setHours(0, 0, 0, 0);
-
-  const validExceptions =
-    JSON.parse(saved).filter(
-      (item: any) => {
-
-        const tillDate =
-          new Date(item.tillDate);
-
-        tillDate.setHours(
-          0,
-          0,
-          0,
-          0
-        );
-
-        return tillDate >= today;
-
-      }
-    );
-
-  setExceptions(validExceptions);
-
-  localStorage.setItem(
-    `exceptions_${currentUser}`,
-    JSON.stringify(validExceptions)
-  );
+  loadExceptions();
 
 }, []);
-
 useEffect(() => {
 
   const savedUser =
@@ -242,7 +213,8 @@ P1316600015512`}
 
 <button
   className="bg-blue-600 text-white px-6 py-3 rounded-lg"
-  onClick={() => {
+  onClick={async () => {
+
 
     const currentUser =
       localStorage.getItem("currentUser");
@@ -255,13 +227,14 @@ P1316600015512`}
       return;
     }
 
-    const creditData =
-      JSON.parse(
-        localStorage.getItem(
-          "creditData"
-        ) || "[]"
-      );
+    const creditResponse =
+  await fetch("/api/credit-data");
 
+const creditResult =
+  await creditResponse.json();
+
+const creditData =
+  creditResult.data || [];
     const invoices =
       invoiceText
         .split("\n")
@@ -302,16 +275,35 @@ P1316600015512`}
         };
       });
 
-    const updated =
-      [...exceptions, ...newExceptions];
+    await fetch(
+  "/api/exceptions",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type":
+        "application/json",
+    },
+    body: JSON.stringify(
+      newExceptions.map(item => ({
+        invoice: item.invoice,
+        till_date: item.tillDate,
+        van_code: item.vanCode,
+        employee_name: item.employeeName,
+        ats_code: item.atsCode,
+        customer_code: item.customerCode,
+        customer_name: item.customerName,
+        created_by: currentUser,
+      }))
+    ),
+  }
+);
 
-    setExceptions(updated);
+const response =
+  await fetch("/api/exceptions");
 
-    localStorage.setItem(
-      `exceptions_${currentUser}`,
-      JSON.stringify(updated)
-    );
-
+setExceptions(
+  await response.json()
+);
     setInvoiceText("");
 
     setTillDate("");
@@ -380,8 +372,7 @@ P1316600015512`}
         (item, index) => {
 
       const tillDate =
-        new Date(item.tillDate);
-
+  new Date(item.till_date);
       const daysLeft =
         Math.ceil(
           (
@@ -398,20 +389,21 @@ P1316600015512`}
   className="border-b hover:bg-slate-50"
 >
 
-          <td className="p-3">{item.vanCode}</td>
+          <td className="p-3">{item.van_code}</td>
 
           <td className="p-3">
-            {item.employeeName}
+            {item.employee_name}
           </td>
 
-          <td className="p-3">{item.atsCode}</td>
+          <td className="p-3">{item.ats_code}
+</td>
 
           <td className="p-3">
-            {item.customerCode}
+            {item.customer_code}
           </td>
 
           <td className="p-3">
-            {item.customerName}
+            {item.customer_name}
           </td>
 
           <td className="p-3">
@@ -419,7 +411,7 @@ P1316600015512`}
           </td>
 
           <td className="p-3">
-            {item.tillDate}
+            {item.till_date}
           </td>
 
           <td className="p-3">
@@ -441,10 +433,7 @@ P1316600015512`}
 
         setExceptions(updated);
 
-        localStorage.setItem(
-          `exceptions_${currentUser}`,
-          JSON.stringify(updated)
-        );
+        setExceptions(updated);
 
       }}
     >
