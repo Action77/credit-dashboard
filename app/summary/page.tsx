@@ -1,5 +1,5 @@
 "use client";
-
+import { storage as localStorage } from "@/utils/storage";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -55,72 +55,56 @@ const usersLogin = [
 
     setData(result.data || []);
 
-    try {
+    const currentUser =
+      await localStorage.getItem("currentUser");
 
-      const exResponse = await fetch("/api/exceptions");
-      const exResult = await exResponse.json();
+    const collected =
+      await localStorage.getItem(
+        "collectedInvoices"
+      );
 
-      setExceptions(exResult || []);
+    const savedPermissions =
+      await localStorage.getItem(
+        "vanPermissions"
+      );
 
-    } catch (error) {
+    const savedUpdatedVans =
+      await localStorage.getItem(
+        "lastUpdatedVans"
+      );
 
-      console.error("Failed to load exceptions", error);
+    const savedFilters =
+      await localStorage.getItem(
+        `savedFilters_${currentUser}`
+      );
 
+    if (savedFilters) {
+      setFilters(JSON.parse(savedFilters));
     }
+
+    if (collected) {
+      setCollectedInvoices(
+        JSON.parse(collected)
+      );
+    }
+
+    if (savedPermissions) {
+      setPermissions(
+        JSON.parse(savedPermissions)
+      );
+    }
+
+    if (savedUpdatedVans) {
+      setLastUpdatedVans(
+        JSON.parse(savedUpdatedVans)
+      );
+    }
+
+    setIsLoggedIn(!!currentUser);
 
   };
 
   loadData();
-
-  const currentUser =
-    localStorage.getItem("currentUser");
-
-  const collected =
-    localStorage.getItem("collectedInvoices");
-
-  const savedPermissions =
-    localStorage.getItem("vanPermissions");
-
-  const savedUpdatedVans =
-    localStorage.getItem("lastUpdatedVans");
-
-  if (savedUpdatedVans) {
-
-    setLastUpdatedVans(
-      JSON.parse(savedUpdatedVans)
-    );
-
-  }
-
-  if (collected) {
-
-    setCollectedInvoices(
-      JSON.parse(collected)
-    );
-
-  }
-
-  if (savedPermissions) {
-
-    setPermissions(
-      JSON.parse(savedPermissions)
-    );
-
-  }
-
-  const savedFilters =
-  localStorage.getItem(
-    "summaryFilters"
-  );
-  setIsLoggedIn(!!currentUser);
-
-  if (savedFilters) {
-
-    setFilters(
-      JSON.parse(savedFilters)
-    );
-
-  }
 
 }, []);
   const getStatusStyle = (
