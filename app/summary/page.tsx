@@ -1,5 +1,5 @@
 "use client";
-import { storage as localStorage } from "@/utils/storage";
+
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -47,59 +47,82 @@ const usersLogin = [
   },
 ];
   useEffect(() => {
+
   const loadData = async () => {
-    const creditData = await localStorage.getItem("creditData");
 
-    const currentUser =
-      await localStorage.getItem("currentUser");
+    const response = await fetch("/api/credit-data");
+    const result = await response.json();
 
-    const savedExceptions =
-      await localStorage.getItem(
-        `exceptions_${currentUser}`
-      );
+    setData(result.data || []);
 
-    if (savedExceptions) {
-      setExceptions(JSON.parse(savedExceptions));
+    try {
+
+      const exResponse = await fetch("/api/exceptions");
+      const exResult = await exResponse.json();
+
+      setExceptions(exResult || []);
+
+    } catch (error) {
+
+      console.error("Failed to load exceptions", error);
+
     }
 
-    const collected =
-      await localStorage.getItem("collectedInvoices");
-
-    const savedPermissions =
-      await localStorage.getItem("vanPermissions");
-
-    const savedUpdatedVans =
-      await localStorage.getItem("lastUpdatedVans");
-
-    if (savedUpdatedVans) {
-      setLastUpdatedVans(
-        JSON.parse(savedUpdatedVans)
-      );
-    }
-
-    if (creditData) {
-      setData(JSON.parse(creditData));
-    }
-
-    if (collected) {
-      setCollectedInvoices(JSON.parse(collected));
-    }
-
-    if (savedPermissions) {
-      setPermissions(JSON.parse(savedPermissions));
-    }
-
-    const savedFilters =
-      await localStorage.getItem("summaryFilters");
-
-    setIsLoggedIn(!!currentUser);
-
-    if (savedFilters) {
-      setFilters(JSON.parse(savedFilters));
-    }
   };
 
   loadData();
+
+  const currentUser =
+    localStorage.getItem("currentUser");
+
+  const collected =
+    localStorage.getItem("collectedInvoices");
+
+  const savedPermissions =
+    localStorage.getItem("vanPermissions");
+
+  const savedUpdatedVans =
+    localStorage.getItem("lastUpdatedVans");
+
+  if (savedUpdatedVans) {
+
+    setLastUpdatedVans(
+      JSON.parse(savedUpdatedVans)
+    );
+
+  }
+
+  if (collected) {
+
+    setCollectedInvoices(
+      JSON.parse(collected)
+    );
+
+  }
+
+  if (savedPermissions) {
+
+    setPermissions(
+      JSON.parse(savedPermissions)
+    );
+
+  }
+
+  const savedFilters =
+    localStorage.getItem(
+      "summaryFilters"
+    );
+
+  setIsLoggedIn(!!currentUser);
+
+  if (savedFilters) {
+
+    setFilters(
+      JSON.parse(savedFilters)
+    );
+
+  }
+
 }, []);
   const getStatusStyle = (
 remaining: number,
@@ -353,8 +376,8 @@ const regionSummary = Object.entries(
 
     <div
       className="flex items-center gap-3 bg-red-600 p-3 rounded-lg cursor-pointer"
-      onClick={async () => {
-        await localStorage.removeItem("currentUser");
+      onClick={() => {
+        localStorage.removeItem("currentUser");
         setIsLoggedIn(false);
       }}
     >
@@ -479,21 +502,25 @@ lastUpdatedVans.some(
                 checked={
                   permissions[van] ?? false
                 }
-                onChange={async (e) => {
+                onChange={(e) => {
 
-  const updated = {
-    ...permissions,
-    [van]: e.target.checked,
-  };
+                  const updated = {
+  ...permissions,
+  [van]: e.target.checked,
+};
 
-  setPermissions(updated);
+                  setPermissions(
+                    updated
+                  );
 
-  await localStorage.setItem(
-    "vanPermissions",
-    JSON.stringify(updated)
-  );
+                  localStorage.setItem(
+                    "vanPermissions",
+                    JSON.stringify(
+                      updated
+                    )
+                  );
 
-}}
+                }}
               />
             </td>
 
@@ -609,7 +636,7 @@ Amount
 
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded"
-         onClick={async () => {
+          onClick={() => {
 
             const user =
               usersLogin.find(
@@ -623,7 +650,7 @@ Amount
               return;
             }
 
-            await localStorage.setItem(
+            localStorage.setItem(
   "currentUser",
   user.id
 );
