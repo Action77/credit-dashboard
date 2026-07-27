@@ -230,61 +230,23 @@ useEffect(() => {
 
 useEffect(() => {
 
-  const loadCreditInfo = async () => {
-
-    const savedCreditInfo =
-      await localStorage.getItem(
-        "creditFileInfo"
-      );
-
-    if (savedCreditInfo) {
-
-      setCreditFileInfo(
-        savedCreditInfo
-      );
-
-    }
-
-  };
-
-  loadCreditInfo();
-
   fetch("/api/collection-data")
     .then(res => res.json())
     .then(data => {
-      setCollectionFileInfo(
-        data.fileInfo || ""
-      );
+      setCollectionFileInfo(data.fileInfo || "");
     });
 
-}, []);
-useEffect(() => {
+}, []);useEffect(() => {
 
   const loadCreditData = async () => {
 
-    const savedData =
-      await localStorage.getItem("creditData");
+    const response = await fetch("/api/credit-data");
 
-    const savedDate =
-      await localStorage.getItem("creditDate");
+    const result = await response.json();
 
-    const today =
-      new Date().toDateString();
+    setData(result.data || []);
 
-    if (
-      savedData &&
-      savedDate === today
-    ) {
-
-      setData(JSON.parse(savedData));
-
-    } else {
-
-      await localStorage.removeItem("creditData");
-
-      await localStorage.removeItem("creditDate");
-
-    }
+    setCreditFileInfo(result.fileInfo || "");
 
   };
 
@@ -292,94 +254,41 @@ useEffect(() => {
 
 }, []);
 
-  const handleCreditImport = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleCreditImport = async (
+  event: React.ChangeEvent<HTMLInputElement>
+) => {
     const file = event.target.files?.[0];
 
     if (!file) return;
-fetch("/api/collection-reset", {
+    const formData = new FormData();
+
+formData.append("file", file);
+
+const currentUsername =
+  users.find(u => u.id === currentUser)?.username || currentUser;
+
+formData.append(
+  "uploadedBy",
+  currentUsername
+);
+
+await fetch("/api/credit-upload", {
+  method: "POST",
+  body: formData,
+});
+const response = await fetch("/api/credit-data");
+const result = await response.json();
+
+setData(result.data || []);
+setCreditFileInfo(result.fileInfo || "");
+
+await fetch("/api/collection-reset", {
   method: "POST",
 });
-    const reader = new FileReader();
-
-    reader.onload = async (e) => {
-      const workbook = XLSX.read(
-        e.target?.result,
-        { type: "binary" }
-      );
-
-      const sheetName =
-        workbook.SheetNames[0];
-
-      const worksheet =
-        workbook.Sheets[sheetName];
-const creditFileDate =
-  worksheet["B3"]?.w ||
-  "";
-      const jsonData: any[] =
-        XLSX.utils.sheet_to_json(
-          worksheet,
-          {
-            range: 5,
-          }
-        );
-
-      const blockedRows =
-  jsonData.filter((row) => {
-
-    const userBlock =
-      String(
-        row["Status User Block"] || ""
-      )
-        .trim()
-        .toLowerCase();
-
-    const invoiceStatus =
-      String(
-        row["Invoice status (Due/ Overdue)"] || ""
-      )
-        .trim()
-        .toLowerCase();
-
-    return (
-      userBlock === "block" &&
-      !invoiceStatus.includes("legal")
-    );
-
-  });
-  setData(blockedRows);
-
-setCreditFileInfo(
-  `${file.name} | ${creditFileDate}`
-);
-await localStorage.setItem(
-  "creditFileInfo",
-  `${file.name} | ${creditFileDate}`
-);
-setCollectedInvoices([]);
-
- localStorage.getItem(
-  "collectedInvoices"
-);
-await localStorage.setItem(
-  "creditData",
-  JSON.stringify(blockedRows)
-);
-
-await localStorage.setItem(
-  "creditDate",
-  new Date().toDateString()
-);
-
-    };
-
-    reader.readAsBinaryString(file);
   };
-  const handleCollectionImport = (
+  const handleCollectionImport = async (
   event: React.ChangeEvent<HTMLInputElement>
 ) => {
-
   console.log("BUTTON WORKING");
 
   const file =
@@ -400,7 +309,7 @@ formData.append(
   currentUsername
 );
 
-fetch("/api/collection-upload", {
+await fetch("/api/collection-upload", {
   method: "POST",
   body: formData,
 });
