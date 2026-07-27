@@ -540,27 +540,35 @@ const blockedCount =
     const invoice =
       String(
         row["Invoice #"]
-      ).replace(/\s/g, "");
+      )
+        .replace(/\s/g, "")
+        .toUpperCase();
 
     const isException =
       exceptions.some(
         (e) =>
           String(e.invoice)
-            .replace(/\s/g, "") ===
+            .replace(/\s/g, "")
+            .toUpperCase() ===
           invoice
       );
 
     const isCollected =
       collectedInvoices.some(
-        (i) => i === invoice
+        (i) =>
+          String(i)
+            .replace(/\s/g, "")
+            .toUpperCase() ===
+          invoice
       );
 
     return (
       !isException &&
       !isCollected
     );
+
   }).length;
-const employeeCount =
+  const employeeCount =
   new Set(
     filteredData.map(
       (row) => row["Employee Name."]
@@ -589,35 +597,42 @@ const employeeCount =
 
   ).filter(([_, rows]: any) =>
 
-    rows.every((row: any) => {
+    rows.some((row: any) => {
 
       const invoice =
         String(
           row["Invoice #"]
-        ).replace(/\s/g, "");
+        )
+          .replace(/\s/g, "")
+          .toUpperCase();
 
       const isException =
         exceptions.some(
           (e) =>
             String(e.invoice)
-              .replace(/\s/g, "") ===
+              .replace(/\s/g, "")
+              .toUpperCase() ===
             invoice
         );
 
       const isCollected =
         collectedInvoices.some(
-          (i) => i === invoice
+          (i) =>
+            String(i)
+              .replace(/\s/g, "")
+              .toUpperCase() ===
+            invoice
         );
 
       return (
-        isException ||
-        isCollected
+        !isException &&
+        !isCollected
       );
 
     })
 
   ).length;
-  const toggleRegion = (
+    const toggleRegion = (
   region: string
 ) => {
 
@@ -1442,31 +1457,38 @@ await localStorage.setItem(
   key={index}
   className="border-b"
   style={{
-  backgroundColor:
+    backgroundColor:
 
-    collectedInvoices.some(
-      (invoice) =>
-        invoice ===
-        String(
-          row["Invoice #"]
-        ).replace(/\s/g, "")
-    )
+      collectedInvoices.some(
+        invoice =>
+          String(invoice)
+            .replace(/\s/g, "")
+            .toUpperCase() ===
+          String(
+            row["Invoice #"]
+          )
+            .replace(/\s/g, "")
+            .toUpperCase()
+      )
 
-      ? "#C6EFCE"
+        ? "#C6EFCE"
 
-      : exceptions.some(
-          (e) =>
-            String(e.invoice)
-              .replace(/\s/g, "") ===
-            String(
-              row["Invoice #"]
-            ).replace(/\s/g, "")
-        )
+        : exceptions.some(
+            e =>
+              String(e.invoice)
+                .replace(/\s/g, "")
+                .toUpperCase() ===
+              String(
+                row["Invoice #"]
+              )
+                .replace(/\s/g, "")
+                .toUpperCase()
+          )
 
-      ? "#FFCB96"
+        ? "#FFCB96"
 
-      : "",
-}}
+        : "",
+  }}
 >
                       <td className="p-3">
   {row["Van Code."]}
