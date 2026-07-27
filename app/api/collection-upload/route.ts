@@ -5,7 +5,6 @@ import path from "path";
 
 export async function POST(req: Request) {
   try {
-
     const formData = await req.formData();
 
     const file = formData.get("file") as File;
@@ -17,7 +16,6 @@ export async function POST(req: Request) {
     }
 
     const bytes = await file.arrayBuffer();
-
     const buffer = Buffer.from(bytes);
 
     const uploadPath = path.join(
@@ -61,7 +59,6 @@ export async function POST(req: Request) {
       rows
         .slice(1)
         .filter((row: any) => {
-
           const status =
             String(
               row[26] || ""
@@ -71,7 +68,6 @@ export async function POST(req: Request) {
             status === "Hold" ||
             status === "Completed"
           );
-
         })
         .map((row: any) =>
           String(row[1] || "")
@@ -85,13 +81,37 @@ export async function POST(req: Request) {
       "collection.json"
     );
 
+    let existingInvoices: string[] = [];
+
+    if (fs.existsSync(jsonPath)) {
+      try {
+        const existingData = JSON.parse(
+          fs.readFileSync(
+            jsonPath,
+            "utf8"
+          )
+        );
+
+        existingInvoices =
+          existingData.invoices || [];
+      } catch {
+        existingInvoices = [];
+      }
+    }
+
+    const mergedInvoices = [
+      ...new Set([
+        ...existingInvoices,
+        ...invoices,
+      ]),
+    ];
+
     fs.writeFileSync(
       jsonPath,
       JSON.stringify(
         {
-          invoices,
-          fileInfo:
-            `${file.name} | ${new Date().toLocaleString()}`,
+          invoices: mergedInvoices,
+          fileInfo: `${file.name} | ${new Date().toLocaleString()}`,
         },
         null,
         2
@@ -100,17 +120,15 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      invoices: invoices.length,
+      invoices: mergedInvoices.length,
+      newInvoices: invoices.length,
       file: file.name,
     });
-
   } catch (error) {
-
     console.error(error);
 
     return NextResponse.json({
       success: false,
     });
-
   }
 }
