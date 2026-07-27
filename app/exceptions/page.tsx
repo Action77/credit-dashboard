@@ -11,8 +11,12 @@ import {
   BarChart3,
   Settings,
   Users,
+  LogOut,
 } from "lucide-react";
-const [isLoggedIn, setIsLoggedIn] =
+
+
+export default function ExceptionsPage() {
+  const [isLoggedIn, setIsLoggedIn] =
   useState(false);
 
 const [showLoginModal, setShowLoginModal] =
@@ -26,8 +30,6 @@ const [password, setPassword] =
 
 const [currentUser, setCurrentUser] =
   useState("");
-
-export default function ExceptionsPage() {
   const [exceptions, setExceptions] = useState<any[]>([]);
   const [invoiceText, setInvoiceText] = useState("");
 
@@ -68,6 +70,16 @@ const [tillDate, setTillDate] = useState("");
 
       }
     );
+
+  setExceptions(validExceptions);
+
+  localStorage.setItem(
+    `exceptions_${currentUser}`,
+    JSON.stringify(validExceptions)
+  );
+
+}, []);
+
 useEffect(() => {
 
   const savedUser =
@@ -84,15 +96,7 @@ useEffect(() => {
   }
 
 }, []);
-  setExceptions(validExceptions);
-
-  localStorage.setItem(
-    `exceptions_${currentUser}`,
-    JSON.stringify(validExceptions)
-  );
-
-}, []);
-return (
+  return (
   <div className="min-h-screen bg-[#f4f7fc] flex">
 
     <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
@@ -159,6 +163,45 @@ return (
 </Link>
 
 </nav>
+
+<div
+  className={`mt-auto flex items-center gap-3 cursor-pointer p-4 ${
+    isLoggedIn
+      ? "bg-red-600"
+      : "bg-blue-600"
+  }`}
+  onClick={() => {
+
+    if (isLoggedIn) {
+
+      localStorage.removeItem("currentUser");
+
+      setIsLoggedIn(false);
+
+      setCurrentUser("");
+
+      window.location.href = "/";
+
+    } else {
+
+      setShowLoginModal(true);
+
+    }
+
+  }}
+>
+  {isLoggedIn ? (
+    <>
+      <LogOut size={18} />
+      Logout
+    </>
+  ) : (
+    <>
+      <Users size={18} />
+      Login
+    </>
+  )}
+</div>
 
 </aside>
 
