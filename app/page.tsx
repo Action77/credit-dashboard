@@ -1652,12 +1652,48 @@ await localStorage.setItem(
 )}
             <div className="mt-8">
 
-              <h4 className="font-bold mb-4">
-                Current Exceptions
-              </h4>
+  <h4 className="font-bold mb-4">
+    Current Exceptions
+  </h4>
 
+  <div className="max-h-[350px] overflow-y-auto border rounded-lg">
 
-<table className="w-full text-sm">
+    <table className="w-full text-sm">
+
+      <thead className="sticky top-0 bg-white z-10">
+
+        <tr className="border-b">
+          <th className="text-left p-2">
+            Invoice
+          </th>
+
+          <th className="text-left p-2">
+            Till Date
+          </th>
+
+          <th className="text-left p-2">
+            Days
+          </th>
+
+          {isLoggedIn && (
+            <th className="text-left p-2">
+              Delete
+            </th>
+          )}
+        </tr>
+
+      </thead>
+
+      <tbody>
+        {/* rows */}
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
 
   <thead>
 
