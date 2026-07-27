@@ -1663,6 +1663,7 @@ await localStorage.setItem(
       <thead className="sticky top-0 bg-white z-10">
 
         <tr className="border-b">
+
           <th className="text-left p-2">
             Invoice
           </th>
@@ -1676,16 +1677,91 @@ await localStorage.setItem(
           </th>
 
           {isLoggedIn && (
+
             <th className="text-left p-2">
               Delete
             </th>
+
           )}
+
         </tr>
 
       </thead>
 
       <tbody>
-        {/* rows */}
+
+        {exceptions.map((item, index) => {
+
+          const tillDate =
+            new Date(item.till_date);
+
+          const daysLeft =
+            isNaN(tillDate.getTime())
+              ? "-"
+              : Math.ceil(
+                  (
+                    tillDate.getTime() -
+                    new Date().getTime()
+                  ) /
+                    (1000 * 60 * 60 * 24)
+                );
+
+          return (
+            <tr key={index}>
+
+              <td className="p-2">
+                {item.invoice}
+              </td>
+
+              <td className="p-2">
+                {item.till_date
+                  ? new Date(
+                      item.till_date
+                    ).toLocaleDateString()
+                  : "-"}
+              </td>
+
+              <td className="p-2">
+                {daysLeft}
+              </td>
+
+              <td className="p-2">
+
+                {isLoggedIn && (
+
+                  <button
+                    className="bg-red-600 text-white px-2 py-1 rounded"
+                    onClick={async () => {
+
+                      await fetch(
+                        `/api/exceptions/${item.id}`,
+                        {
+                          method: "DELETE",
+                        }
+                      );
+
+                      setExceptions(
+                        prev =>
+                          prev.filter(
+                            exception =>
+                              exception.id !== item.id
+                          )
+                      );
+
+                    }}
+                  >
+                    X
+                  </button>
+
+                )}
+
+              </td>
+
+            </tr>
+          );
+
+        })}
+
       </tbody>
 
     </table>
@@ -1693,110 +1769,12 @@ await localStorage.setItem(
   </div>
 
 </div>
-
-
-  <thead>
-
-    <tr className="border-b">
-
-      <th className="text-left p-2">
-        Invoice
-      </th>
-
-      <th className="text-left p-2">
-        Till Date
-      </th>
-
-<th className="text-left p-2">
-  Days
-</th>
-
-{isLoggedIn && (
-  <th className="text-left p-2">
-    Delete
-  </th>
-)}
-
-    </tr>
-
-  </thead>
-
-<tbody>
-
-  {exceptions.map((item, index) => {
-
-
-
-      const tillDate =
-  new Date(item.till_date);
-
-const daysLeft =
-  isNaN(tillDate.getTime())
-    ? "-"
-    : Math.ceil(
-        (
-          tillDate.getTime() -
-          new Date().getTime()
-        ) /
-          (1000 * 60 * 60 * 24)
-      );
-      return (
-        <tr key={index}>
-          <td className="p-2">
-            {item.invoice}
-          </td>
-
-<td className="p-2">
-  {item.till_date
-    ? new Date(
-        item.till_date
-      ).toLocaleDateString()
-    : "-"}
-</td>
-
-          <td className="p-2">
-            {daysLeft}
-          </td>
-          <td className="p-2">
-{isLoggedIn && (
-
-<button
-  className="bg-red-600 text-white px-2 py-1 rounded"
-  onClick={async () => {
-
-    await fetch(
-      `/api/exceptions/${item.id}`,
-      {
-        method: "DELETE",
-      }
-    );
-
-    setExceptions(prev =>
-      prev.filter(
-        exception =>
-          exception.id !== item.id
-      )
-    );
-
-  }}
->
-  X
-</button>
-  )}
-</td>
-        </tr>
-      );
-    })}
-
-</tbody>
-</table>
-
+    
               </div>
               
 
             </div>
 
-          </div>
 
        
         
