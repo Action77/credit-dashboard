@@ -12,6 +12,21 @@ import {
   Settings,
   Users,
 } from "lucide-react";
+const [isLoggedIn, setIsLoggedIn] =
+  useState(false);
+
+const [showLoginModal, setShowLoginModal] =
+  useState(false);
+
+const [username, setUsername] =
+  useState("");
+
+const [password, setPassword] =
+  useState("");
+
+const [currentUser, setCurrentUser] =
+  useState("");
+
 export default function ExceptionsPage() {
   const [exceptions, setExceptions] = useState<any[]>([]);
   const [invoiceText, setInvoiceText] = useState("");
@@ -53,7 +68,22 @@ const [tillDate, setTillDate] = useState("");
 
       }
     );
+useEffect(() => {
 
+  const savedUser =
+    localStorage.getItem(
+      "currentUser"
+    );
+
+  if (savedUser) {
+
+    setCurrentUser(savedUser);
+
+    setIsLoggedIn(true);
+
+  }
+
+}, []);
   setExceptions(validExceptions);
 
   localStorage.setItem(
