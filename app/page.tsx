@@ -94,34 +94,36 @@ const [loadedExceptions,
   useState(false);
   useEffect(() => {
 
-  if (!currentUser) return;
-
   const loadExceptions = async () => {
 
-    const saved = await localStorage.getItem(
-      `exceptions_${currentUser}`
-    );
+    const response =
+      await fetch("/api/exceptions");
 
-    if (!saved) {
-      setExceptions([]);
-      setLoadedExceptions(true);
-      return;
-    }
+    const data =
+      await response.json();
 
     const today = new Date();
+
     today.setHours(0, 0, 0, 0);
 
-    const validExceptions = JSON.parse(saved).filter(
-      (item: any) => {
+    const validExceptions =
+      data.filter((item: any) => {
 
-        const tillDate = new Date(item.tillDate);
+        const tillDate =
+          new Date(
+            item.till_date
+          );
 
-        tillDate.setHours(0, 0, 0, 0);
+        tillDate.setHours(
+          0,
+          0,
+          0,
+          0
+        );
 
         return tillDate >= today;
 
-      }
-    );
+      });
 
     setExceptions(validExceptions);
 
@@ -131,7 +133,7 @@ const [loadedExceptions,
 
   loadExceptions();
 
-}, [currentUser]);
+}, []);
 
 useEffect(() => {
 
@@ -186,23 +188,6 @@ useEffect(() => {
   loadFilters();
 
 }, [currentUser]);
-useEffect(() => {
-
-  if (
-    !loadedExceptions ||
-    !currentUser
-  ) return;
-
-   localStorage.setItem(
-    `exceptions_${currentUser}`,
-    JSON.stringify(exceptions)
-  );
-
-}, [
-  exceptions,
-  loadedExceptions,
-  currentUser,
-]);
 
 useEffect(() => {
 
@@ -1589,7 +1574,7 @@ await localStorage.setItem(
 
 <button
   className="bg-blue-600 text-white w-full py-3 rounded-lg"
-  onClick={() => {
+  onClick={async () => {
 
     const invoice =
       invoiceNo
@@ -1599,37 +1584,71 @@ await localStorage.setItem(
     if (
       !invoice ||
       !tillDate
-    )
+    ) {
       return;
+    }
 
-    setExceptions((prev) => {
-
-      if (
-        prev.some(
-          (x) =>
-            x.invoice === invoice
-        )
-      ) {
-        return prev;
-      }
-
-      return [
-        ...prev,
-        {
-          invoice,
-          tillDate,
+    await fetch(
+      "/api/exceptions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
         },
-      ];
-    });
+        body: JSON.stringify([
+          {
+            invoice,
+            till_date: tillDate,
+            created_by: currentUser,
+          },
+        ]),
+      }
+    );
+
+    const response =
+      await fetch(
+        "/api/exceptions"
+      );
+
+    const data =
+      await response.json();
+
+    setExceptions(
+  data.filter((item: any) => {
+
+    const tillDate =
+      new Date(item.till_date);
+
+    const today =
+      new Date();
+
+    today.setHours(
+      0,
+      0,
+      0,
+      0
+    );
+
+    tillDate.setHours(
+      0,
+      0,
+      0,
+      0
+    );
+
+    return tillDate >= today;
+
+  })
+);
 
     setInvoiceNo("");
     setTillDate("");
-  }}
 
+  }}
 >
   Add Exception
 </button>
-
 )}
             <div className="mt-8">
 
@@ -1673,7 +1692,7 @@ await localStorage.setItem(
 
 
       const tillDate =
-  new Date(item.tillDate);
+  new Date(item.till_date);
 
 const daysLeft =
   isNaN(tillDate.getTime())
@@ -1692,9 +1711,9 @@ const daysLeft =
           </td>
 
 <td className="p-2">
-  {item.tillDate
+  {item.till_date
     ? new Date(
-        item.tillDate
+        item.till_date
       ).toLocaleDateString()
     : "-"}
 </td>
