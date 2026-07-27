@@ -33,17 +33,18 @@ export async function POST(req: Request) {
 
     const creditFileDate = worksheet["B3"]?.w || "";
 
-    const jsonData: any[] = XLSX.utils.sheet_to_json(
-      worksheet,
-      {
-        range: 5,
-      }
-    );
+    const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, {
+      range: 5,
+      defval: "",
+    });
+
+    console.log("========== CREDIT FILE ==========");
+    console.log("Total Rows:", jsonData.length);
+    console.log("First Row:", jsonData[0]);
+    console.log("Second Row:", jsonData[1]);
 
     const blockedRows = jsonData.filter((row) => {
-      const userBlock = String(
-        row["Status User Block"] || ""
-      )
+      const userBlock = String(row["Status User Block"] || "")
         .trim()
         .toLowerCase();
 
@@ -59,15 +60,17 @@ export async function POST(req: Request) {
       );
     });
 
-    const { error: deleteError } = await supabase
-  .from("credit_data")
-  .delete()
-  .neq("invoice", "");
+    console.log("Blocked Rows:", blockedRows.length);
 
-if (deleteError) {
-  console.error("DELETE ERROR:", deleteError);
-  throw deleteError;
-}
+    const { error: deleteError } = await supabase
+      .from("credit_data")
+      .delete()
+      .neq("invoice", "");
+
+    if (deleteError) {
+      console.error("DELETE ERROR:", deleteError);
+      throw deleteError;
+    }
 
     const records = blockedRows.map((row) => ({
       invoice: String(row["Invoice #"]).replace(/\s/g, ""),
@@ -78,11 +81,11 @@ if (deleteError) {
       customer_name: row["Customer Name"],
       central_invoice: row["Central Invoice"],
       payment_term: row["Payment Term"],
-      trx_date: row["Trx Date"],
-      credit_invoice_amount: row["Credit Invoice Amount"],
-      pending_cim: row["Pending CIM"],
-      credit_days: row["Credit_Days"],
-      total_rejected_count: row["Total Rejected Count"],
+      trx_date: String(row["Trx Date"]),
+      credit_invoice_amount: Number(row["Credit Invoice Amount"]) || 0,
+      pending_cim: Number(row["Pending CIM"]) || 0,
+      credit_days: Number(row["Credit_Days"]) || 0,
+      total_rejected_count: Number(row["Total Rejected Count"]) || 0,
       region: row["Region"],
       city: row["City"],
       uploaded_by: uploadedBy,
@@ -90,16 +93,23 @@ if (deleteError) {
       file_date: creditFileDate,
     }));
 
+    console.log("Records To Insert:", records.length);
+
+    if (records.length > 0) {
+      console.log("Sample Record:", records[0]);
+    }
+
     const { data, error } = await supabase
-  .from("credit_data")
-  .insert(records)
-  .select();
+      .from("credit_data")
+      .insert(records)
+      .select();
 
-console.log("Rows to insert:", records.length);
-console.log("Inserted:", data);
-console.log("Insert error:", error);
+    console.log("Inserted Rows:", data?.length);
+    console.log("Insert Error:", error);
 
-if (error) throw error;
+    if (error) {
+      throw error;
+    }
 
     return NextResponse.json({
       success: true,
@@ -107,7 +117,7 @@ if (error) throw error;
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("UPLOAD ERROR:", err);
 
     return NextResponse.json({
       success: false,
