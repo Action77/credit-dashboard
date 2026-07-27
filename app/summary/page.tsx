@@ -48,7 +48,18 @@ const usersLogin = [
 ];
   useEffect(() => {
     const creditData = localStorage.getItem("creditData");
-    const savedExceptions = localStorage.getItem("exceptions");
+    const currentUser =
+  localStorage.getItem("currentUser");
+
+const savedExceptions =
+  localStorage.getItem(
+    `exceptions_${currentUser}`
+  );
+  if (savedExceptions) {
+  setExceptions(
+    JSON.parse(savedExceptions)
+  );
+}
     const collected = localStorage.getItem("collectedInvoices");
     const savedPermissions = localStorage.getItem("vanPermissions");
 
@@ -71,10 +82,7 @@ if (savedUpdatedVans) {
       setData(JSON.parse(creditData));
     }
 
-    if (savedExceptions) {
-      setExceptions(JSON.parse(savedExceptions));
-    }
-
+    
     if (collected) {
       setCollectedInvoices(JSON.parse(collected));
     }
@@ -86,7 +94,6 @@ if (savedUpdatedVans) {
   localStorage.getItem(
     "summaryFilters"
   );
-const currentUser = localStorage.getItem("currentUser");
 
 setIsLoggedIn(!!currentUser);
 if (savedFilters) {
