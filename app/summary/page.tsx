@@ -109,9 +109,11 @@ const usersLogin = [
   }
 
   const savedFilters =
-    localStorage.getItem(
-      "summaryFilters"
-    );
+  currentUser
+    ? localStorage.getItem(
+        `savedFilters_${currentUser}`
+      )
+    : null;
 
   setIsLoggedIn(!!currentUser);
 

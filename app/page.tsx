@@ -1054,7 +1054,53 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
 <input
   type="checkbox"
   checked={selectedRegions.includes(region)}
-  onChange={() => {}}
+  onChange={(e) => {
+
+    const regionCities = data
+      .filter(row => row["Region"] === region)
+      .map(row => row["City"])
+      .filter(Boolean);
+
+    const regionVans = data
+      .filter(row => row["Region"] === region)
+      .map(row => row["Van Code."])
+      .filter(Boolean);
+
+    if (e.target.checked) {
+
+      setSelectedRegions(prev => [
+        ...new Set([...prev, region])
+      ]);
+
+      setSelectedCities(prev => [
+        ...new Set([...prev, ...regionCities])
+      ]);
+
+      setSelectedVans(prev => [
+        ...new Set([...prev, ...regionVans])
+      ]);
+
+    } else {
+
+      setSelectedRegions(prev =>
+        prev.filter(r => r !== region)
+      );
+
+      setSelectedCities(prev =>
+        prev.filter(
+          city => !regionCities.includes(city)
+        )
+      );
+
+      setSelectedVans(prev =>
+        prev.filter(
+          van => !regionVans.includes(van)
+        )
+      );
+
+    }
+
+  }}
 />
   <span
     className="cursor-pointer"
