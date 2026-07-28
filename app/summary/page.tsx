@@ -587,6 +587,9 @@ const regionSummary = Object.entries(
   </div>
 
 </div>
+
+<div className="flex gap-6 items-start">
+
 <div
   className="
     bg-white
@@ -754,10 +757,11 @@ const regionSummary = Object.entries(
 
 </table>
 
-  </div>
+</div>
 
 </div>
-<div className="mt-8 bg-white rounded-2xl shadow-sm border border-slate-100">
+
+<div className="w-[350px] bg-white rounded-2xl shadow-sm border border-slate-100">
 
   <div className="px-5 py-4 border-b border-slate-100">
 
@@ -842,10 +846,13 @@ const regionSummary = Object.entries(
 
     </div>
 
-  </div>
+</div>
 
 </div>
-      </main>
+
+</div>
+
+</main>
 {showLoginModal && (
   <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
