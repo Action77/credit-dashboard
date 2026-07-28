@@ -133,29 +133,6 @@ useEffect(() => {
 
   useEffect(() => {
 
-    const loadData = async () => {
-
-      const response =
-        await fetch("/api/reports");
-
-      const data =
-        await response.json();
-
-      setCreditData(
-        data.creditData || []
-      );
-
-      setCollections(
-        data.collections || []
-      );
-
-    };
-
-    loadData();
-
-  }, []);
-useEffect(() => {
-
   const loadData = async () => {
 
     const response =
@@ -364,11 +341,10 @@ return (
       <h1 className="text-3xl font-bold mb-6">
         Reports
       </h1>
-      <div
+     <div
   className="bg-white border rounded-xl p-5 mb-6 overflow-hidden"
   style={{
-    width: "100%",
-    maxWidth: "1400px",
+    maxWidth: "1200px"
   }}
 >
   <div className="flex justify-between items-center mb-4">
@@ -383,8 +359,8 @@ return (
 
   </div>
 
-  <table className="text-xs border">
-    <thead>
+  <table className="w-full border">
+        <thead>
 
       <tr className="bg-amber-600 text-white">
 
@@ -516,13 +492,7 @@ return (
 
         <div className="overflow-auto">
 
-          <table
-  className="table-fixed border"
-  style={{
-    width: "100%",
-    maxWidth: "1400px",
-  }}
->
+<table className="w-full border">
 
             <thead>
 
@@ -536,7 +506,7 @@ return (
 
 <th
   key={key}
-  className="p-2 whitespace-nowrap"
+  className="p-3"
 >
                       {key}
                     </th>
@@ -549,38 +519,28 @@ return (
 
             <tbody>
 
-              {filteredCreditRows.map(
-                                (row, index) => (
+  {filteredCollectionRows.map(
+    (row: any) => (
 
-                  <tr
-                    key={index}
-                    className="border-b"
-                  >
-                    {Object.values(row)
-                      .map(
-                        (
-                          value,
-                          cellIndex
-                        ) => (
+      <tr
+        key={row.id}
+        className="border-b"
+      >
 
-<td
-  key={cellIndex}
-  className="p-2 whitespace-nowrap text-xs"
->
-                            {String(
-                              value
-                            )}
-                          </td>
+        <td className="p-2">
+          {row.invoice}
+        </td>
 
-                        )
-                      )}
-                  </tr>
+        <td className="p-2">
+          {row.uploaded_by}
+        </td>
 
-                )
-              )}
+      </tr>
 
-            </tbody>
+    )
+  )}
 
+</tbody>
           </table>
 
         </div>
