@@ -35,6 +35,18 @@ const [currentUser, setCurrentUser] =
   const [invoiceText, setInvoiceText] = useState("");
 
 const [tillDate, setTillDate] = useState("");
+<label className="flex items-center gap-2 mb-4">
+  <input
+    type="checkbox"
+    checked={isPermanent}
+    onChange={(e) =>
+      setIsPermanent(e.target.checked)
+    }
+  />
+  Permanent Exception
+</label>
+const [isPermanent, setIsPermanent] =
+  useState(false);
 const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
 
@@ -208,15 +220,26 @@ P1316600015511
 P1316600015512`}
   className="w-full border rounded-lg p-3 mb-4"
 />
-
-<input
-  type="date"
-  value={tillDate}
-  onChange={(e) =>
-    setTillDate(e.target.value)
-  }
-  className="border rounded-lg p-3 mb-4 w-full"
-/>
+<label className="flex items-center gap-2 mb-4">
+  <input
+    type="checkbox"
+    checked={isPermanent}
+    onChange={(e) =>
+      setIsPermanent(e.target.checked)
+    }
+  />
+  Permanent Exception
+</label>
+{!isPermanent && (
+  <input
+    type="date"
+    value={tillDate}
+    onChange={(e) =>
+      setTillDate(e.target.value)
+    }
+    className="border rounded-lg p-3 mb-4 w-full"
+  />
+)}
 
 <button
   className="bg-blue-600 text-white px-6 py-3 rounded-lg"
@@ -227,11 +250,11 @@ P1316600015512`}
   await localStorage.getItem(
     "currentUser"
   );
-    if (
-      !currentUser ||
-      !tillDate ||
-      !invoiceText
-    ) {
+if (
+  !currentUser ||
+  !invoiceText ||
+  (!isPermanent && !tillDate)
+) {
       return;
     }
 
@@ -295,17 +318,20 @@ const creditData =
         "application/json",
     },
     body: JSON.stringify(
-      newExceptions.map(item => ({
-        invoice: item.invoice,
-        till_date: item.tillDate,
-        van_code: item.vanCode,
-        employee_name: item.employeeName,
-        ats_code: item.atsCode,
-        customer_code: item.customerCode,
-        customer_name: item.customerName,
-        created_by: currentUser,
-      }))
-    ),
+  newExceptions.map(item => ({
+    invoice: item.invoice,
+    till_date: isPermanent
+      ? null
+      : item.tillDate,
+    permanent: isPermanent,
+    van_code: item.vanCode,
+    employee_name: item.employeeName,
+    ats_code: item.atsCode,
+    customer_code: item.customerCode,
+    customer_name: item.customerName,
+    created_by: currentUser,
+  }))
+),
   }
 );
 
