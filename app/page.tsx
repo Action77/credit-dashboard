@@ -8,6 +8,7 @@ import {
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Upload,
@@ -23,6 +24,7 @@ import {
 
 
 export default function Home() {
+  const pathname = usePathname();
 const [whatsAppVan, setWhatsAppVan] =
   useState("");
   const [data, setData] =
@@ -939,9 +941,13 @@ return (
 
     <nav className="px-4 space-y-2">
 
-  <Link
+<Link
   href="/"
-  className="flex items-center gap-3 px-4 py-3"
+  className={`flex items-center gap-3 px-4 py-3 rounded-lg ${
+    pathname === "/"
+      ? "bg-blue-600"
+      : ""
+  }`}
 >
   <LayoutDashboard size={18} />
   <span>Dashboard</span>
