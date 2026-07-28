@@ -220,6 +220,38 @@ const filteredCreditRows =
       )
 
   );
+  const orderedColumns = [
+  "region",
+  "city",
+  "oracle_acc",
+  "van_code",
+  "employee_name",
+  "employee_ats_code",
+  "customer_code",
+  "customer_name",
+  "channel_name",
+  "chain_name",
+  "sub_channel_namegr",
+  "class_name",
+  "central_invoice",
+  "credit_limit",
+  "customer_status",
+  "payment_term",
+  "order_type",
+  "order_status",
+  "invoice",
+  "e_invoice",
+  "trx_date",
+  "coupon",
+  "credit_invoice_amount",
+  "collect_amount",
+  "pending_cim",
+  "credit_days",
+  "invoice_status",
+  "status_user_block",
+  "total_rejected_count",
+  "total_rejected_amount",
+];
 return (
 
 <div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
@@ -496,27 +528,33 @@ return (
 
             <thead>
 
-              <tr className="bg-slate-800 text-white">
+  <tr className="bg-slate-800 text-white">
 
-                {filteredCreditRows.length > 0 &&
-                  Object.keys(
-  filteredCreditRows[0]
-)
-.map(key => (
+    {filteredCreditRows.length > 0 &&
+      [
+        ...orderedColumns.filter(
+          col => col in filteredCreditRows[0]
+        ),
+        ...Object.keys(
+          filteredCreditRows[0]
+        ).filter(
+          col =>
+            !orderedColumns.includes(col)
+        ),
+      ].map(key => (
 
-<th
-  key={key}
-  className="p-3"
->
-                      {key}
-                    </th>
+        <th
+          key={key}
+          className="p-3"
+        >
+          {key}
+        </th>
 
-                  ))}
+      ))}
 
-              </tr>
+  </tr>
 
-            </thead>
-
+</thead>
             <tbody>
 
   {filteredCreditRows.map(
@@ -526,21 +564,30 @@ return (
         key={index}
         className="border-b"
       >
-        {Object.values(row).map(
-          (
-            value,
-            cellIndex
-          ) => (
+
+        {[
+          ...orderedColumns.filter(
+            col => col in row
+          ),
+          ...Object.keys(row).filter(
+            col =>
+              !orderedColumns.includes(col)
+          ),
+        ].map(
+          (key, cellIndex) => (
 
             <td
               key={cellIndex}
               className="p-2"
             >
-              {String(value)}
+              {String(
+                row[key] ?? ""
+              )}
             </td>
 
           )
         )}
+
       </tr>
 
     )
