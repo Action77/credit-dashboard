@@ -364,7 +364,7 @@ return (
       <h1 className="text-3xl font-bold mb-6">
         Reports
       </h1>
-      <div className="bg-white border rounded-xl p-5 mb-6">
+      <div className="bg-white border rounded-xl p-5 mb-6 overflow-hidden">
 
   <div className="flex justify-between items-center mb-4">
 
@@ -579,55 +579,82 @@ return (
 
       ) : (
 
-        <div className="overflow-auto">
+        <div className="overflow-x-auto">
 
-          <table className="w-full border">
+  <table className="w-full table-fixed border">
 
-            <thead>
+    <thead>
 
-              <tr className="bg-slate-800 text-white">
+      <tr className="bg-amber-600 text-white">
 
-                <th className="p-3">
-                  Invoice
-                </th>
+        <th className="w-[22%] p-3 text-left">
+          Invoice No
+        </th>
 
-                <th className="p-3">
-                  Uploaded By
-                </th>
+        <th className="w-[15%] p-3 text-left">
+          Customer Code
+        </th>
 
-              </tr>
+        <th className="w-[33%] p-3 text-left">
+          Customer Name
+        </th>
 
-            </thead>
+        <th className="w-[15%] p-3 text-left">
+          First Seen
+        </th>
 
-            <tbody>
+        <th className="w-[15%] p-3 text-left">
+          Missing From
+        </th>
 
-              {filteredCollectionRows.map(
-                                (row: any) => (
+      </tr>
 
-                  <tr
-                    key={row.id}
-                    className="border-b"
-                  >
+    </thead>
 
-                    <td className="p-2">
-                      {row.invoice}
-                    </td>
+    <tbody>
 
-                    <td className="p-2">
-                      {row.uploaded_by}
-                    </td>
+      {missingInvoices.map(
+        (row: any, index) => (
 
-                  </tr>
+          <tr
+            key={index}
+            className="bg-yellow-100 border-b"
+          >
 
-                )
-              )}
+            <td className="p-3">
+              {row.invoice}
+            </td>
 
-            </tbody>
+            <td className="p-3">
+              {row.customer_code}
+            </td>
 
-          </table>
+            <td className="p-3">
+              {row.customer_name}
+            </td>
 
-        </div>
+            <td className="p-3">
+              <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                #{row.first_seen}
+              </span>
+            </td>
 
+            <td className="p-3">
+              <span className="bg-red-100 text-red-700 px-2 py-1 rounded">
+                #{row.missing_from}
+              </span>
+            </td>
+
+          </tr>
+
+        )
+      )}
+
+    </tbody>
+
+  </table>
+
+</div>
       )}
 
   </main>
