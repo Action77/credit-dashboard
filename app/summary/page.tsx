@@ -295,8 +295,8 @@ const filteredData = data.filter((row) => {
 };
 const regionSummary = Object.entries(
 
-  filteredData.reduce(
-    (acc: any, row) => {
+  data.reduce(
+        (acc: any, row) => {
 
       const region =
         row["Region"] || "Unknown";
@@ -592,13 +592,13 @@ const regionSummary = Object.entries(
 
 <div
   className="
+    flex-1
     bg-white
     rounded-2xl
     shadow-sm
     border
     border-slate-100
     overflow-hidden
-    w-[900px]
   "
 >
 
@@ -761,9 +761,8 @@ const regionSummary = Object.entries(
 
 </div>
 
-<div className="w-[350px] bg-white rounded-2xl shadow-sm border border-slate-100">
-
-  <div className="px-5 py-4 border-b border-slate-100">
+<div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-100 h-fit">
+    <div className="px-5 py-4 border-b border-slate-100">
 
     <h2 className="text-lg font-bold text-slate-800">
       Region Summary
