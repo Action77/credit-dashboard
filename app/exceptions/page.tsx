@@ -114,7 +114,7 @@ useEffect(() => {
 
 <Link
   href="/exceptions"
-  className="flex items-center gap-3 px-4 py-3"
+  className="flex items-center gap-3 px-4 py-3 bg-blue-600 rounded-lg"
 >
   <AlertCircle size={18} />
   <span>Exceptions</span>
