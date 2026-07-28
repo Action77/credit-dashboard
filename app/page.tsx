@@ -591,6 +591,15 @@ const blockedCount =
       (row) => row["Employee Name."]
     )
   ).size;
+  const legalCount =
+  exceptions.filter(
+    (item) => item.permanent
+  ).length;
+
+const exceptionCount =
+  exceptions.filter(
+    (item) => !item.permanent
+  ).length;
   const activeEmployees =
   Object.entries(
 
