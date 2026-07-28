@@ -941,9 +941,13 @@ return (
 
     <nav className="px-4 space-y-2">
 
-  <Link
+<Link
   href="/"
-  className="flex items-center gap-3 px-4 py-3"
+  className={`flex items-center gap-3 px-4 py-3 rounded-lg ${
+    pathname === "/"
+      ? "bg-blue-600"
+      : "hover:bg-blue-700"
+  }`}
 >
   <LayoutDashboard size={18} />
   <span>Dashboard</span>
