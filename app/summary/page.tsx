@@ -310,70 +310,72 @@ const filteredData = data.filter((row) => {
   return "All Collected";
 
 };
+const summaryBaseData =
+  filteredData.filter((row) =>
+    String(
+      row["Central Invoice"] || ""
+    )
+      .trim()
+      .toUpperCase() ===
+    "NOT CENTRAL"
+  );
+
 const regionSummary = Object.entries(
 
-  data.reduce(
-    
-        (acc: any, row) => {
+  summaryBaseData.reduce(
+    (acc: any, row) => {
 
       const region =
         row["Region"] || "Unknown";
 
       if (!acc[region]) {
-
         acc[region] = {
           invoices: 0,
           amount: 0,
         };
-
       }
 
-      const invoice =
-  String(row["Invoice #"])
-    .replace(/\s/g, "")
-    .toUpperCase();
-
-const normalizedInvoice = String(
-  row["Invoice #"] || ""
-)
-  .trim()
-  .replace(/\s/g, "")
-  .toUpperCase();
-
-const isException =
-  exceptions.some(
-    (e: any) =>
-      String(e.invoice || "")
+      const normalizedInvoice = String(
+        row["Invoice #"] || ""
+      )
         .trim()
         .replace(/\s/g, "")
-        .toUpperCase() === normalizedInvoice
-  );
+        .toUpperCase();
 
-const isCollected =
-  collectedInvoices.some(
-    (i: string) =>
-      String(i || "")
-        .trim()
-        .replace(/\s/g, "")
-        .toUpperCase() === normalizedInvoice
-  );
+      const isException =
+        exceptions.some(
+          (e: any) =>
+            String(e.invoice || "")
+              .trim()
+              .replace(/\s/g, "")
+              .toUpperCase() === normalizedInvoice
+        );
 
-if (
-  !isException &&
-  !isCollected
-) {
-  acc[region].invoices++;
+      const isCollected =
+        collectedInvoices.some(
+          (i: string) =>
+            String(i || "")
+              .trim()
+              .replace(/\s/g, "")
+              .toUpperCase() === normalizedInvoice
+        );
 
-  acc[region].amount +=
-  Number(
-    row["Pending CIM"]
-  ) || 0;
-}      return acc;
+      if (
+        !isException &&
+        !isCollected
+      ) {
+        acc[region].invoices++;
 
+        acc[region].amount +=
+          Number(
+            row["Pending CIM"]
+          ) || 0;
+      }
+
+      return acc;
     },
     {}
   )
-
 );
   return (
     <div className="min-h-screen bg-[#f4f7fc] flex">
