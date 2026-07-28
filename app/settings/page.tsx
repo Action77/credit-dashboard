@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
+    const [isUpdatingPassword, setIsUpdatingPassword] =
+  useState(false);
     const [invoiceAlert, setInvoiceAlert] = useState(true);
 
 const [exceptionAlert, setExceptionAlert] = useState(true);
@@ -348,69 +350,88 @@ useEffect(() => {
 
 
 <button
-  className="mt-6 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+  disabled={isUpdatingPassword}
+  className={`mt-6 px-5 py-2 text-white rounded-lg ${
+    isUpdatingPassword
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-700"
+  }`}
   onClick={async () => {
 
-  const username =
-    localStorage.getItem("currentUser");
+    if (isUpdatingPassword) return;
 
-  if (!username) {
-    alert("Please Login First");
-    return;
-  }
+    setIsUpdatingPassword(true);
 
-  if (!currentPassword) {
-    alert("Enter Current Password");
-    return;
-  }
+    try {
 
-  if (!newPassword) {
-    alert("Enter New Password");
-    return;
-  }
+      const username =
+        localStorage.getItem("currentUser");
 
-  if (newPassword !== confirmPassword) {
-    alert("Passwords Do Not Match");
-    return;
-  }
+      if (!username) {
+        alert("Please Login First");
+        return;
+      }
 
-  const { data: user } = await supabase
-    .from("app_users")
-    .select("*")
-    .eq("username", username)
-    .single();
+      if (!currentPassword) {
+        alert("Enter Current Password");
+        return;
+      }
 
-  if (!user) {
-    alert("User Not Found");
-    return;
-  }
+      if (!newPassword) {
+        alert("Enter New Password");
+        return;
+      }
 
-  if (user.password !== currentPassword) {
-    alert("Current Password Is Incorrect");
-    return;
-  }
+      if (newPassword !== confirmPassword) {
+        alert("Passwords Do Not Match");
+        return;
+      }
 
-  const { error } = await supabase
-    .from("app_users")
-    .update({
-      password: newPassword,
-    })
-    .eq("username", username);
+      const { data: user } = await supabase
+        .from("app_users")
+        .select("*")
+        .eq("username", username)
+        .single();
 
-  if (error) {
-    alert("Failed To Update Password");
-    return;
-  }
+      if (!user) {
+        alert("User Not Found");
+        return;
+      }
 
-  setCurrentPassword("");
-  setNewPassword("");
-  setConfirmPassword("");
+      if (user.password !== currentPassword) {
+        alert("Current Password Is Incorrect");
+        return;
+      }
 
-  alert("Password Updated Successfully");
+      const { error } = await supabase
+        .from("app_users")
+        .update({
+          password: newPassword,
+        })
+        .eq("username", username);
 
-}}
+      if (error) {
+        alert("Failed To Update Password");
+        return;
+      }
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      alert("Password Updated Successfully");
+
+    } finally {
+
+      setIsUpdatingPassword(false);
+
+    }
+
+  }}
 >
-  Update Password
+  {isUpdatingPassword
+    ? "Updating..."
+    : "Update Password"}
 </button>
               </>
             )}
