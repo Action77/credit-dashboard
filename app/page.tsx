@@ -423,7 +423,10 @@ await localStorage.setItem(
 };
 const filterBaseData =
   data.filter((row) => {
-
+const isNotCentral =
+  String(row["Central Invoice"] || "")
+    .trim()
+    .toUpperCase() === "NOT CENTRAL";
     const matchesFilters =
       (
         selectedRegions.length === 0 ||
@@ -464,10 +467,11 @@ const filterBaseData =
         .join(" ")
         .toLowerCase()
         .includes(search);
-    return (
-      matchesFilters &&
-      matchesSearch
-    );
+return (
+  isNotCentral &&
+  matchesFilters &&
+  matchesSearch
+);
   });
   const whatsappVanCodes = [
   ...new Set(
@@ -513,8 +517,8 @@ const filterBaseData =
   )
 
 ].sort();
-const filteredData = filterBaseData.filter(
-  (row) => {
+const filteredData = filterBaseData
+  .filter((row) => {
 
     const matchesWhatsappVan =
       !whatsAppVan ||
@@ -522,9 +526,12 @@ const filteredData = filterBaseData.filter(
 
     return matchesWhatsappVan;
 
-  }
-);
-
+  })
+  .sort((a, b) =>
+    String(a["Van Code."] || "").localeCompare(
+      String(b["Van Code."] || "")
+    )
+  );
 const blockedCount =
   filteredData.filter((row) => {
 
