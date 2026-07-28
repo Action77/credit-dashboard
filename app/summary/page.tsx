@@ -340,7 +340,7 @@ const isCollected =
         .replace(/\s/g, "")
         .toUpperCase() === normalizedInvoice
   );
-  
+
 if (
   !isException &&
   !isCollected
@@ -348,9 +348,9 @@ if (
   acc[region].invoices++;
 
   acc[region].amount +=
-    Number(
-      row["Credit Invoice Amount"]
-    ) || 0;
+  Number(
+    row["Pending CIM"]
+  ) || 0;
 }      return acc;
 
     },
