@@ -1,7 +1,8 @@
 "use client";
 
+import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Upload,
@@ -14,11 +15,64 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
+    const [invoiceAlert, setInvoiceAlert] = useState(true);
+
+const [exceptionAlert, setExceptionAlert] = useState(true);
+
+const [creditImportAlert, setCreditImportAlert] = useState(true);
+
+const [collectionImportAlert, setCollectionImportAlert] = useState(true);
+    const [currentPassword, setCurrentPassword] = useState("");
+const [newPassword, setNewPassword] = useState("");
+const [confirmPassword, setConfirmPassword] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 const [showLoginModal, setShowLoginModal] = useState(false);
 const [currentUser, setCurrentUser] = useState("");
   const [activeTab, setActiveTab] = useState("notifications");
+  useEffect(() => {
+  const savedUser =
+    localStorage.getItem("currentUser");
 
+  if (savedUser) {
+    setCurrentUser(savedUser);
+    setIsLoggedIn(true);
+  }
+}, []);
+useEffect(() => {
+  const loadSettings = async () => {
+
+    const currentUser =
+      localStorage.getItem("currentUser");
+
+    if (!currentUser) return;
+
+    const { data } = await supabase
+      .from("user_settings")
+      .select("*")
+      .eq("username", currentUser)
+      .single();
+
+    if (!data) return;
+
+    setInvoiceAlert(
+      data.invoice_disappeared_alert
+    );
+
+    setExceptionAlert(
+      data.exception_alert
+    );
+
+    setCreditImportAlert(
+      data.credit_import_alert
+    );
+
+    setCollectionImportAlert(
+      data.collection_import_alert
+    );
+  };
+
+  loadSettings();
+}, []);
   return (
     <div className="flex min-h-screen bg-slate-100">
       {/* Sidebar */}
@@ -171,29 +225,89 @@ const [currentUser, setCurrentUser] = useState("");
 
                 <div className="space-y-4">
                   <label className="flex items-center gap-3">
-                    <input type="checkbox" defaultChecked />
+                    <input
+  type="checkbox"
+  checked={invoiceAlert}
+  onChange={(e) =>
+    setInvoiceAlert(e.target.checked)
+  }
+/>
                     Invoice Disappeared Alerts
                   </label>
 
                   <label className="flex items-center gap-3">
-                    <input type="checkbox" defaultChecked />
+                    <input
+  type="checkbox"
+  checked={exceptionAlert}
+  onChange={(e) =>
+    setExceptionAlert(e.target.checked)
+  }
+/>
                     Exception Alerts
                   </label>
 
                   <label className="flex items-center gap-3">
-                    <input type="checkbox" defaultChecked />
+                    <input
+  type="checkbox"
+  checked={creditImportAlert}
+  onChange={(e) =>
+    setCreditImportAlert(e.target.checked)
+  }
+/>
                     Credit Import Alerts
                   </label>
 
                   <label className="flex items-center gap-3">
-                    <input type="checkbox" defaultChecked />
+                    <input
+  type="checkbox"
+  checked={collectionImportAlert}
+  onChange={(e) =>
+    setCollectionImportAlert(e.target.checked)
+  }
+/>
                     Collection Import Alerts
                   </label>
                 </div>
 
-                <button className="mt-6 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                  Save Changes
-                </button>
+<button
+  className="mt-6 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+  onClick={async () => {
+
+    const currentUser =
+      localStorage.getItem("currentUser");
+
+    if (!currentUser) {
+      alert("Please Login First");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("user_settings")
+      .update({
+        invoice_disappeared_alert:
+          invoiceAlert,
+
+        exception_alert:
+          exceptionAlert,
+
+        credit_import_alert:
+          creditImportAlert,
+
+        collection_import_alert:
+          collectionImportAlert,
+      })
+      .eq("username", currentUser);
+
+    if (error) {
+      alert("Failed To Save Settings");
+      return;
+    }
+
+    alert("Settings Saved Successfully");
+  }}
+>
+  Save Changes
+</button>
               </>
             )}
 
@@ -209,22 +323,26 @@ const [currentUser, setCurrentUser] = useState("");
 
                 <div className="space-y-4">
                   <input
-                    type="password"
-                    placeholder="Current Password"
-                    className="w-full border rounded-lg p-3"
-                  />
-
-                  <input
-                    type="password"
-                    placeholder="New Password"
-                    className="w-full border rounded-lg p-3"
-                  />
-
-                  <input
-                    type="password"
-                    placeholder="Confirm New Password"
-                    className="w-full border rounded-lg p-3"
-                  />
+  type="password"
+  placeholder="Current Password"
+  value={currentPassword}
+  onChange={(e) => setCurrentPassword(e.target.value)}
+  className="w-full border rounded-lg p-3"
+/>
+  <input
+  type="password"
+  placeholder="New Password"
+  value={newPassword}
+  onChange={(e) => setNewPassword(e.target.value)}
+  className="w-full border rounded-lg p-3"
+/>
+  <input
+  type="password"
+  placeholder="Confirm New Password"
+  value={confirmPassword}
+  onChange={(e) => setConfirmPassword(e.target.value)}
+  className="w-full border rounded-lg p-3"
+/>
                 </div>
 
                 <div className="mt-6 text-sm text-gray-600 space-y-1">
@@ -234,9 +352,71 @@ const [currentUser, setCurrentUser] = useState("");
                   <p>✓ Include special characters</p>
                 </div>
 
-                <button className="mt-6 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                  Update Password
-                </button>
+<button
+  className="mt-6 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+  onClick={async () => {
+
+  const username =
+    localStorage.getItem("currentUser");
+
+  if (!username) {
+    alert("Please Login First");
+    return;
+  }
+
+  if (!currentPassword) {
+    alert("Enter Current Password");
+    return;
+  }
+
+  if (!newPassword) {
+    alert("Enter New Password");
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    alert("Passwords Do Not Match");
+    return;
+  }
+
+  const { data: user } = await supabase
+    .from("app_users")
+    .select("*")
+    .eq("username", username)
+    .single();
+
+  if (!user) {
+    alert("User Not Found");
+    return;
+  }
+
+  if (user.password !== currentPassword) {
+    alert("Current Password Is Incorrect");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("app_users")
+    .update({
+      password: newPassword,
+    })
+    .eq("username", username);
+
+  if (error) {
+    alert("Failed To Update Password");
+    return;
+  }
+
+  setCurrentPassword("");
+  setNewPassword("");
+  setConfirmPassword("");
+
+  alert("Password Updated Successfully");
+
+}}
+>
+  Update Password
+</button>
               </>
             )}
           </div>
