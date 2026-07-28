@@ -95,7 +95,10 @@ useEffect(() => {
       await localStorage.getItem(
         "currentUser"
       );
-
+console.log(
+  "LOADED USER =",
+  savedUser
+);
     if (savedUser) {
 
       setCurrentUser(savedUser);
@@ -758,7 +761,7 @@ console.log(
 
             <button
               className="w-full bg-blue-600 text-white py-3 rounded-xl"
-              onClick={() => {
+              onClick={async () => {
 
                 const users = [
   {
@@ -782,11 +785,19 @@ if (!user) {
   return;
 }
 
-localStorage.setItem(
+await localStorage.removeItem(
+  "currentUser"
+);
+
+await localStorage.setItem(
   "currentUser",
   user.username
 );
 
+console.log(
+  "SAVED USER =",
+  user.username
+);
 setCurrentUser(
   user.username
 );
