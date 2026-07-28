@@ -1550,7 +1550,12 @@ await localStorage.setItem(
 </td>
 
 <td className="p-3">
-  {row["Trx Date"]}
+  {typeof row["Trx Date"] === "number"
+    ? XLSX.SSF.format(
+        "dd/mm/yyyy",
+        row["Trx Date"]
+      )
+    : row["Trx Date"]}
 </td>
 
 <td className="p-3">
