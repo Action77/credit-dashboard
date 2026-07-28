@@ -414,9 +414,13 @@ setExceptions(
 
       return (
 
-        <tr
+<tr
   key={index}
-  className="border-b hover:bg-slate-50"
+  className={`border-b ${
+    item.permanent
+      ? "bg-red-50"
+      : "hover:bg-slate-50"
+  }`}
 >
 
           <td className="p-3">{item.van_code}</td>
@@ -445,9 +449,14 @@ setExceptions(
           </td>
 
           <td className="p-3">
-            {daysLeft}
-          </td>
-
+  {item.permanent ? (
+    <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
+      Legal
+    </span>
+  ) : (
+    daysLeft
+  )}
+</td>
 <td className="p-3">
   {isLoggedIn &&
     currentUser === item.created_by && (
