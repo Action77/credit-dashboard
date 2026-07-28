@@ -494,23 +494,39 @@ setExceptions(
               onClick={() => {
 
                 const users = [
-                  {
-                    username: "halyousif",
-                    password: "123456",
-                    id: "user1"
-                  },
-                  {
-                    username: "nelson",
-                    password: "123456",
-                    id: "user2"
-                  }
-                ];
-
+  {
+    username: "halyousif",
+    password: "123456",
+    id: "user1"
+  },
+  {
+    username: "nelson",
+    password: "123456",
+    id: "user2"
+  }
+];
                 const user = users.find(
                   u =>
                     u.username === username &&
                     u.password === password
                 );
+if (!user) {
+  alert("Invalid Username or Password");
+  return;
+}
+
+localStorage.setItem(
+  "currentUser",
+  user.id
+);
+
+setCurrentUser(
+  user.id
+);
+
+setIsLoggedIn(true);
+
+setShowLoginModal(false);
 
                 if (!user) {
                   alert("Invalid Username or Password");
@@ -518,11 +534,13 @@ setExceptions(
                 }
 
                 localStorage.setItem(
-                  "currentUser",
-                  user.id
-                );
+  "currentUser",
+  user.username
+);
 
-                setCurrentUser(user.id);
+setCurrentUser(
+  user.username
+);
 
                 setIsLoggedIn(true);
 
