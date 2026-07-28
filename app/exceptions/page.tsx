@@ -1,5 +1,6 @@
 
 "use client";
+import { storage as localStorage } from "@/utils/storage";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
