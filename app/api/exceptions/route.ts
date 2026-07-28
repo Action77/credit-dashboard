@@ -8,6 +8,16 @@ const supabase = createClient(
 
 export async function GET() {
 
+  const today =
+    new Date().toISOString().split("T")[0];
+
+  // حذف جميع الاستثناءات المنتهية
+  await supabase
+    .from("exceptions")
+    .delete()
+    .lt("till_date", today);
+
+  // جلب الاستثناءات الحالية
   const { data } =
     await supabase
       .from("exceptions")
@@ -20,7 +30,6 @@ export async function GET() {
     data || []
   );
 }
-
 export async function POST(
   request: Request
 ) {
