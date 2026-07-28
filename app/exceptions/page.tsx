@@ -71,7 +71,10 @@ const latestLegal =
 
     const data =
       await response.json();
-console.log(data[0]);
+console.log(
+  "FIRST RECORD =",
+  data[0]?.created_by
+);
     setExceptions(data || []);
 
   };
