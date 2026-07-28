@@ -415,9 +415,6 @@ P1316600015512`}
       setInvoiceText("");
       setTillDate("");
 
-      alert(
-        "Exceptions Added Successfully"
-      );
 
     } catch (error) {
 
