@@ -520,11 +520,27 @@ return (
 const filteredData = filterBaseData
   .filter((row) => {
 
+    const invoice =
+      String(row["Invoice #"])
+        .replace(/\s/g, "")
+        .toUpperCase();
+
+    const isException =
+      exceptions.some(
+        (e) =>
+          String(e.invoice)
+            .replace(/\s/g, "")
+            .toUpperCase() === invoice
+      );
+
     const matchesWhatsappVan =
       !whatsAppVan ||
       row["Van Code."] === whatsAppVan;
 
-    return matchesWhatsappVan;
+    return (
+      matchesWhatsappVan &&
+      !isException
+    );
 
   })
   .sort((a, b) =>

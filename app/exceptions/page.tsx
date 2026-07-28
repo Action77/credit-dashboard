@@ -219,7 +219,7 @@ P1316600015512`}
       setIsPermanent(e.target.checked)
     }
   />
-  Permanent Exception
+  Legal
 </label>
 
 {!isPermanent && (
