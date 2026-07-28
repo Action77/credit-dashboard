@@ -76,10 +76,6 @@ const latestLegal =
 
     const data =
       await response.json();
-console.log(
-  "FIRST RECORD =",
-  data[0]?.created_by
-);
     setExceptions(data || []);
 
   };
@@ -777,15 +773,7 @@ await localStorage.removeItem(
   "currentUser"
 );
 
-await localStorage.setItem(
-  "currentUser",
-  user.username
-);
 
-
-setCurrentUser(
-  user.username
-);
 setIsLoggedIn(true);
 
 setShowLoginModal(false);
