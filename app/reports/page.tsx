@@ -378,8 +378,7 @@ return (
 
   </div>
 
-  <table className="w-full border">
-
+  <table className="text-xs border">
     <thead>
 
       <tr className="bg-amber-600 text-white">
@@ -524,10 +523,10 @@ return (
 )
 .map(key => (
 
-                    <th
-                      key={key}
-                      className="p-3"
-                    >
+<th
+  key={key}
+  className="p-2 whitespace-nowrap"
+>
                       {key}
                     </th>
 
@@ -553,12 +552,10 @@ return (
                           cellIndex
                         ) => (
 
-                          <td
-                            key={
-                              cellIndex
-                            }
-                            className="p-2"
-                          >
+<td
+  key={cellIndex}
+  className="p-2 whitespace-nowrap text-xs"
+>
                             {String(
                               value
                             )}
