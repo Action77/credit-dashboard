@@ -331,16 +331,7 @@ const isCollected =
         .toUpperCase() === invoice
   );
 
-const isBlocked =
-  String(
-    row["Status User Block"] || ""
-  )
-    .trim()
-    .toUpperCase()
-    .includes("BLOCK");
-
 if (
-  isBlocked &&
   !isException &&
   !isCollected
 ) {
@@ -350,8 +341,7 @@ if (
     Number(
       row["Credit Invoice Amount"]
     ) || 0;
-}
-      return acc;
+}      return acc;
 
     },
     {}
@@ -840,8 +830,7 @@ if (
 
                 <div className="text-right text-sm text-slate-500 mt-1">
 
-                  {info.amount.toLocaleString()}
-
+                  SAR {info.amount.toLocaleString()}
                 </div>
 
               </div>
