@@ -87,10 +87,6 @@ useEffect(() => {
       await localStorage.getItem(
         "currentUser"
       );
-console.log(
-  "LOADED USER =",
-  savedUser
-);
     if (savedUser) {
 
       setCurrentUser(savedUser);
@@ -284,10 +280,7 @@ P1316600015512`}
   }`}
   onClick={async () => {
 
-    console.log(
-      "ADD EXCEPTION CLICKED"
-    );
-
+  
     if (isAddingExceptions)
       return;
 
@@ -300,10 +293,6 @@ P1316600015512`}
     "currentUser"
   );
 
-console.log(
-  "CURRENT USER =",
-  currentUser
-);
       if (!currentUser) {
 
         alert(
@@ -512,8 +501,6 @@ console.log(
 
     <div className="mt-3 text-sm font-medium">
   By {latestAdded?.created_by || "-"}
-  <br />
-  {latestAdded?.invoice}
 </div>
     <div className="text-xs text-slate-400">
       Latest Added Record
@@ -787,10 +774,7 @@ await localStorage.setItem(
   user.username
 );
 
-console.log(
-  "SAVED USER =",
-  user.username
-);
+
 setCurrentUser(
   user.username
 );
