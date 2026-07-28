@@ -295,7 +295,7 @@ const filteredData = data.filter((row) => {
 };
 const regionSummary = Object.entries(
 
-  filteredData.reduce(
+  data.reduce(
     
         (acc: any, row) => {
 
