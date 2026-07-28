@@ -16,6 +16,9 @@ import { storage as localStorage } from "@/utils/storage";
 
 
 export default function ReportsPage() {
+  
+  const [missingInvoices, setMissingInvoices] =
+  useState<any[]>([]);
   const [filteredCreditData, setFilteredCreditData] =
   useState<any[]>([]);
 const [isLoggedIn, setIsLoggedIn] =
@@ -151,6 +154,50 @@ useEffect(() => {
     loadData();
 
   }, []);
+useEffect(() => {
+
+  const loadData = async () => {
+
+    const response =
+      await fetch("/api/reports");
+
+    const data =
+      await response.json();
+
+    setCreditData(
+      data.creditData || []
+    );
+
+    setCollections(
+      data.collections || []
+    );
+
+  };
+
+  loadData();
+
+}, []);
+
+useEffect(() => {
+
+  const loadMissingInvoices =
+    async () => {
+
+      const response =
+        await fetch(
+          "/api/reports/missing"
+        );
+
+      const data =
+        await response.json();
+
+      setMissingInvoices(data);
+
+    };
+
+  loadMissingInvoices();
+
+}, []);
 
   const loadCollection =
     async (id: number) => {
@@ -166,18 +213,26 @@ useEffect(() => {
       setCollectionRows(data);
 
     };
+    
 const filteredCreditRows =
-  filteredCreditData.filter((row) =>
+  filteredCreditData
+    .filter((row) =>
 
-    Object.values(row)
-      .join(" ")
-      .toLowerCase()
-      .includes(
-        searchText.toLowerCase()
-      )
+      Object.values(row)
+        .join(" ")
+        .toLowerCase()
+        .includes(
+          searchText.toLowerCase()
+        )
 
-  );
-  const filteredCollectionRows =
+    )
+    .sort((a, b) =>
+      String(a["Van Code."] || "")
+        .localeCompare(
+          String(b["Van Code."] || "")
+        )
+    );
+      const filteredCollectionRows =
   collectionRows.filter((row) =>
 
     Object.values(row)
@@ -309,6 +364,90 @@ return (
       <h1 className="text-3xl font-bold mb-6">
         Reports
       </h1>
+      <div className="bg-white border rounded-xl p-5 mb-6">
+
+  <div className="flex justify-between items-center mb-4">
+
+    <h2 className="text-xl font-bold text-amber-700">
+      🚨 Disappeared Invoices
+    </h2>
+
+    <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
+      {missingInvoices.length}
+    </span>
+
+  </div>
+
+  <table className="w-full border">
+
+    <thead>
+
+      <tr className="bg-amber-600 text-white">
+
+        <th className="p-3">
+          Invoice No
+        </th>
+
+        <th className="p-3">
+          Customer Code
+        </th>
+
+        <th className="p-3">
+          Customer Name
+        </th>
+
+        <th className="p-3">
+          First Seen
+        </th>
+
+        <th className="p-3">
+          Missing From
+        </th>
+
+      </tr>
+
+    </thead>
+
+    <tbody>
+
+      {missingInvoices.map(
+        (row: any, index) => (
+
+          <tr
+            key={index}
+            className="bg-yellow-100 border-b"
+          >
+
+            <td className="p-2">
+              {row.invoice}
+            </td>
+
+            <td className="p-2">
+              {row.customer_code}
+            </td>
+
+            <td className="p-2">
+              {row.customer_name}
+            </td>
+
+            <td className="p-2">
+              Collection {row.first_seen}
+            </td>
+
+            <td className="p-2">
+              Collection {row.missing_from}
+            </td>
+
+          </tr>
+
+        )
+      )}
+
+    </tbody>
+
+  </table>
+
+</div>
 <div className="mb-4">
 
   <input
