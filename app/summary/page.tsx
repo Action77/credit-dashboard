@@ -629,22 +629,23 @@ const regionSummary = Object.entries(
 
 <tr className="bg-[#071d5c] text-white border-b border-blue-900">
 
-<th className="px-4 py-3 text-center text-sm font-semibold">
-Status
+<th className="px-4 py-3 text-center text-sm font-semibold border-r border-blue-900">
+  Status
 </th>
 
-<th className="px-4 py-3 text-center text-sm font-semibold">ID
+<th className="px-4 py-3 text-center text-sm font-semibold border-r border-blue-900">
+  ID
 </th>
 
-<th className="px-4 py-3 text-center text-sm font-semibold">
+<th className="px-4 py-3 text-center text-sm font-semibold border-r border-blue-900">
   Van Code
 </th>
 
-<th className="px-4 py-3 text-center text-sm font-semibold">
+<th className="px-4 py-3 text-center text-sm font-semibold border-r border-blue-900">
   Remaining
 </th>
 
-<th className="px-4 py-3 text-center text-sm font-semibold">
+<th className="px-4 py-3 text-center text-sm font-semibold border-r border-blue-900">
   Exception
 </th>
 
@@ -688,7 +689,7 @@ Status
   `}
 >
 
-            <td className="px-4 py-3 text-center">
+            <td className="px-4 py-3 text-center border-r border-slate-200">
 
   <span
   className={`
