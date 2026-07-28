@@ -624,7 +624,7 @@ const regionSummary = Object.entries(
 
   <div className="overflow-auto max-h-[500px]">
 
-    <table className="w-full text-sm">
+    <table className="w-full text-sm border-collapse">
   <thead className="sticky top-0 z-10 bg-[#071d5c] text-white">
 
 <tr className="bg-[#071d5c] text-white border-b border-blue-900">
@@ -673,8 +673,6 @@ const regionSummary = Object.entries(
       <tr
   key={van}
   className={`
-    border-b
-    border-slate-100
     transition-all
     duration-200
     ${
@@ -689,7 +687,7 @@ const regionSummary = Object.entries(
   `}
 >
 
-            <td className="px-4 py-3 text-center border-r border-slate-200">
+            <td className="px-4 py-3 text-center border-r border-b border-slate-300">
 
   <span
   className={`
@@ -717,24 +715,23 @@ const regionSummary = Object.entries(
   </span>
 
 </td>
-            <td className="px-3 py-2 border-r text-center">
+            <td className="px-3 py-2 border-r border-b border-slate-300 text-center">
               {[...info.ids].join(" or ")}
             </td>
 
-            <td className="px-3 py-2 border-r font-semibold text-slate-800">
-  {van}
+            <td className="px-3 py-2 border-r border-b border-slate-300 font-semibold text-slate-800">  {van}
 </td>
 
-<td className="px-3 py-2 text-center border-r">
+<td className="px-3 py-2 text-center border-r border-b border-slate-300">
   {info.remaining}
 </td>
 
-<td className="px-3 py-2 text-center border-r">
-  {info.exceptions}
+<td className="px-3 py-2 text-center border-r border-b border-slate-300">
+    {info.exceptions}
 </td>
 
-<td className="px-4 py-3 text-center">
-  <input
+<td className="px-4 py-3 text-center border-b border-slate-300">
+    <input
     type="checkbox"
     className="w-4 h-4 accent-blue-600 cursor-pointer"
     disabled={!isLoggedIn}
