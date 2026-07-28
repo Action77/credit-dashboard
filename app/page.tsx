@@ -2,6 +2,7 @@
 import { storage as localStorage } from "@/utils/storage";
 import WhatsAppReport from "@/components/WhatsAppReport";
 import html2canvas from "html2canvas";
+import { users } from "@/data/users";
 import {
   openWhatsApp
 } from "@/utils/whatsapp";
@@ -757,18 +758,6 @@ const exceptionCount =
   );
 
 };
-const users = [
-  {
-    username: "halyousif",
-    password: "123456",
-    id: "user1"
-  },
-  {
-    username: "nelson",
-    password: "123456",
-    id: "user2"
-  }
-];
 
 const toggleCity = (
   cityKey: string

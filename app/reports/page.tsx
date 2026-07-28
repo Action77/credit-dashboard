@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-
+import { users } from "@/data/users";
 import {
   LayoutDashboard,
   Upload,
@@ -688,19 +688,7 @@ return (
           onClick={async () => {
             
 
-            const users = [
-              {
-                username: "halyousif",
-                password: "123456",
-                id: "user1",
-              },
-              {
-                username: "nelson",
-                password: "123456",
-                id: "user2",
-              },
-            ];
-
+            
             const user = users.find(
               u =>
                 u.username === username &&

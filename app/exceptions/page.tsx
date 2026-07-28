@@ -3,7 +3,7 @@
 import { storage as localStorage } from "@/utils/storage";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
+import { users } from "@/data/users";
 import {
   LayoutDashboard,
   Upload,
@@ -747,19 +747,7 @@ P1316600015512`}
               className="w-full bg-blue-600 text-white py-3 rounded-xl"
               onClick={async () => {
 
-                const users = [
-  {
-    username: "halyousif",
-    password: "123456",
-    id: "user1"
-  },
-  {
-    username: "nelson",
-    password: "123456",
-    id: "user2"
-  }
-];
-                const user = users.find(
+                                const user = users.find(
                   u =>
                     u.username === username &&
                     u.password === password
