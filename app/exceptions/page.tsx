@@ -772,13 +772,12 @@ if (!user) {
 
 localStorage.setItem(
   "currentUser",
-  user.id
+  user.username
 );
 
 setCurrentUser(
-  user.id
+  user.username
 );
-
 setIsLoggedIn(true);
 
 setShowLoginModal(false);
