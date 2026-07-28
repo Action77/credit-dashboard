@@ -17,7 +17,7 @@ import {
 
 
 export default function ExceptionsPage() {
-  const [deletingId, setDeletingId] =
+    const [deletingId, setDeletingId] =
   useState<number | null>(null);
   const [isAddingExceptions, setIsAddingExceptions] =
   useState(false);
@@ -42,7 +42,27 @@ const [tillDate, setTillDate] = useState("");
 const [isPermanent, setIsPermanent] =
   useState(false);
 const [searchTerm, setSearchTerm] = useState("");
-  useEffect(() => {
+
+const addedCount =
+  exceptions.filter(
+    item => !item.permanent
+  ).length;
+
+const legalCount =
+  exceptions.filter(
+    item => item.permanent
+  ).length;
+
+const latestAdded =
+  exceptions
+    .filter(item => !item.permanent)
+    .sort((a, b) => b.id - a.id)[0];
+
+const latestLegal =
+  exceptions
+    .filter(item => item.permanent)
+    .sort((a, b) => b.id - a.id)[0];
+      useEffect(() => {
 
   const loadExceptions = async () => {
 
@@ -415,7 +435,6 @@ P1316600015512`}
         return;
 
       }
-
       const response =
         await fetch(
           "/api/exceptions"
@@ -470,84 +489,56 @@ P1316600015512`}
 
   <div className="space-y-4">
 
-    <div className="border border-green-200 bg-green-50 rounded-xl p-4">
+  <div className="border border-green-200 bg-green-50 rounded-xl p-4">
 
-      <div className="text-green-700 font-semibold">
-        Added Exceptions
-      </div>
-
-      <div className="text-3xl font-bold mt-2">
-        23
-      </div>
-
-      <div className="text-sm text-slate-500">
-        Records Added
-      </div>
-
-      <div className="mt-3 text-sm font-medium">
-        By Halyousif
-      </div>
-
-      <div className="text-xs text-slate-400">
-        2 Hours Ago
-      </div>
-
+    <div className="text-green-700 font-semibold">
+      Added Exceptions
     </div>
 
-    <div className="border border-amber-200 bg-amber-50 rounded-xl p-4">
-
-      <div className="text-amber-700 font-semibold">
-        Legal Exceptions
-      </div>
-
-      <div className="text-3xl font-bold mt-2">
-        8
-      </div>
-
-      <div className="text-sm text-slate-500">
-        Records Added
-      </div>
-
-      <div className="mt-3 text-sm font-medium">
-        By Nelson
-      </div>
-
-      <div className="text-xs text-slate-400">
-        5 Hours Ago
-      </div>
-
+    <div className="text-3xl font-bold mt-2">
+      {addedCount}
     </div>
 
-    <div className="border border-red-200 bg-red-50 rounded-xl p-4">
+    <div className="text-sm text-slate-500">
+      Records Added
+    </div>
 
-      <div className="text-red-700 font-semibold">
-        Deleted Exceptions
-      </div>
+    <div className="mt-3 text-sm font-medium">
+      By {latestAdded?.created_by || "-"}
+    </div>
 
-      <div className="text-3xl font-bold mt-2">
-        3
-      </div>
+    <div className="text-xs text-slate-400">
+      Latest Added Record
+    </div>
 
-      <div className="text-sm text-slate-500">
-        Records Deleted
-      </div>
+  </div>
 
-      <div className="mt-3 text-sm font-medium">
-        By Halyousif
-      </div>
+  <div className="border border-amber-200 bg-amber-50 rounded-xl p-4">
 
-      <div className="text-xs text-slate-400">
-        Yesterday
-      </div>
+    <div className="text-amber-700 font-semibold">
+      Legal Exceptions
+    </div>
 
+    <div className="text-3xl font-bold mt-2">
+      {legalCount}
+    </div>
+
+    <div className="text-sm text-slate-500">
+      Records Added
+    </div>
+
+    <div className="mt-3 text-sm font-medium">
+      By {latestLegal?.created_by || "-"}
+    </div>
+
+    <div className="text-xs text-slate-400">
+      Latest Legal Record
     </div>
 
   </div>
 
 </div>
-          </div>
-
-)}
+</div>
 
       <div className="bg-white rounded-xl border p-5">
         <div className="flex justify-between items-center mb-4">
@@ -680,7 +671,6 @@ P1316600015512`}
     setDeletingId(item.id);
 
     try {
-
       await fetch(
         `/api/exceptions/${item.id}`,
         {
