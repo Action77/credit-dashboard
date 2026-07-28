@@ -350,7 +350,7 @@ setExceptions(
               <th className="p-3 text-left">Invoice #</th>
               <th className="p-3 text-left">Till Date</th>
               <th className="p-3 text-left">Days</th>
-              {isLoggedIn && (
+{isLoggedIn && (
   <th className="p-3 text-left">Delete</th>
 )}
 
@@ -421,35 +421,31 @@ setExceptions(
             {daysLeft}
           </td>
 
-{isLoggedIn && (
+<td className="p-3">
+  {isLoggedIn &&
+    currentUser === item.created_by && (
+      <button
+        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
+        onClick={async () => {
+          await fetch(
+            `/api/exceptions/${item.id}`,
+            {
+              method: "DELETE",
+            }
+          );
 
-  <td className="p-3">
-
-    <button
-  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
-  onClick={async () => {
-
-    await fetch(
-      `/api/exceptions/${item.id}`,
-      {
-        method: "DELETE",
-      }
-    );
-
-    setExceptions(prev =>
-      prev.filter(
-        exception =>
-          exception.id !== item.id
-      )
-    );
-
-  }}
->
-  Delete
-</button>
-  </td>
-
-)}
+          setExceptions(prev =>
+            prev.filter(
+              exception =>
+                exception.id !== item.id
+            )
+          );
+        }}
+      >
+        Delete
+      </button>
+    )}
+</td>
         </tr>
 
       );
