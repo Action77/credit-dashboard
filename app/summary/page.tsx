@@ -331,7 +331,7 @@ const isCollected =
         .replace(/\s/g, "")
         .toUpperCase() === invoice
   );
-
+  
 if (
   !isException &&
   !isCollected
