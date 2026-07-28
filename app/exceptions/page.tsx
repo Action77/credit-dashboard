@@ -247,7 +247,12 @@ P1316600015512`}
   }`}
   onClick={async () => {
 
-    if (isAddingExceptions) return;
+    console.log(
+      "ADD EXCEPTION CLICKED"
+    );
+
+    if (isAddingExceptions)
+      return;
 
     setIsAddingExceptions(true);
 
@@ -258,16 +263,43 @@ P1316600015512`}
           "currentUser"
         );
 
-      if (
-        !currentUser ||
-        !invoiceText ||
-        (!isPermanent && !tillDate)
-      ) {
+      if (!currentUser) {
+
+        alert(
+          "Please Login First"
+        );
+
         return;
+
+      }
+
+      if (!invoiceText.trim()) {
+
+        alert(
+          "Please Enter Invoice Number"
+        );
+
+        return;
+
+      }
+
+      if (
+        !isPermanent &&
+        !tillDate
+      ) {
+
+        alert(
+          "Please Select Till Date"
+        );
+
+        return;
+
       }
 
       const creditResponse =
-        await fetch("/api/credit-data");
+        await fetch(
+          "/api/credit-data"
+        );
 
       const creditResult =
         await creditResponse.json();
@@ -298,7 +330,9 @@ P1316600015512`}
             );
 
           return {
+
             invoice,
+
             tillDate,
 
             vanCode:
@@ -315,52 +349,83 @@ P1316600015512`}
 
             customerName:
               match?.["Customer Name"] || ""
+
           };
 
         });
 
-      await fetch(
-        "/api/exceptions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify(
-            newExceptions.map(item => ({
-              invoice: item.invoice,
-              till_date: isPermanent
-                ? null
-                : item.tillDate,
-              permanent: isPermanent,
-              van_code: item.vanCode,
-              employee_name:
-                item.employeeName,
-              ats_code:
-                item.atsCode,
-              customer_code:
-                item.customerCode,
-              customer_name:
-                item.customerName,
-              created_by:
-                currentUser,
-            }))
-          ),
-        }
-      );
+      const saveResponse =
+        await fetch(
+          "/api/exceptions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify(
+              newExceptions.map(
+                item => ({
+                  invoice:
+                    item.invoice,
+                  till_date:
+                    isPermanent
+                      ? null
+                      : item.tillDate,
+                  permanent:
+                    isPermanent,
+                  van_code:
+                    item.vanCode,
+                  employee_name:
+                    item.employeeName,
+                  ats_code:
+                    item.atsCode,
+                  customer_code:
+                    item.customerCode,
+                  customer_name:
+                    item.customerName,
+                  created_by:
+                    currentUser,
+                })
+              )
+            ),
+          }
+        );
+
+      if (!saveResponse.ok) {
+
+        alert(
+          "Failed To Save Exception"
+        );
+
+        return;
+
+      }
 
       const response =
         await fetch(
           "/api/exceptions"
         );
 
-      setExceptions(
-        await response.json()
-      );
+      const data =
+        await response.json();
+
+      setExceptions(data);
 
       setInvoiceText("");
       setTillDate("");
+
+      alert(
+        "Exceptions Added Successfully"
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Unexpected Error"
+      );
 
     } finally {
 
