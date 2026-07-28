@@ -198,44 +198,50 @@ useEffect(() => {
         </h1>
       </div>
 
-      <div className="bg-white rounded-xl border shadow-sm p-5 mb-6 max-w-4xl">
-        <h3 className="font-bold text-lg mb-4">
-          Add Multiple Exceptions
-        </h3>
+{isLoggedIn && (
 
-        <textarea
-  rows={5}
-  value={invoiceText}
-  onChange={(e) =>
-    setInvoiceText(e.target.value)
-  }
-  placeholder={`P1316600015510
+  <div className="bg-white rounded-xl border shadow-sm p-5 mb-6 max-w-4xl">
+
+    <h3 className="font-bold text-lg mb-4">
+      Add Multiple Exceptions
+    </h3>
+
+    <textarea
+      rows={5}
+      value={invoiceText}
+      onChange={(e) =>
+        setInvoiceText(e.target.value)
+      }
+      placeholder={`P1316600015510
 P1316600015511
 P1316600015512`}
-  className="w-full border rounded-lg p-3 mb-4"
-/>
+      className="w-full border rounded-lg p-3 mb-4"
+    />
 
-<label className="flex items-center gap-2 mb-4">
-  <input
-    type="checkbox"
-    checked={isPermanent}
-    onChange={(e) =>
-      setIsPermanent(e.target.checked)
-    }
-  />
-  Legal
-</label>
+    <label className="flex items-center gap-2 mb-4">
+      <input
+        type="checkbox"
+        checked={isPermanent}
+        onChange={(e) =>
+          setIsPermanent(e.target.checked)
+        }
+      />
+      Legal
+    </label>
 
-{!isPermanent && (
-  <input
-    type="date"
-    value={tillDate}
-    onChange={(e) =>
-      setTillDate(e.target.value)
-    }
-    className="border rounded-lg p-3 mb-4 w-full"
-  />
-)}
+    {!isPermanent && (
+      <input
+        type="date"
+        value={tillDate}
+        onChange={(e) =>
+          setTillDate(e.target.value)
+        }
+        className="border rounded-lg p-3 mb-4 w-full"
+      />
+    )}
+
+    {/* Add Exceptions Button هنا */}
+
 
 
 <button
@@ -439,6 +445,9 @@ P1316600015512`}
     : "Add Exceptions"}
 </button>
       </div>
+      
+
+)}
 
       <div className="bg-white rounded-xl border p-5">
         <div className="flex justify-between items-center mb-4">
@@ -682,11 +691,7 @@ setIsLoggedIn(true);
 
 setShowLoginModal(false);
 
-                if (!user) {
-                  alert("Invalid Username or Password");
-                  return;
-                }
-
+                
                 
               }}
             >
