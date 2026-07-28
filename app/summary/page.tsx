@@ -247,41 +247,13 @@ const filteredData = data.filter((row) => {
   }, {})
 )
 
-.sort((a: any, b: any) => {
-
-  const aInfo = a[1];
-  const bInfo = b[1];
-
-  const aPriority =
-    aInfo.remaining > 0 &&
-    aInfo.exceptions > 0
-      ? 1
-      : aInfo.remaining > 0
-      ? 2
-      : aInfo.exceptions > 0
-      ? 3
-      : 4;
-
-  const bPriority =
-    bInfo.remaining > 0 &&
-    bInfo.exceptions > 0
-      ? 1
-      : bInfo.remaining > 0
-      ? 2
-      : bInfo.exceptions > 0
-      ? 3
-      : 4;
-
-  if (aPriority !== bPriority) {
-    return aPriority - bPriority;
-  }
-
-  return (
-    bInfo.remaining -
-    aInfo.remaining
-  );
-
-});
+.sort((a: any, b: any) =>
+  String(a[0]).localeCompare(
+    String(b[0]),
+    undefined,
+    { numeric: true }
+  )
+);
   const getStatus = (
   remaining: number,
   ex: number
