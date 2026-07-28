@@ -54,23 +54,15 @@ const legalCount =
   ).length;
 
 const latestAdded =
-  exceptions
-    .filter(item => !item.permanent)
-    .sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() -
-        new Date(a.created_at).getTime()
-    )[0];
+  exceptions.find(
+    item => !item.permanent
+  );
 
 const latestLegal =
-  exceptions
-    .filter(item => item.permanent)
-    .sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() -
-        new Date(a.created_at).getTime()
-    )[0];
-          useEffect(() => {
+  exceptions.find(
+    item => item.permanent
+  );
+            useEffect(() => {
 
   const loadExceptions = async () => {
 
