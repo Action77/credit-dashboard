@@ -122,11 +122,6 @@ ex: number,
 updated: boolean
 ) => {
 
-if (updated) {
-
-return "bg-sky-100 text-sky-700";
-
-}
 
 if (remaining === 0 && ex === 0) {
 
