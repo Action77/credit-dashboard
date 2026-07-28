@@ -4,67 +4,135 @@ import Link from "next/link";
 import { useState } from "react";
 import {
   LayoutDashboard,
+  Upload,
+  FileText,
   AlertCircle,
   BarChart3,
   Settings,
   Users,
+  LogOut,
 } from "lucide-react";
 
 export default function SettingsPage() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [showLoginModal, setShowLoginModal] = useState(false);
+const [currentUser, setCurrentUser] = useState("");
   const [activeTab, setActiveTab] = useState("notifications");
 
   return (
     <div className="flex min-h-screen bg-slate-100">
       {/* Sidebar */}
-      <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
-        <div className="p-4">
-          <h1 className="text-xl font-bold leading-tight">
-            Credit With Route Block
-          </h1>
-        </div>
+ <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
 
-        <nav className="px-4 space-y-2">
-          <Link
-            href="/"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700"
-          >
-            <LayoutDashboard size={18} />
-            Dashboard
-          </Link>
+    <div className="p-4">
+      <h1 className="text-xl font-bold leading-tight">
+        Credit With Route Block
+      </h1>
+    </div>
 
-          <Link
-            href="/exceptions"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700"
-          >
-            <AlertCircle size={18} />
-            Exceptions
-          </Link>
+    <nav className="px-4 space-y-2">
 
-          <Link
-            href="/summary"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700"
-          >
-            <BarChart3 size={18} />
-            Summary
-          </Link>
+  <Link
+  href="/"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <LayoutDashboard size={18} />
+  <span>Dashboard</span>
+</Link>
 
-          <Link
-            href="/settings"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"
-          >
-            <Settings size={18} />
-            Settings
-          </Link>
+  <div className="flex items-center gap-3 px-4 py-3">
+    <Upload size={18} />
+    Import File
+  </div>
 
-          <Link
-            href="/users"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700"
-          >
-            <Users size={18} />
-            Users
-          </Link>
-        </nav>
-      </aside>
+  <div className="flex items-center gap-3 px-4 py-3">
+    <FileText size={18} />
+    Invoices
+  </div>
+
+<Link
+  href="/exceptions"
+  className="flex items-center gap-3 px-4 py-3 bg-blue-600 rounded-lg"
+>
+  <AlertCircle size={18} />
+  <span>Exceptions</span>
+</Link>
+
+
+<Link
+  href="/summary"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <BarChart3 size={18} />
+  <span>Summary</span>
+</Link>
+
+<Link
+  href="/reports"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <BarChart3 size={18} />
+  <span>Reports</span>
+</Link>
+
+  <Link
+  href="/settings"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <Settings size={18} />
+  Settings
+</Link>
+
+<Link
+  href="/users"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <Users size={18} />
+  Users
+</Link>
+
+</nav>
+
+<div
+  className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg ${
+    isLoggedIn
+      ? "bg-red-600"
+      : "bg-blue-600"
+  }`}
+  onClick={() => {
+
+    if (isLoggedIn) {
+
+      localStorage.removeItem("currentUser");
+
+      setIsLoggedIn(false);
+
+      setCurrentUser("");
+
+      window.location.href = "/";
+
+    } else {
+
+      setShowLoginModal(true);
+
+    }
+
+  }}
+>
+  {isLoggedIn ? (
+    <>
+      <LogOut size={18} />
+      Logout
+    </>
+  ) : (
+    <>
+      <Users size={18} />
+      Login
+    </>
+  )}
+</div>
+
+</aside>
 
       {/* Content */}
       <main className="flex-1 p-6">
