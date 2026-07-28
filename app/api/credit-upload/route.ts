@@ -61,7 +61,15 @@ export async function POST(req: Request) {
     });
 
     console.log("Blocked Rows:", blockedRows.length);
+await supabase
+  .from("collection_invoices")
+  .delete()
+  .neq("id", 0);
 
+await supabase
+  .from("collection_uploads")
+  .delete()
+  .neq("id", 0);
     const { error: deleteError } = await supabase
       .from("credit_data")
       .delete()

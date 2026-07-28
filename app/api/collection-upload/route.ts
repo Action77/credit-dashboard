@@ -62,22 +62,35 @@ const uploadedBy =
           .replace(/\s/g, "")
       );
 
-    const records = invoices.map(
+    const { data: uploadRecord, error: uploadError } =
+  await supabase
+    .from("collection_uploads")
+    .insert({
+      file_name: file.name,
+      uploaded_by: uploadedBy,
+    })
+    .select()
+    .single();
+
+if (uploadError) {
+  throw uploadError;
+}
+
+const records = invoices.map(
   (invoice) => ({
     invoice,
     uploaded_by: uploadedBy,
+    upload_id: uploadRecord.id,
   })
 );
 
-    const { error } = await supabase
-      .from("collection_invoices")
-      .upsert(records, {
-        onConflict: "invoice",
-      });
+const { error } = await supabase
+  .from("collection_invoices")
+  .insert(records);
 
-    if (error) {
-      throw error;
-    }
+if (error) {
+  throw error;
+}
 
     return NextResponse.json({
       success: true,
