@@ -24,115 +24,108 @@ const [currentUser, setCurrentUser] = useState("");
       {/* Sidebar */}
  <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
 
-    <div className="p-4">
-      <h1 className="text-xl font-bold leading-tight">
-        Credit With Route Block
-      </h1>
-    </div>
+        <div className="p-4">
+          <h1 className="text-xl font-bold leading-tight">
+            Credit With Route Block
+          </h1>
+        </div>
 
-    <nav className="px-4 space-y-2">
+        <nav className="px-4 space-y-2">
 
   <Link
-  href="/"
-  className="flex items-center gap-3 px-4 py-3"
->
-  <LayoutDashboard size={18} />
-  <span>Dashboard</span>
-</Link>
+    href="/"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <LayoutDashboard size={18} />
+    <span>Dashboard</span>
+  </Link>
 
-  <div className="flex items-center gap-3 px-4 py-3">
+  <Link
+    href="/import"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
     <Upload size={18} />
-    Import File
-  </div>
-
-  <div className="flex items-center gap-3 px-4 py-3">
-    <FileText size={18} />
-    Invoices
-  </div>
-
-<Link
-  href="/exceptions"
-  className="flex items-center gap-3 px-4 py-3 bg-blue-600 rounded-lg"
->
-  <AlertCircle size={18} />
-  <span>Exceptions</span>
-</Link>
-
-
-<Link
-  href="/summary"
-  className="flex items-center gap-3 px-4 py-3"
->
-  <BarChart3 size={18} />
-  <span>Summary</span>
-</Link>
-
-<Link
-  href="/reports"
-  className="flex items-center gap-3 px-4 py-3"
->
-  <BarChart3 size={18} />
-  <span>Reports</span>
-</Link>
+    <span>Import File</span>
+  </Link>
 
   <Link
-  href="/settings"
-  className="flex items-center gap-3 px-4 py-3"
->
-  <Settings size={18} />
-  Settings
-</Link>
+    href="/invoices"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <FileText size={18} />
+    <span>Invoices</span>
+  </Link>
 
-<Link
-  href="/users"
-  className="flex items-center gap-3 px-4 py-3"
->
-  <Users size={18} />
-  Users
-</Link>
+  <Link
+    href="/exceptions"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <AlertCircle size={18} />
+    <span>Exceptions</span>
+  </Link>
+
+  <Link
+    href="/summary"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"
+  >
+    <BarChart3 size={18} />
+    <span>Summary</span>
+  </Link>
+
+  <Link
+    href="/reports"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <BarChart3 size={18} />
+    <span>Reports</span>
+  </Link>
+
+  <Link
+    href="/settings"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <Settings size={18} />
+    <span>Settings</span>
+  </Link>
+
+  <Link
+    href="/users"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <Users size={18} />
+    <span>Users</span>
+  </Link>
 
 </nav>
+<div className="p-6 border-t border-white/10">
 
-<div
-  className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg ${
-    isLoggedIn
-      ? "bg-red-600"
-      : "bg-blue-600"
-  }`}
-  onClick={() => {
-
-    if (isLoggedIn) {
-
-      localStorage.removeItem("currentUser");
-
-      setIsLoggedIn(false);
-
-      setCurrentUser("");
-
-      window.location.href = "/";
-
-    } else {
-
-      setShowLoginModal(true);
-
-    }
-
-  }}
->
   {isLoggedIn ? (
-    <>
+
+    <div
+      className="flex items-center gap-3 bg-red-600 p-3 rounded-lg cursor-pointer"
+      onClick={() => {
+        localStorage.removeItem("currentUser");
+        setIsLoggedIn(false);
+      }}
+    >
       <LogOut size={18} />
       Logout
-    </>
+    </div>
+
   ) : (
-    <>
+
+    <div
+      className="flex items-center gap-3 bg-blue-600 p-3 rounded-lg cursor-pointer"
+      onClick={() => setShowLoginModal(true)}
+    >
       <Users size={18} />
       Login
-    </>
-  )}
-</div>
+    </div>
 
-</aside>
+  )}
+
+</div>
+      </aside>
 
       {/* Content */}
       <main className="flex-1 p-6">
