@@ -757,15 +757,16 @@ if (!user) {
   return;
 }
 
-await localStorage.removeItem(
-  "currentUser"
+await localStorage.setItem(
+  "currentUser",
+  user.username
 );
 
+setCurrentUser(user.username);
 
 setIsLoggedIn(true);
 
 setShowLoginModal(false);
-
                 
                 
               }}
