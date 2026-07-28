@@ -237,10 +237,12 @@ if (isException) {
   ex: number
 ) => {
 
-  if (
-    remaining > 0 &&
-    ex > 0
-  ) {
+if (
+  remaining > 0 &&
+  ex > 0
+) {
+  return `${remaining} Remaining , Ex`;
+} {
     return `${remaining} Remaining , Ex ${ex}`;
   }
 
@@ -251,9 +253,10 @@ if (isException) {
   }
 
   if (
+    remaining === 0 &&
     ex > 0
   ) {
-    return `Ex ${ex}`;
+    return "Ex & All Collected";
   }
 
   return "All Collected";
