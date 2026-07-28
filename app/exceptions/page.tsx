@@ -129,10 +129,13 @@ useEffect(() => {
   <span>Summary</span>
 </Link>
 
-  <div className="flex items-center gap-3 px-4 py-3">
-    <BarChart3 size={18} />
-    Reports
-  </div>
+<Link
+  href="/reports"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <BarChart3 size={18} />
+  <span>Reports</span>
+</Link>
 
   <div className="flex items-center gap-3 px-4 py-3">
     <Settings size={18} />
