@@ -65,16 +65,29 @@ const exceptionsResponse =
 const exceptionsData =
   await exceptionsResponse.json();
 
-setExceptions(
-  exceptionsData || []
-);
+const today = new Date();
+today.setHours(0,0,0,0);
+
+const validExceptions =
+  exceptionsData.filter((item:any) => {
+
+    const tillDate =
+      new Date(item.till_date);
+
+    tillDate.setHours(
+      0,0,0,0
+    );
+
+    return (
+      item.permanent ||
+      tillDate >= today
+    );
+  });
+
+setExceptions(validExceptions);
     const currentUser =
       await localStorage.getItem("currentUser");
 
-    const collected =
-      await localStorage.getItem(
-        "collectedInvoices"
-      );
 
     const savedPermissions =
       await localStorage.getItem(
@@ -95,11 +108,15 @@ setExceptions(
       setFilters(JSON.parse(savedFilters));
     }
 
-    if (collected) {
-      setCollectedInvoices(
-        JSON.parse(collected)
-      );
-    }
+    const collectionResponse =
+  await fetch("/api/collection-data");
+
+const collectionData =
+  await collectionResponse.json();
+
+setCollectedInvoices(
+  collectionData.invoices || []
+);
 
     if (savedPermissions) {
       setPermissions(
@@ -349,7 +366,7 @@ if (
 
   acc[region].amount +=
   Number(
-    row["pending_cim"]
+    row["Pending CIM"]
   ) || 0;
 }      return acc;
 
