@@ -232,13 +232,11 @@ if (isException) {
   ex: number
 ) => {
 
-if (
-  remaining > 0 &&
-  ex > 0
-) {
-  return `${remaining} Remaining , Ex`;
-} {
-    return `${remaining} Remaining , Ex ${ex}`;
+  if (
+    remaining > 0 &&
+    ex > 0
+  ) {
+    return `${remaining} Remaining , Ex`;
   }
 
   if (
