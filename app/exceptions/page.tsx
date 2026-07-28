@@ -203,8 +203,13 @@ useEffect(() => {
 
 {isLoggedIn && (
 
-  <div className="bg-white rounded-xl border shadow-sm p-5 mb-6 max-w-4xl">
+  <div className="grid grid-cols-2 gap-6 mb-6">
 
+    {/* Add Multiple Exceptions */}
+
+    <div className="bg-white rounded-xl border shadow-sm p-5">
+
+   
     <h3 className="font-bold text-lg mb-4">
       Add Multiple Exceptions
     </h3>
@@ -443,12 +448,104 @@ P1316600015512`}
 
   }}
 >
+  
   {isAddingExceptions
     ? "Processing..."
     : "Add Exceptions"}
 </button>
       </div>
-      
+      <div className="bg-white rounded-xl border shadow-sm p-5">
+
+  <div className="flex justify-between items-center mb-6">
+
+    <h3 className="font-bold text-lg">
+      Recent Activity
+    </h3>
+
+    <span className="text-xs text-slate-400">
+      Last Actions
+    </span>
+
+  </div>
+
+  <div className="space-y-4">
+
+    <div className="border border-green-200 bg-green-50 rounded-xl p-4">
+
+      <div className="text-green-700 font-semibold">
+        Added Exceptions
+      </div>
+
+      <div className="text-3xl font-bold mt-2">
+        23
+      </div>
+
+      <div className="text-sm text-slate-500">
+        Records Added
+      </div>
+
+      <div className="mt-3 text-sm font-medium">
+        By Halyousif
+      </div>
+
+      <div className="text-xs text-slate-400">
+        2 Hours Ago
+      </div>
+
+    </div>
+
+    <div className="border border-amber-200 bg-amber-50 rounded-xl p-4">
+
+      <div className="text-amber-700 font-semibold">
+        Legal Exceptions
+      </div>
+
+      <div className="text-3xl font-bold mt-2">
+        8
+      </div>
+
+      <div className="text-sm text-slate-500">
+        Records Added
+      </div>
+
+      <div className="mt-3 text-sm font-medium">
+        By Nelson
+      </div>
+
+      <div className="text-xs text-slate-400">
+        5 Hours Ago
+      </div>
+
+    </div>
+
+    <div className="border border-red-200 bg-red-50 rounded-xl p-4">
+
+      <div className="text-red-700 font-semibold">
+        Deleted Exceptions
+      </div>
+
+      <div className="text-3xl font-bold mt-2">
+        3
+      </div>
+
+      <div className="text-sm text-slate-500">
+        Records Deleted
+      </div>
+
+      <div className="mt-3 text-sm font-medium">
+        By Halyousif
+      </div>
+
+      <div className="text-xs text-slate-400">
+        Yesterday
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+          </div>
 
 )}
 
