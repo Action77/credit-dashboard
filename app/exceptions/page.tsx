@@ -759,10 +759,10 @@ if (!user) {
 
 await localStorage.setItem(
   "currentUser",
-  user.username
+  user.name
 );
 
-setCurrentUser(user.username);
+setCurrentUser(user.name);
 
 setIsLoggedIn(true);
 
