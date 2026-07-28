@@ -56,13 +56,21 @@ const legalCount =
 const latestAdded =
   exceptions
     .filter(item => !item.permanent)
-    .sort((a, b) => b.id - a.id)[0];
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() -
+        new Date(a.created_at).getTime()
+    )[0];
 
 const latestLegal =
   exceptions
     .filter(item => item.permanent)
-    .sort((a, b) => b.id - a.id)[0];
-      useEffect(() => {
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() -
+        new Date(a.created_at).getTime()
+    )[0];
+          useEffect(() => {
 
   const loadExceptions = async () => {
 
@@ -641,7 +649,9 @@ P1316600015512`}
           <td className="p-3">
             {item.invoice}
           </td>
-
+<td className="p-3">
+  {item.created_by}
+</td>
           <td className="p-3">
             {item.till_date}
           </td>
