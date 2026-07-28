@@ -10,6 +10,10 @@ import {
   Settings,
   Users,
   LogOut,
+  Truck,
+  CircleAlert,
+  CheckCircle,
+  Receipt,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -173,60 +177,94 @@ const filteredData = data.filter((row) => {
 });
   const vans = Object.entries(
   filteredData.reduce((acc: any, row) => {
-          const van = row["Van Code."];
 
-      if (!acc[van]) {
-        acc[van] = {
-          ids: new Set(),
-          remaining: 0,
-          exceptions: 0,
-        };
-      }
+    const van = row["Van Code."];
 
-      acc[van].ids.add(row["Employee ATS Code."]);
+    if (!acc[van]) {
+      acc[van] = {
+        ids: new Set(),
+        remaining: 0,
+        exceptions: 0,
+      };
+    }
 
-      const invoice =
-  String(
-    row["Invoice #"]
-  )
-    .replace(/\s/g, "")
-    .toUpperCase();
+    acc[van].ids.add(
+      row["Employee ATS Code."]
+    );
 
-const isException =
-  exceptions.some(
-    (e: any) =>
-      String(e.invoice)
+    const invoice =
+      String(row["Invoice #"])
         .replace(/\s/g, "")
-        .toUpperCase() ===
-      invoice
+        .toUpperCase();
+
+    const isException =
+      exceptions.some(
+        (e: any) =>
+          String(e.invoice)
+            .replace(/\s/g, "")
+            .toUpperCase() ===
+          invoice
+      );
+
+    const isCollected =
+      collectedInvoices.some(
+        i =>
+          String(i)
+            .replace(/\s/g, "")
+            .toUpperCase() ===
+          invoice
+      );
+
+    if (isException) {
+
+      acc[van].exceptions++;
+
+    } else if (!isCollected) {
+
+      acc[van].remaining++;
+
+    }
+
+    return acc;
+
+  }, {})
+)
+
+.sort((a: any, b: any) => {
+
+  const aInfo = a[1];
+  const bInfo = b[1];
+
+  const aPriority =
+    aInfo.remaining > 0 &&
+    aInfo.exceptions > 0
+      ? 1
+      : aInfo.remaining > 0
+      ? 2
+      : aInfo.exceptions > 0
+      ? 3
+      : 4;
+
+  const bPriority =
+    bInfo.remaining > 0 &&
+    bInfo.exceptions > 0
+      ? 1
+      : bInfo.remaining > 0
+      ? 2
+      : bInfo.exceptions > 0
+      ? 3
+      : 4;
+
+  if (aPriority !== bPriority) {
+    return aPriority - bPriority;
+  }
+
+  return (
+    bInfo.remaining -
+    aInfo.remaining
   );
 
-const isCollected =
-  collectedInvoices.some(
-    i =>
-      String(i)
-        .replace(/\s/g, "")
-        .toUpperCase() ===
-      invoice
-  );
-
-if (isException) {
-
-  acc[van].exceptions++;
-
-} else if (!isCollected) {
-
-  acc[van].remaining++;
-
-}
-      return acc;
-    }, {})
-).sort(([a], [b]) =>
-  String(a).localeCompare(
-    String(b)
-  )
-);
-
+});
   const getStatus = (
   remaining: number,
   ex: number
@@ -424,27 +462,195 @@ const regionSummary = Object.entries(
         <h1 className="text-3xl font-bold mb-6">
           Summary
         </h1>
+<div className="grid grid-cols-4 gap-4 mb-6">
 
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-auto max-h-[480px]">
-          <table className="w-full table-fixed text-sm">
+  <div className="grid grid-cols-4 gap-4 mb-6">
 
+  <div className="bg-white border rounded-xl p-5 shadow-sm">
+
+    <div className="flex items-center justify-between">
+
+      <div>
+        <p className="text-sm text-slate-500">
+          Total Vans
+        </p>
+
+        <h2 className="text-3xl font-bold mt-2">
+          {vans.length}
+        </h2>
+      </div>
+
+      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+        <Truck
+          size={22}
+          className="text-blue-600"
+        />
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="bg-white border rounded-xl p-5 shadow-sm">
+
+    <div className="flex items-center justify-between">
+
+      <div>
+        <p className="text-sm text-pink-600">
+          Remaining Invoices
+        </p>
+
+        <h2 className="text-3xl font-bold mt-2 text-pink-600">
+          {vans.reduce(
+            (
+              sum: number,
+              [_, info]: any
+            ) =>
+              sum +
+              info.remaining,
+            0
+          )}
+        </h2>
+      </div>
+
+      <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center">
+        <Receipt
+          size={22}
+          className="text-pink-600"
+        />
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="bg-white border rounded-xl p-5 shadow-sm">
+
+    <div className="flex items-center justify-between">
+
+      <div>
+        <p className="text-sm text-orange-600">
+          Exception Invoices
+        </p>
+
+        <h2 className="text-3xl font-bold mt-2 text-orange-600">
+          {vans.reduce(
+            (
+              sum: number,
+              [_, info]: any
+            ) =>
+              sum +
+              info.exceptions,
+            0
+          )}
+        </h2>
+      </div>
+
+      <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+        <CircleAlert
+          size={22}
+          className="text-orange-600"
+        />
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="bg-white border rounded-xl p-5 shadow-sm">
+
+    <div className="flex items-center justify-between">
+
+      <div>
+        <p className="text-sm text-green-600">
+          All Collected Vans
+        </p>
+
+        <h2 className="text-3xl font-bold mt-2 text-green-600">
+          {
+            vans.filter(
+              ([_, info]: any) =>
+                info.remaining === 0
+            ).length
+          }
+        </h2>
+      </div>
+
+      <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+        <CheckCircle
+          size={22}
+          className="text-green-600"
+        />
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+<div
+  className="
+    bg-white
+    rounded-2xl
+    shadow-sm
+    border
+    border-slate-100
+    overflow-hidden
+  "
+>
+
+  <div className="px-6 py-5 border-b border-slate-100">
+
+    <div className="flex items-center justify-between">
+
+      <div>
+
+        <h2 className="text-xl font-bold text-slate-800">
+          Van Performance
+        </h2>
+
+        <p className="text-sm text-slate-500 mt-1">
+          Credit block status by van
+        </p>
+
+      </div>
+
+      <div className="text-sm text-slate-500">
+        {vans.length} Vans
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="overflow-auto max-h-[650px]">
+
+    <table className="w-full text-sm">
   <thead className="sticky top-0 z-10 bg-[#071d5c] text-white">
 
 <tr className="bg-[#071d5c] text-white border-b border-blue-900">
 
-<th className="p-4 w-[24%] text-left font-semibold">
+<th className="p-4 text-left font-semibold">
 Status
 </th>
 
-<th className="p-4 w-[20%] text-center font-semibold">
+<th className="p-4 text-center font-semibold">
 ID
 </th>
 
-<th className="p-4 w-[32%] text-left font-semibold">
+<th className="p-4 text-left font-semibold">
 Van Code
 </th>
 
-<th className="p-4 w-[24%] text-center font-semibold">
+<th className="p-4 text-center font-semibold">
+Remaining
+</th>
+
+<th className="p-4 text-center font-semibold">
+Exception
+</th>
+
+<th className="p-4 text-center font-semibold">
 Permission
 </th>
 
@@ -465,47 +671,54 @@ Permission
 
         return (
 
-        <tr
-key={van}
-className={`
-border-b
-border-slate-200
-transition-colors
-${
-lastUpdatedVans.some(
-  (v) => String(v).trim() === String(van).trim()
-)
-? "bg-yellow-200"
-: "hover:bg-slate-50"
-}
-`}
+      <tr
+  key={van}
+  className={`
+    border-b
+    border-slate-100
+    transition-all
+    duration-200
+    ${
+      lastUpdatedVans.some(
+        (v) =>
+          String(v).trim() ===
+          String(van).trim()
+      )
+        ? "bg-yellow-50"
+        : "hover:bg-slate-50"
+    }
+  `}
 >
 
-            <td className="p-3 border-r text-center">
+            <td className="p-4 text-center">
 
   <span
     className={`
       inline-flex
       items-center
       justify-center
-      px-4
-      py-1.5
+      min-w-[170px]
+      px-5
+      py-2.5
       rounded-full
-      text-xs
-      font-semibold
+      text-sm
+      font-bold
+      shadow-sm
       ${getStatusStyle(
-  info.remaining,
-  info.exceptions,
-  lastUpdatedVans.some(
-    (v) => String(v).trim() === String(van).trim()
-  )
-)}    `}
+        info.remaining,
+        info.exceptions,
+        lastUpdatedVans.some(
+          (v) =>
+            String(v).trim() ===
+            String(van).trim()
+        )
+      )}
+    `}
   >
     {status}
   </span>
 
 </td>
-
             <td className="p-3 border-r text-center">
               {[...info.ids].join(" or ")}
             </td>
@@ -513,36 +726,43 @@ lastUpdatedVans.some(
             <td className="p-3 border-r font-semibold text-slate-800">
   {van}
 </td>
-            <td className="p-3 text-center">
-<input
-  type="checkbox"
-  className="w-5 h-5 accent-blue-600 cursor-pointer"
-  disabled={!isLoggedIn}
-                checked={
-                  permissions[van] ?? false
-                }
-                onChange={(e) => {
 
-                  const updated = {
+<td className="p-3 text-center border-r">
+  {info.remaining}
+</td>
+
+<td className="p-3 text-center border-r">
+  {info.exceptions}
+</td>
+
+<td className="p-3 text-center">
+  <input
+    type="checkbox"
+    className="w-5 h-5 accent-blue-600 cursor-pointer"
+    disabled={!isLoggedIn}
+    checked={
+      permissions[van] ?? false
+    }
+    onChange={(e) => {
+
+      const updated = {
   ...permissions,
   [van]: e.target.checked,
 };
+      setPermissions(
+        updated
+      );
 
-                  setPermissions(
-                    updated
-                  );
+      localStorage.setItem(
+        "vanPermissions",
+        JSON.stringify(
+          updated
+        )
+      );
 
-                  localStorage.setItem(
-                    "vanPermissions",
-                    JSON.stringify(
-                      updated
-                    )
-                  );
-
-                }}
-              />
-            </td>
-
+    }}
+  />
+</td>
           </tr>
 
         );
@@ -552,65 +772,96 @@ lastUpdatedVans.some(
   </tbody>
 
 </table>
-        </div>
-<div className="mt-8 bg-white rounded-xl border p-5">
 
-  <h2 className="text-xl font-bold mb-4">
-    Region Summary
-  </h2>
+  </div>
 
-  <table className="w-full text-sm">
+</div>
+<div className="mt-8 bg-white rounded-2xl shadow-sm border border-slate-100">
 
-<thead>
+  <div className="px-6 py-5 border-b border-slate-100">
 
-<tr className="bg-[#071d5c] text-white border-b border-blue-900">
+    <h2 className="text-xl font-bold text-slate-800">
+      Region Summary
+    </h2>
 
-<th className="p-4 text-left font-semibold">
-Region
-</th>
+    <p className="text-sm text-slate-500 mt-1">
+      Outstanding invoices by region
+    </p>
 
-<th className="p-4 text-center font-semibold">
-Invoices
-</th>
+  </div>
 
-<th className="p-4 text-right font-semibold">
-Amount
-</th>
+  <div className="p-6">
 
-</tr>
+    <div className="space-y-5">
 
-</thead>
-
-    <tbody>
-
-      {regionSummary.map(
-        ([region, info]: any) => (
-
-          <tr
-            key={region}
-            className="border-b"
-          >
-
-            <td className="p-3">
-              {region}
-            </td>
-
-            <td className="p-3">
-              {info.invoices}
-            </td>
-
-            <td className="p-3">
-              {info.amount.toLocaleString()}
-            </td>
-
-          </tr>
-
+      {regionSummary
+        .sort(
+          (a: any, b: any) =>
+            b[1].invoices -
+            a[1].invoices
         )
-      )}
+        .map(
+          ([region, info]: any) => {
 
-    </tbody>
+            const maxInvoices =
+              Math.max(
+                ...regionSummary.map(
+                  (r: any) =>
+                    r[1].invoices
+                ),
+                1
+              );
 
-  </table>
+            return (
+
+              <div key={region}>
+
+                <div className="flex justify-between mb-2">
+
+                  <span className="font-semibold">
+                    {region}
+                  </span>
+
+                  <span className="text-slate-500">
+                    {info.invoices}
+                    {" "}
+                    Invoices
+                  </span>
+
+                </div>
+
+                <div className="h-3 bg-slate-200 rounded-full">
+
+                  <div
+                    className="h-3 bg-blue-600 rounded-full"
+                    style={{
+                      width: `${
+                        (
+                          info.invoices /
+                          maxInvoices
+                        ) * 100
+                      }%`,
+                    }}
+                  />
+
+                </div>
+
+                <div className="text-right text-sm text-slate-500 mt-1">
+
+                  {info.amount.toLocaleString()}
+
+                </div>
+
+              </div>
+
+            );
+
+          }
+        )}
+
+    </div>
+
+  </div>
 
 </div>
       </main>
