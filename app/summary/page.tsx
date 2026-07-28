@@ -329,10 +329,9 @@ const regionSummary = Object.entries(
         );
 
       const isBlocked =
-  String(row["Status"] || "")
+  String(row["Status User Block"] || "")
     .trim()
     .toUpperCase() === "BLOCK";
-
 if (
   isBlocked &&
   !isException &&
