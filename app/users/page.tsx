@@ -15,6 +15,12 @@ import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 
 export default function UsersPage() {
+  const [editingUserId, setEditingUserId] =
+  useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
+
+const [deletingUserId, setDeletingUserId] =
+  useState<number | null>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [editingId, setEditingId] =
   useState<number | null>(null);
@@ -172,7 +178,14 @@ loadUsers();
   };
 
   const handleDelete =
-    async (id: number) => {
+  async (id: number) => {
+
+    if (deletingUserId === id)
+      return;
+
+    setDeletingUserId(id);
+
+    try {
 
       await fetch(
         "/api/users",
@@ -188,43 +201,64 @@ loadUsers();
         }
       );
 
-      loadUsers();
-    };
+      await loadUsers();
 
+    } finally {
+
+      setDeletingUserId(null);
+
+    }
+  };
   const handleEdit = (
   user: any
 ) => {
 
-  console.log("USER =", user);
-  console.log("USER ID =", user.id);
-  console.log("USER CODE =", user.user_code);
+  if (editingUserId === user.id)
+    return;
+
+  setEditingUserId(user.id);
 
   setEditingId(user.id);
+
   setEditData(user);
+
 };
 const handleSave =
   async () => {
 
-    await fetch(
-      "/api/users",
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify(
-          editData
-        ),
-      }
-    );
+    if (saving) return;
 
-    setEditingId(null);
-    setEditData({});
+    setSaving(true);
 
-    loadUsers();
+    try {
+
+      await fetch(
+        "/api/users",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify(
+            editData
+          ),
+        }
+      );
+
+      setEditingId(null);
+      setEditingUserId(null);
+      setEditData({});
+
+      await loadUsers();
+
+    } finally {
+
+      setSaving(false);
+
+    }
   };
-  const filteredUsers =
+    const filteredUsers =
     users.filter((user) => {
 
       const matchesSearch =
@@ -720,28 +754,47 @@ return (
 
                   {isLoggedIn &&
   (editingId === user.id ? (
-    <button
-      className="bg-green-600 text-white px-3 py-1 rounded"
-      onClick={handleSave}
-    >
-      Save
-    </button>
+<button
+  disabled={saving}
+  className={`text-white px-3 py-1 rounded ${
+    saving
+      ? "bg-slate-400 cursor-not-allowed"
+      : "bg-green-600"
+  }`}
+  onClick={handleSave}
+>
+  {saving ? "Saving..." : "Save"}
+</button>
   ) : (
-    <button
-      className="bg-blue-600 text-white px-3 py-1 rounded"
-      onClick={() => handleEdit(user)}
-    >
-      Edit
-    </button>
+<button
+  disabled={editingUserId === user.id}
+  className={`text-white px-3 py-1 rounded ${
+    editingUserId === user.id
+      ? "bg-slate-400 cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-700"
+  }`}
+  onClick={() => handleEdit(user)}
+>
+  {editingUserId === user.id
+    ? "Editing..."
+    : "Edit"}
+</button>
   ))}
 
 {isLoggedIn && (
-  <button
-    className="bg-red-600 text-white px-3 py-1 rounded"
-    onClick={() => handleDelete(user.id)}
-  >
-    Delete
-  </button>
+<button
+  disabled={deletingUserId === user.id}
+  className={`text-white px-3 py-1 rounded ${
+    deletingUserId === user.id
+      ? "bg-slate-400 cursor-not-allowed"
+      : "bg-red-600"
+  }`}
+  onClick={() => handleDelete(user.id)}
+>
+  {deletingUserId === user.id
+    ? "Deleting..."
+    : "Delete"}
+</button>
 )}
 
                 </td>
