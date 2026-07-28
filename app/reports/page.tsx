@@ -519,22 +519,28 @@ return (
 
             <tbody>
 
-  {filteredCollectionRows.map(
-    (row: any) => (
+  {filteredCreditRows.map(
+    (row, index) => (
 
       <tr
-        key={row.id}
+        key={index}
         className="border-b"
       >
+        {Object.values(row).map(
+          (
+            value,
+            cellIndex
+          ) => (
 
-        <td className="p-2">
-          {row.invoice}
-        </td>
+            <td
+              key={cellIndex}
+              className="p-2"
+            >
+              {String(value)}
+            </td>
 
-        <td className="p-2">
-          {row.uploaded_by}
-        </td>
-
+          )
+        )}
       </tr>
 
     )
@@ -547,32 +553,20 @@ return (
 
       ) : (
 
-        <div className="overflow-x-auto">
+        <div className="overflow-auto">
 
-  <table className="w-full max-w-full table-fixed border">
+  <table className="w-full border">
 
     <thead>
 
-      <tr className="bg-amber-600 text-white">
+      <tr className="bg-slate-800 text-white">
 
-        <th className="w-[22%] p-3 text-left">
-          Invoice No
+        <th className="p-3">
+          Invoice
         </th>
 
-        <th className="w-[15%] p-3 text-left">
-          Customer Code
-        </th>
-
-        <th className="w-[33%] p-3 text-left">
-          Customer Name
-        </th>
-
-        <th className="w-[15%] p-3 text-left">
-          First Seen
-        </th>
-
-        <th className="w-[15%] p-3 text-left">
-          Missing From
+        <th className="p-3">
+          Uploaded By
         </th>
 
       </tr>
@@ -581,36 +575,20 @@ return (
 
     <tbody>
 
-      {missingInvoices.map(
-        (row: any, index) => (
+      {filteredCollectionRows.map(
+        (row: any) => (
 
           <tr
-            key={index}
-            className="bg-yellow-100 border-b"
+            key={row.id}
+            className="border-b"
           >
 
-            <td className="p-3">
+            <td className="p-2">
               {row.invoice}
             </td>
 
-            <td className="p-3">
-              {row.customer_code}
-            </td>
-
-            <td className="p-3">
-              {row.customer_name}
-            </td>
-
-            <td className="p-3">
-              <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                #{row.first_seen}
-              </span>
-            </td>
-
-            <td className="p-3">
-              <span className="bg-red-100 text-red-700 px-2 py-1 rounded">
-                #{row.missing_from}
-              </span>
+            <td className="p-2">
+              {row.uploaded_by}
             </td>
 
           </tr>
@@ -623,6 +601,7 @@ return (
   </table>
 
 </div>
+
       )}
 
   </main>
