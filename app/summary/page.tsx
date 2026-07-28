@@ -191,11 +191,12 @@ const isNotCentral =
     .trim()
     .toUpperCase() ===
   "NOT CENTRAL";
-  return (
-    regionMatch &&
-    cityMatch &&
-    vanMatch
-  );
+return (
+  isNotCentral &&
+  regionMatch &&
+  cityMatch &&
+  vanMatch
+);
 
 });
   const vans = Object.entries(
