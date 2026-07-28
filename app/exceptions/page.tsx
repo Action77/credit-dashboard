@@ -160,10 +160,13 @@ useEffect(() => {
   <span>Reports</span>
 </Link>
 
-  <div className="flex items-center gap-3 px-4 py-3">
-    <Settings size={18} />
-    Settings
-  </div>
+  <Link
+  href="/settings"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <Settings size={18} />
+  Settings
+</Link>
 
 <Link
   href="/users"
