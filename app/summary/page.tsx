@@ -349,7 +349,7 @@ if (
 
   acc[region].amount +=
   Number(
-    row["Pending CIM"]
+    row["pending_cim"]
   ) || 0;
 }      return acc;
 
