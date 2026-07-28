@@ -941,13 +941,9 @@ return (
 
     <nav className="px-4 space-y-2">
 
-<Link
+  <Link
   href="/"
-  className={`flex items-center gap-3 px-4 py-3 rounded-lg ${
-    pathname === "/"
-      ? "bg-blue-600"
-      : ""
-  }`}
+  className="flex items-center gap-3 px-4 py-3"
 >
   <LayoutDashboard size={18} />
   <span>Dashboard</span>
@@ -980,10 +976,13 @@ return (
   <span>Summary</span>
 </Link>
 
-  <div className="flex items-center gap-3 px-4 py-3">
-    <BarChart3 size={18} />
-    Reports
-  </div>
+<Link
+  href="/reports"
+  className="flex items-center gap-3 px-4 py-3"
+>
+  <BarChart3 size={18} />
+  <span>Reports</span>
+</Link>
 
   <div className="flex items-center gap-3 px-4 py-3">
     <Settings size={18} />
@@ -1050,7 +1049,7 @@ return (
       {/* Content */}
       <main className="flex-1 p-6">
 
-        {/* Header */}
+                {/* Header */}
         <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6 flex justify-between items-center">
 
           <h2 className="text-3xl font-bold">
