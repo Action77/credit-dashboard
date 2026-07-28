@@ -311,40 +311,45 @@ const regionSummary = Object.entries(
       }
 
       const invoice =
-        String(
-          row["Invoice #"]
-        ).replace(/\s/g, "");
+  String(row["Invoice #"])
+    .replace(/\s/g, "")
+    .toUpperCase();
 
-      const isException =
-        exceptions.some(
-          (e: any) =>
-            String(e.invoice)
-              .replace(/\s/g, "") ===
-            invoice
-        );
+const isException =
+  exceptions.some(
+    (e: any) =>
+      String(e.invoice)
+        .replace(/\s/g, "")
+        .toUpperCase() === invoice
+  );
 
-      const isCollected =
-        collectedInvoices.includes(
-          invoice
-        );
+const isCollected =
+  collectedInvoices.some(
+    (i: string) =>
+      String(i)
+        .replace(/\s/g, "")
+        .toUpperCase() === invoice
+  );
 
-      const isBlocked =
-  String(row["Status User Block"] || "")
+const isBlocked =
+  String(
+    row["Status User Block"] || ""
+  )
     .trim()
-    .toUpperCase() === "BLOCK";
+    .toUpperCase()
+    .includes("BLOCK");
+
 if (
   isBlocked &&
   !isException &&
   !isCollected
 ) {
-
   acc[region].invoices++;
 
   acc[region].amount +=
     Number(
       row["Credit Invoice Amount"]
     ) || 0;
-
 }
       return acc;
 
