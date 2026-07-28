@@ -89,10 +89,23 @@ const [tillDate, setTillDate] =
 const [collectionFileInfo,
   setCollectionFileInfo] =
   useState("");
+
 const [loadedExceptions,
   setLoadedExceptions] =
   useState(false);
-  useEffect(() => {
+
+const [isUploadingCredit,
+  setIsUploadingCredit] =
+  useState(false);
+
+const [isUploadingCollection,
+  setIsUploadingCollection] =
+  useState(false);
+
+const [isAddingException,
+  setIsAddingException] =
+  useState(false);
+    useEffect(() => {
 
   const loadExceptions = async () => {
 
@@ -245,184 +258,254 @@ useEffect(() => {
   const handleCreditImport = async (
   event: React.ChangeEvent<HTMLInputElement>
 ) => {
+
+  if (isUploadingCredit) return;
+
+  setIsUploadingCredit(true);
+
+  try {
+
     const file = event.target.files?.[0];
 
     if (!file) return;
+
     const formData = new FormData();
 
-formData.append("file", file);
+    formData.append("file", file);
 
-const currentUsername =
-  users.find(u => u.id === currentUser)?.username || currentUser;
+    const currentUsername =
+      users.find(
+        u => u.id === currentUser
+      )?.username || currentUser;
 
-formData.append(
-  "uploadedBy",
-  currentUsername
-);
+    formData.append(
+      "uploadedBy",
+      currentUsername
+    );
 
-const uploadResponse = await fetch("/api/credit-upload", {
-  method: "POST",
-  body: formData,
-});
+    const uploadResponse =
+      await fetch(
+        "/api/credit-upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-const uploadResult = await uploadResponse.json();
+    const uploadResult =
+      await uploadResponse.json();
 
-console.log(uploadResult);
+    console.log(uploadResult);
 
-if (!uploadResult.success) {
-  alert(uploadResult.error);
-  return;
-}
-const response = await fetch("/api/credit-data");
-const result = await response.json();
+    if (!uploadResult.success) {
+      alert(uploadResult.error);
+      return;
+    }
 
-setData(result.data || []);
-setCreditFileInfo(result.fileInfo || "");
+    const response =
+      await fetch("/api/credit-data");
 
-await fetch("/api/collection-reset", {
-  method: "POST",
-});
-  };
+    const result =
+      await response.json();
+
+    setData(result.data || []);
+
+    setCreditFileInfo(
+      result.fileInfo || ""
+    );
+
+    await fetch(
+      "/api/collection-reset",
+      {
+        method: "POST",
+      }
+    );
+
+  } finally {
+
+    setIsUploadingCredit(false);
+
+  }
+
+};
   const handleCollectionImport = async (
   event: React.ChangeEvent<HTMLInputElement>
 ) => {
-  console.log("BUTTON WORKING");
+
+  if (isUploadingCollection) return;
+
+  setIsUploadingCollection(true);
 
   const file =
     event.target.files?.[0];
 
+  if (!file) {
 
-  if (!file) return;
-const formData = new FormData();
+    setIsUploadingCollection(false);
 
-formData.append("file", file);
-const currentUsername =
-  users.find(
-    u => u.id === currentUser
-  )?.username || currentUser;
+    return;
 
-formData.append(
-  "uploadedBy",
-  currentUsername
-);
+  }
 
-await fetch("/api/collection-upload", {
-  method: "POST",
-  body: formData,
-});
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  const currentUsername =
+    users.find(
+      u => u.id === currentUser
+    )?.username || currentUser;
+
+  formData.append(
+    "uploadedBy",
+    currentUsername
+  );
+
+  await fetch(
+    "/api/collection-upload",
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
   const reader =
     new FileReader();
 
-  reader.onload = async (e) => {
+  reader.onload =
+    async (e) => {
 
-    const workbook =
-      XLSX.read(
-        e.target?.result,
-        { type: "binary" }
-      );
+      try {
 
-    const sheetName =
-      workbook.SheetNames[0];
+        const workbook =
+          XLSX.read(
+            e.target?.result,
+            {
+              type: "binary",
+            }
+          );
 
-    const worksheet =
-      workbook.Sheets[sheetName];
+        const sheetName =
+          workbook.SheetNames[0];
 
-    const rows: any[] =
-      XLSX.utils.sheet_to_json(
-        worksheet,
-        {
-          header: 1,
-        }
-      );
+        const worksheet =
+          workbook.Sheets[
+            sheetName
+          ];
 
-    const invoices =
-      rows
-        .slice(1)
-        .filter((row) => {
+        const rows: any[] =
+          XLSX.utils.sheet_to_json(
+            worksheet,
+            {
+              header: 1,
+            }
+          );
 
-          
-            const status =
-  String(
-    row[26] || ""
-  ).trim();
+        const invoices =
+          rows
+            .slice(1)
+            .filter((row) => {
 
-return (
-  
-  status === "Hold" ||
-  status === "Completed"
-);
-        })
-        .map((row) =>
-          String(row[1] || "")
-            .trim()
-            .replace(/\s/g, "")
+              const status =
+                String(
+                  row[26] || ""
+                ).trim();
+
+              return (
+                status === "Hold" ||
+                status === "Completed"
+              );
+
+            })
+            .map((row) =>
+              String(row[1] || "")
+                .trim()
+                .replace(/\s/g, "")
+            );
+
+        const previousInvoices =
+          JSON.parse(
+            await localStorage.getItem(
+              "collectedInvoices"
+            ) || "[]"
+          );
+
+        const newCollected =
+          invoices.filter(
+            (invoice) =>
+              !previousInvoices.includes(
+                invoice
+              )
+          );
+
+        const affectedVans = [
+          ...new Set(
+            data
+              .filter((row) =>
+                newCollected.includes(
+                  String(
+                    row["Invoice #"]
+                  ).replace(
+                    /\s/g,
+                    ""
+                  )
+                )
+              )
+              .map(
+                (row) =>
+                  row["Van Code."]
+              )
+          ),
+        ];
+
+        setLastUpdatedVans(
+          affectedVans
         );
 
-    console.log("Collection Invoices:");
-console.log(invoices);
-const previousInvoices =
-  JSON.parse(
-    await localStorage.getItem(
-      "collectedInvoices"
-    ) || "[]"
-  );
+        await localStorage.setItem(
+          "lastUpdatedVans",
+          JSON.stringify(
+            affectedVans
+          )
+        );
 
-const newCollected =
-  invoices.filter(
-    (invoice) =>
-      !previousInvoices.includes(
-        invoice
-      )
-  );
+        setCollectedInvoices(
+          invoices
+        );
 
-const affectedVans = [
-  ...new Set(
-    data
-      .filter((row) =>
-        newCollected.includes(
-          String(
-            row["Invoice #"]
-          ).replace(/\s/g, "")
-        )
-      )
-      .map(
-        (row) =>
-          row["Van Code."]
-      )
-  ),
-];
+        const now =
+          new Date();
 
-setLastUpdatedVans(
-  affectedVans
-);
+        setCollectionFileInfo(
+          `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
+        );
 
-await localStorage.setItem(
-  "lastUpdatedVans",
-  JSON.stringify(
-    affectedVans
-  )
-);
-setCollectedInvoices(
-  invoices
-);
-const now = new Date();
+        await localStorage.setItem(
+          "collectionFileInfo",
+          `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
+        );
 
-setCollectionFileInfo(
-  `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
-);
-await localStorage.setItem(
-  "collectionFileInfo",
-  `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
-);
-await localStorage.setItem(
-  "collectedInvoices",
-  JSON.stringify(invoices)
-);
-  };
+        await localStorage.setItem(
+          "collectedInvoices",
+          JSON.stringify(
+            invoices
+          )
+        );
+
+      } finally {
+
+        setIsUploadingCollection(
+          false
+        );
+
+      }
+
+    };
 
   reader.readAsBinaryString(
     file
   );
+
 };
 const filterBaseData =
   data.filter((row) => {
@@ -1035,10 +1118,16 @@ return (
 
             {isLoggedIn && (
 
-  <label className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg cursor-pointer">
-
-    Import Credit
-
+  <label
+  className={`text-white px-5 py-3 rounded-lg cursor-pointer ${
+    isUploadingCredit
+      ? "bg-slate-400 pointer-events-none"
+      : "bg-blue-600 hover:bg-blue-700"
+  }`}
+>
+    {isUploadingCredit
+  ? "Uploading..."
+  : "Import Credit"}
     <input
       type="file"
       accept=".xlsx,.xls"
@@ -1051,9 +1140,17 @@ return (
 )}
 {isLoggedIn && (
 
-  <label className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg cursor-pointer">
+  <label
+  className={`text-white px-5 py-3 rounded-lg cursor-pointer ${
+    isUploadingCollection
+      ? "bg-slate-400 pointer-events-none"
+      : "bg-green-600 hover:bg-green-700"
+  }`}
+>
 
-    Import Collection
+  {isUploadingCollection
+    ? "Uploading..."
+    : "Import Collection"}
 
     <input
       type="file"
@@ -1667,11 +1764,22 @@ await localStorage.setItem(
 {isLoggedIn && (
 
 <button
-  className="bg-blue-600 text-white w-full py-3 rounded-lg"
+  disabled={isAddingException}
+  className={`text-white w-full py-3 rounded-lg ${
+    isAddingException
+      ? "bg-slate-400"
+      : "bg-blue-600"
+  }`}
   onClick={async () => {
 
-    const invoice =
-      invoiceNo
+  if (isAddingException) return;
+
+  setIsAddingException(true);
+
+  try {
+
+  const invoice =
+        invoiceNo
         .replace(/\s/g, "")
         .toUpperCase();
 
@@ -1738,11 +1846,17 @@ await localStorage.setItem(
 
     setInvoiceNo("");
     setTillDate("");
+  } finally {
 
+    setIsAddingException(false);
+
+  }
   }}
 >
-  Add Exception
-</button>
+  {isAddingException
+  ? "Processing..."
+  : "Add Exception"}
+  </button>
 )}
             <div className="mt-8">
 
