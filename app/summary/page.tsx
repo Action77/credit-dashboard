@@ -624,33 +624,32 @@ const regionSummary = Object.entries(
 
   <div className="overflow-auto max-h-[500px]">
 
-    <table className="w-full text-xs">
+    <table className="w-full text-sm">
   <thead className="sticky top-0 z-10 bg-[#071d5c] text-white">
 
 <tr className="bg-[#071d5c] text-white border-b border-blue-900">
 
-<th className="px-3 py-2 text-center text-xs font-semibold">
+<th className="px-4 py-3 text-center text-sm font-semibold">
 Status
 </th>
 
-<th className="px-3 py-2 text-center text-xs font-semibold">
-ID
+<th className="px-4 py-3 text-center text-sm font-semibold">ID
 </th>
 
-<th className="px-3 py-2 text-center text-xs font-semibold">
-Van Code
+<th className="px-4 py-3 text-center text-sm font-semibold">
+  Van Code
 </th>
 
-<th className="px-3 py-2 text-center text-xs font-semibold">
-Remaining
+<th className="px-4 py-3 text-center text-sm font-semibold">
+  Remaining
 </th>
 
-<th className="px-3 py-2 text-center text-xs font-semibold">
-Exception
+<th className="px-4 py-3 text-center text-sm font-semibold">
+  Exception
 </th>
 
-<th className="px-3 py-2 text-center text-xs font-semibold">
-Permission
+<th className="px-4 py-3 text-center text-sm font-semibold">
+  Permission
 </th>
 
 </tr>
@@ -689,14 +688,14 @@ Permission
   `}
 >
 
-            <td className="px-3 py-2 text-center">
+            <td className="px-4 py-3 text-center">
 
   <span
   className={`
       inline-flex
       items-center
       justify-center
-      min-w-[105px]
+      min-w-[130px]
       px-3
       py-1
       rounded-full
@@ -733,7 +732,7 @@ Permission
   {info.exceptions}
 </td>
 
-<td className="px-3 py-2 text-center">
+<td className="px-4 py-3 text-center">
   <input
     type="checkbox"
     className="w-4 h-4 accent-blue-600 cursor-pointer"
