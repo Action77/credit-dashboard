@@ -997,8 +997,14 @@ return (
             </p>
 
             <h2 className="text-5xl font-bold text-orange-500 mt-3">
-  {exceptions.length}
+  {exceptionCount}
 </h2>
+
+<div className="mt-2">
+  <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
+    Legal: {legalCount}
+  </span>
+</div>
           </div>
 
           <div className="bg-white border rounded-xl p-6 shadow-sm">
@@ -1769,8 +1775,11 @@ await localStorage.setItem(
 
       <tbody>
 
-        {exceptions.map((item, index) => {
-
+        {exceptions
+  .filter(
+    (item) => !item.permanent
+  )
+  .map((item, index) => {
           const tillDate =
             new Date(item.till_date);
 
