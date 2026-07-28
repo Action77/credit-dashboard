@@ -364,7 +364,13 @@ return (
       <h1 className="text-3xl font-bold mb-6">
         Reports
       </h1>
-      <div className="bg-white border rounded-xl p-5 mb-6 max-w-full overflow-hidden">
+      <div
+  className="bg-white border rounded-xl p-5 mb-6 overflow-hidden"
+  style={{
+    width: "100%",
+    maxWidth: "1400px",
+  }}
+>
   <div className="flex justify-between items-center mb-4">
 
     <h2 className="text-xl font-bold text-amber-700">
@@ -510,7 +516,13 @@ return (
 
         <div className="overflow-auto">
 
-          <table className="w-full border">
+          <table
+  className="table-fixed border"
+  style={{
+    width: "100%",
+    maxWidth: "1400px",
+  }}
+>
 
             <thead>
 
