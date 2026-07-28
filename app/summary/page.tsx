@@ -184,7 +184,13 @@ const filteredData = data.filter((row) => {
     filters.vans.includes(
       row["Van Code."]
     );
-
+const isNotCentral =
+  String(
+    row["Central Invoice"] || ""
+  )
+    .trim()
+    .toUpperCase() ===
+  "NOT CENTRAL";
   return (
     regionMatch &&
     cityMatch &&
