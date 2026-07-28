@@ -8,8 +8,14 @@ const supabase = createClient(
 
 export async function GET() {
 
-  const today =
-    new Date().toISOString().split("T")[0];
+  const today = new Date();
+
+today.setHours(
+  today.getHours() + 3
+);
+
+const todayDate =
+  today.toISOString().split("T")[0];
 
   // حذف جميع الاستثناءات المنتهية
   await supabase
