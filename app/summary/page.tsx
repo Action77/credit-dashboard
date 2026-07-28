@@ -608,7 +608,7 @@ const regionSummary = Object.entries(
           Van Performance
         </h2>
 
-        <p className="text-sm text-slate-500 mt-1">
+       <p className="text-xs text-slate-500 mt-1">
           Credit block status by van
         </p>
 
@@ -622,34 +622,34 @@ const regionSummary = Object.entries(
 
   </div>
 
-  <div className="overflow-auto max-h-[650px]">
+  <div className="overflow-auto max-h-[500px]">
 
-    <table className="w-full text-sm">
+    <table className="w-full text-xs">
   <thead className="sticky top-0 z-10 bg-[#071d5c] text-white">
 
 <tr className="bg-[#071d5c] text-white border-b border-blue-900">
 
-<th className="p-4 text-left font-semibold">
+<th className="px-3 py-2 text-center text-xs font-semibold">
 Status
 </th>
 
-<th className="p-4 text-center font-semibold">
+<th className="px-3 py-2 text-center text-xs font-semibold">
 ID
 </th>
 
-<th className="p-4 text-left font-semibold">
+<th className="px-3 py-2 text-center text-xs font-semibold">
 Van Code
 </th>
 
-<th className="p-4 text-center font-semibold">
+<th className="px-3 py-2 text-center text-xs font-semibold">
 Remaining
 </th>
 
-<th className="p-4 text-center font-semibold">
+<th className="px-3 py-2 text-center text-xs font-semibold">
 Exception
 </th>
 
-<th className="p-4 text-center font-semibold">
+<th className="px-3 py-2 text-center text-xs font-semibold">
 Permission
 </th>
 
@@ -689,21 +689,20 @@ Permission
   `}
 >
 
-            <td className="p-4 text-center">
+            <td className="px-3 py-2 text-center">
 
   <span
-    className={`
+  className={`
       inline-flex
       items-center
       justify-center
-      min-w-[170px]
-      px-5
-      py-2.5
+      min-w-[105px]
+      px-3
+      py-1
       rounded-full
-      text-sm
-      font-bold
-      shadow-sm
-      ${getStatusStyle(
+      text-xs
+      font-semibold
+            ${getStatusStyle(
         info.remaining,
         info.exceptions,
         lastUpdatedVans.some(
@@ -718,26 +717,26 @@ Permission
   </span>
 
 </td>
-            <td className="p-3 border-r text-center">
+            <td className="px-3 py-2 border-r text-center">
               {[...info.ids].join(" or ")}
             </td>
 
-            <td className="p-3 border-r font-semibold text-slate-800">
+            <td className="px-3 py-2 border-r font-semibold text-slate-800">
   {van}
 </td>
 
-<td className="p-3 text-center border-r">
+<td className="px-3 py-2 text-center border-r">
   {info.remaining}
 </td>
 
-<td className="p-3 text-center border-r">
+<td className="px-3 py-2 text-center border-r">
   {info.exceptions}
 </td>
 
-<td className="p-3 text-center">
+<td className="px-3 py-2 text-center">
   <input
     type="checkbox"
-    className="w-5 h-5 accent-blue-600 cursor-pointer"
+    className="w-4 h-4 accent-blue-600 cursor-pointer"
     disabled={!isLoggedIn}
     checked={
       permissions[van] ?? false
@@ -777,13 +776,13 @@ Permission
 </div>
 <div className="mt-8 bg-white rounded-2xl shadow-sm border border-slate-100">
 
-  <div className="px-6 py-5 border-b border-slate-100">
+  <div className="px-5 py-4 border-b border-slate-100">
 
-    <h2 className="text-xl font-bold text-slate-800">
+    <h2 className="text-lg font-bold text-slate-800">
       Region Summary
     </h2>
 
-    <p className="text-sm text-slate-500 mt-1">
+    <p className="text-xs text-slate-500 mt-1">
       Outstanding invoices by region
     </p>
 
