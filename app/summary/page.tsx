@@ -595,6 +595,7 @@ const regionSummary = Object.entries(
     border
     border-slate-100
     overflow-hidden
+    w-[900px]
   "
 >
 
@@ -639,14 +640,6 @@ const regionSummary = Object.entries(
 
 <th className="px-4 py-3 text-center text-sm font-semibold border-r border-blue-900">
   Van Code
-</th>
-
-<th className="px-4 py-3 text-center text-sm font-semibold border-r border-blue-900">
-  Remaining
-</th>
-
-<th className="px-4 py-3 text-center text-sm font-semibold border-r border-blue-900">
-  Exception
 </th>
 
 <th className="px-4 py-3 text-center text-sm font-semibold">
@@ -721,14 +714,6 @@ const regionSummary = Object.entries(
 
             <td className="px-3 py-2 text-center border-r border-b border-slate-300 font-semibold text-slate-800">
   {van}
-</td>
-
-<td className="px-3 py-2 text-center border-r border-b border-slate-300">
-  {info.remaining}
-</td>
-
-<td className="px-3 py-2 text-center border-r border-b border-slate-300">
-    {info.exceptions}
 </td>
 
 <td className="px-4 py-3 text-center border-b border-slate-300">
