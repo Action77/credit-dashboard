@@ -311,7 +311,7 @@ const filteredData = data.filter((row) => {
 
 };
 const summaryBaseData =
-  filteredData.filter((row) =>
+  data.filter((row) =>
     String(
       row["Central Invoice"] || ""
     )
@@ -319,7 +319,6 @@ const summaryBaseData =
       .toUpperCase() ===
     "NOT CENTRAL"
   );
-
 const regionSummary = Object.entries(
 
   summaryBaseData.reduce(
