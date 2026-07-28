@@ -16,6 +16,8 @@ import { storage as localStorage } from "@/utils/storage";
 
 
 export default function ReportsPage() {
+  const [filteredCreditData, setFilteredCreditData] =
+  useState<any[]>([]);
 const [isLoggedIn, setIsLoggedIn] =
   useState(false);
 
@@ -39,9 +41,70 @@ const [currentUser, setCurrentUser] =
 
   const [selectedTab, setSelectedTab] =
     useState("credit");
-
+const [searchText, setSearchText] =
+  useState("");
   const [collectionRows, setCollectionRows] =
     useState<any[]>([]);
+    useEffect(() => {
+
+  const loadFilters = async () => {
+
+    const saved =
+      await localStorage.getItem(
+        "summaryFilters"
+      );
+
+    if (!saved) {
+
+      setFilteredCreditData(
+        creditData
+      );
+
+      return;
+    }
+
+    const filters =
+      JSON.parse(saved);
+
+    const filtered =
+      creditData.filter((row) => {
+
+        const regionMatch =
+          filters.regions?.length === 0 ||
+          filters.regions?.includes(
+            row.region
+          );
+
+        const cityMatch =
+          filters.cities?.length === 0 ||
+          filters.cities?.includes(
+            row.city
+          );
+
+        const vanMatch =
+          filters.vans?.length === 0 ||
+          filters.vans?.includes(
+            row.van_code
+          );
+
+        return (
+          regionMatch &&
+          cityMatch &&
+          vanMatch
+        );
+
+      });
+
+    setFilteredCreditData(
+      filtered
+    );
+
+  };
+
+  loadFilters();
+
+}, [creditData]);
+
 useEffect(() => {
 
   const loadUser = async () => {
@@ -64,6 +127,7 @@ useEffect(() => {
   loadUser();
 
 }, []);
+
   useEffect(() => {
 
     const loadData = async () => {
@@ -102,7 +166,28 @@ useEffect(() => {
       setCollectionRows(data);
 
     };
+const filteredCreditRows =
+  filteredCreditData.filter((row) =>
 
+    Object.values(row)
+      .join(" ")
+      .toLowerCase()
+      .includes(
+        searchText.toLowerCase()
+      )
+
+  );
+  const filteredCollectionRows =
+  collectionRows.filter((row) =>
+
+    Object.values(row)
+      .join(" ")
+      .toLowerCase()
+      .includes(
+        searchText.toLowerCase()
+      )
+
+  );
 return (
 
 <div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
@@ -224,7 +309,19 @@ return (
       <h1 className="text-3xl font-bold mb-6">
         Reports
       </h1>
+<div className="mb-4">
 
+  <input
+    type="text"
+    placeholder="Search..."
+    value={searchText}
+    onChange={(e) =>
+      setSearchText(e.target.value)
+    }
+    className="w-full max-w-md border rounded-lg px-4 py-2"
+  />
+
+</div>
       <div className="flex gap-2 mb-6">
 
         <button
@@ -282,10 +379,11 @@ return (
 
               <tr className="bg-slate-800 text-white">
 
-                {creditData.length > 0 &&
+                {filteredCreditRows.length > 0 &&
                   Object.keys(
-                    creditData[0]
-                  ).map(key => (
+  filteredCreditRows[0]
+)
+.map(key => (
 
                     <th
                       key={key}
@@ -302,8 +400,8 @@ return (
 
             <tbody>
 
-              {creditData.map(
-                (row, index) => (
+              {filteredCreditRows.map(
+                                (row, index) => (
 
                   <tr
                     key={index}
@@ -364,8 +462,8 @@ return (
 
             <tbody>
 
-              {collectionRows.map(
-                (row: any) => (
+              {filteredCollectionRows.map(
+                                (row: any) => (
 
                   <tr
                     key={row.id}
@@ -428,6 +526,7 @@ return (
         <button
           className="w-full bg-blue-600 text-white py-3 rounded-xl"
           onClick={async () => {
+            
 
             const users = [
               {
