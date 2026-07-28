@@ -1,9 +1,9 @@
 
 "use client";
+import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { users } from "@/data/users";
 import {
   LayoutDashboard,
   Upload,
@@ -744,39 +744,30 @@ P1316600015512`}
               className="w-full bg-blue-600 text-white py-3 rounded-xl"
               onClick={async () => {
 
-                                const user = users.find(
-                  u =>
-                    u.username === username &&
-                    u.password === password
-                );
-if (!user) {
-  alert("Invalid Username or Password");
-  return;
-}
+  const { data, error } = await supabase
+    .from("app_users")
+    .select("*")
+    .eq("username", username)
+    .eq("password", password)
+    .single();
 
-await localStorage.setItem(
-  "currentUser",
-  user.name
-);
+  if (error || !data) {
+    alert("Invalid Username or Password");
+    return;
+  }
 
-setCurrentUser(user.name);
+  await localStorage.setItem(
+    "currentUser",
+    data.username
+  );
 
-setIsLoggedIn(true);
+  setCurrentUser(data.username);
 
-setShowLoginModal(false);
-                
-                
-              }}
-            >
-              Login
-            </button>
+  setIsLoggedIn(true);
 
-            <button
-              className="w-full mt-3 border py-3 rounded-xl"
-              onClick={() =>
-                setShowLoginModal(false)
-              }
-            >
+  setShowLoginModal(false);
+
+}}            >
               Cancel
             </button>
 

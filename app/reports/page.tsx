@@ -1,6 +1,6 @@
 "use client";
+import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import { users } from "@/data/users";
 import {
   LayoutDashboard,
   Upload,
@@ -682,29 +682,37 @@ return (
             
 
             
-            const user = users.find(
-              u =>
-                u.username === username &&
-                u.password === password
-            );
+            const { data: user } = await supabase
+  .from("app_users")
+  .select("*")
+  .eq("username", username)
+  .single();
 
-            if (!user) {
-              alert("Invalid Username or Password");
-              return;
-            }
+if (!user) {
+  alert("Invalid Username");
+  return;
+}
 
-            await localStorage.setItem(
-              "currentUser",
-              user.id
-            );
+if (user.password !== password) {
+  alert("Invalid Password");
+  return;
+}
 
-            setCurrentUser(user.id);
+await localStorage.setItem(
+  "currentUser",
+  user.username
+);
 
-            setIsLoggedIn(true);
+setCurrentUser(user.username);
 
-            setShowLoginModal(false);
+setIsLoggedIn(true);
 
-          }}
+setShowLoginModal(false);
+
+setUsername("");
+setPassword("");
+
+}}
         >
           Login
         </button>

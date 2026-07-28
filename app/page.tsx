@@ -1,8 +1,8 @@
 "use client";
+import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 import WhatsAppReport from "@/components/WhatsAppReport";
 import html2canvas from "html2canvas";
-import { users } from "@/data/users";
 import {
   openWhatsApp
 } from "@/utils/whatsapp";
@@ -276,11 +276,7 @@ useEffect(() => {
 
     formData.append("file", file);
 
-    const currentUsername =
-      users.find(
-        u => u.id === currentUser
-      )?.username || currentUser;
-
+    const currentUsername = currentUser;
     formData.append(
       "uploadedBy",
       currentUsername
@@ -354,11 +350,8 @@ useEffect(() => {
 
   formData.append("file", file);
 
-  const currentUsername =
-    users.find(
-      u => u.id === currentUser
-    )?.username || currentUser;
-
+  const currentUsername = currentUser;
+  
   formData.append(
     "uploadedBy",
     currentUsername
@@ -2216,28 +2209,32 @@ await localStorage.setItem(
             className="w-full bg-blue-600 text-white py-3 rounded-xl"
             onClick={async () => {
 
-              const user =
-                users.find(
-                  u =>
-                    u.username === username &&
-                    u.password === password
-                );
+              const { data: user } = await supabase
+  .from("app_users")
+  .select("*")
+  .eq("username", username)
+  .single();
 
-              if (!user) {
-                alert("Invalid Username or Password");
-                return;
-              }
+if (!user) {
+  alert("Invalid Username");
+  return;
+}
 
-              setCurrentUser(user.id);
-              setIsLoggedIn(true);
+if (user.password !== password) {
+  alert("Invalid Password");
+  return;
+}
 
-              await localStorage.setItem(
-                "currentUser",
-                user.id
-              );
+setCurrentUser(user.username);
 
-              setShowLoginModal(false);
+setIsLoggedIn(true);
 
+localStorage.setItem(
+  "currentUser",
+  user.username
+);
+
+setShowLoginModal(false);
             }}
           >
             Login

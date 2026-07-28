@@ -1,7 +1,7 @@
 "use client";
+import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 import Link from "next/link";
-import { users } from "@/data/users";
 import {
   LayoutDashboard,
   Upload,
@@ -39,18 +39,7 @@ const [username, setUsername] = useState("");
 
 const [password, setPassword] = useState("");
 
-const usersLogin = [
-  {
-    username: "halyousif",
-    password: "123456",
-    id: "user1",
-  },
-  {
-    username: "nelson",
-    password: "123456",
-    id: "user2",
-  },
-];
+
   useEffect(() => {
 
   const loadData = async () => {
@@ -898,31 +887,36 @@ const regionSummary = Object.entries(
 
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded"
-          onClick={() => {
+          onClick={async () => {
 
-            const user =
-              usersLogin.find(
-                (u) =>
-                  u.username === username &&
-                  u.password === password
-              );
+  const { data: user } = await supabase
+    .from("app_users")
+    .select("*")
+    .eq("username", username)
+    .single();
 
-            if (!user) {
-              alert("Invalid Login");
-              return;
-            }
+  if (!user) {
+    alert("Invalid Username");
+    return;
+  }
 
-            localStorage.setItem(
-  "currentUser",
-  user.id
-);
+  if (user.password !== password) {
+    alert("Invalid Password");
+    return;
+  }
 
-setIsLoggedIn(true);
-setShowLoginModal(false);
+  localStorage.setItem(
+    "currentUser",
+    user.username
+  );
 
-setUsername("");
-setPassword("");
-          }}
+  setIsLoggedIn(true);
+  setShowLoginModal(false);
+
+  setUsername("");
+  setPassword("");
+
+}}
         >
           Login
         </button>

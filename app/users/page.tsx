@@ -1,4 +1,5 @@
 "use client";
+import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { storage as localStorage } from "@/utils/storage";
 import {
@@ -15,6 +16,8 @@ import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 
 export default function UsersPage() {
+  const [currentUser, setCurrentUser] =
+  useState("");
   const [editingUserId, setEditingUserId] =
   useState<number | null>(null);
   const [saving, setSaving] = useState(false);
@@ -48,18 +51,6 @@ const [username, setUsername] = useState("");
 
 const [password, setPassword] = useState("");
 
-const usersLogin = [
-  {
-    username: "halyousif",
-    password: "123456",
-    id: "user1",
-  },
-  {
-    username: "nelson",
-    password: "123456",
-    id: "user2",
-  },
-];
   const loadUsers = async () => {
 
   const response =
@@ -842,21 +833,34 @@ return (
           className="w-full bg-blue-600 text-white py-3 rounded-xl"
           onClick={async () => {
 
-            const user = usersLogin.find(
-              u =>
-                u.username === username &&
-                u.password === password
-            );
+            const { data: user } = await supabase
+  .from("app_users")
+  .select("*")
+  .eq("username", username)
+  .single();
 
-            if (!user) {
-              alert("Invalid Username or Password");
-              return;
-            }
+if (!user) {
+  alert("Invalid Username");
+  return;
+}
 
-            await localStorage.setItem("currentUser", user.id);
-            setIsLoggedIn(true);
-            setShowLoginModal(false);
+if (user.password !== password) {
+  alert("Invalid Password");
+  return;
+}
 
+await localStorage.setItem(
+  "currentUser",
+  user.username
+);
+
+setIsLoggedIn(true);
+setCurrentUser(user.username);
+
+setShowLoginModal(false);
+
+setUsername("");
+setPassword("");
           }}
         >
           Login
