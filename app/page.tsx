@@ -1550,12 +1550,11 @@ await localStorage.setItem(
 </td>
 
 <td className="p-3">
-  {typeof row["Trx Date"] === "number"
-    ? XLSX.SSF.format(
-        "dd/mm/yyyy",
-        row["Trx Date"]
-      )
-    : row["Trx Date"]}
+  {new Date(
+    (Number(row["Trx Date"]) - 25569) *
+      86400 *
+      1000
+  ).toLocaleDateString("en-GB")}
 </td>
 
 <td className="p-3">
