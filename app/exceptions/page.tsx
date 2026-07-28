@@ -17,6 +17,10 @@ import {
 
 
 export default function ExceptionsPage() {
+  const [deletingId, setDeletingId] =
+  useState<number | null>(null);
+  const [isAddingExceptions, setIsAddingExceptions] =
+  useState(false);
   const [isLoggedIn, setIsLoggedIn] =
   useState(false);
 
@@ -235,112 +239,142 @@ P1316600015512`}
 
 
 <button
-  className="bg-blue-600 text-white px-6 py-3 rounded-lg"
+  disabled={isAddingExceptions}
+  className={`text-white px-6 py-3 rounded-lg ${
+    isAddingExceptions
+      ? "bg-slate-400 cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-700"
+  }`}
   onClick={async () => {
 
+    if (isAddingExceptions) return;
 
-    const currentUser =
-  await localStorage.getItem(
-    "currentUser"
-  );
-if (
-  !currentUser ||
-  !invoiceText ||
-  (!isPermanent && !tillDate)
-) {
-      return;
+    setIsAddingExceptions(true);
+
+    try {
+
+      const currentUser =
+        await localStorage.getItem(
+          "currentUser"
+        );
+
+      if (
+        !currentUser ||
+        !invoiceText ||
+        (!isPermanent && !tillDate)
+      ) {
+        return;
+      }
+
+      const creditResponse =
+        await fetch("/api/credit-data");
+
+      const creditResult =
+        await creditResponse.json();
+
+      const creditData =
+        creditResult.data || [];
+
+      const invoices =
+        invoiceText
+          .split("\n")
+          .map(x => x.trim())
+          .filter(Boolean);
+
+      const newExceptions =
+        invoices.map(invoice => {
+
+          const match =
+            creditData.find(
+              (row: any) =>
+                String(
+                  row["Invoice #"] || ""
+                )
+                  .replace(/\s/g, "")
+                  .toUpperCase() ===
+                invoice
+                  .replace(/\s/g, "")
+                  .toUpperCase()
+            );
+
+          return {
+            invoice,
+            tillDate,
+
+            vanCode:
+              match?.["Van Code."] || "",
+
+            employeeName:
+              match?.["Employee Name."] || "",
+
+            atsCode:
+              match?.["Employee ATS Code."] || "",
+
+            customerCode:
+              match?.["Customer Code"] || "",
+
+            customerName:
+              match?.["Customer Name"] || ""
+          };
+
+        });
+
+      await fetch(
+        "/api/exceptions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify(
+            newExceptions.map(item => ({
+              invoice: item.invoice,
+              till_date: isPermanent
+                ? null
+                : item.tillDate,
+              permanent: isPermanent,
+              van_code: item.vanCode,
+              employee_name:
+                item.employeeName,
+              ats_code:
+                item.atsCode,
+              customer_code:
+                item.customerCode,
+              customer_name:
+                item.customerName,
+              created_by:
+                currentUser,
+            }))
+          ),
+        }
+      );
+
+      const response =
+        await fetch(
+          "/api/exceptions"
+        );
+
+      setExceptions(
+        await response.json()
+      );
+
+      setInvoiceText("");
+      setTillDate("");
+
+    } finally {
+
+      setIsAddingExceptions(
+        false
+      );
+
     }
 
-    const creditResponse =
-  await fetch("/api/credit-data");
-
-const creditResult =
-  await creditResponse.json();
-
-const creditData =
-  creditResult.data || [];
-    const invoices =
-      invoiceText
-        .split("\n")
-        .map(x => x.trim())
-        .filter(Boolean);
-
-    const newExceptions =
-      invoices.map(invoice => {
-
-        const match =
-  creditData.find(
-    (row: any) =>
-      String(
-        row["Invoice #"] || ""
-      )
-        .replace(/\s/g, "")
-        .toUpperCase() ===
-      invoice
-        .replace(/\s/g, "")
-        .toUpperCase()
-  );
-
-        return {
-          invoice,
-          tillDate,
-
-          vanCode:
-            match?.["Van Code."] || "",
-
-          employeeName:
-            match?.["Employee Name."] || "",
-
-          atsCode:
-            match?.["Employee ATS Code."] || "",
-
-          customerCode:
-            match?.["Customer Code"] || "",
-
-          customerName:
-            match?.["Customer Name"] || ""
-        };
-      });
-
-    await fetch(
-  "/api/exceptions",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type":
-        "application/json",
-    },
-    body: JSON.stringify(
-  newExceptions.map(item => ({
-    invoice: item.invoice,
-    till_date: isPermanent
-      ? null
-      : item.tillDate,
-    permanent: isPermanent,
-    van_code: item.vanCode,
-    employee_name: item.employeeName,
-    ats_code: item.atsCode,
-    customer_code: item.customerCode,
-    customer_name: item.customerName,
-    created_by: currentUser,
-  }))
-),
-  }
-);
-
-const response =
-  await fetch("/api/exceptions");
-
-setExceptions(
-  await response.json()
-);
-    setInvoiceText("");
-
-    setTillDate("");
-    
   }}
 >
-  Add Exceptions
+  {isAddingExceptions
+    ? "Processing..."
+    : "Add Exceptions"}
 </button>
       </div>
 
@@ -461,25 +495,47 @@ setExceptions(
   {isLoggedIn &&
     currentUser === item.created_by && (
       <button
-        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
-        onClick={async () => {
-          await fetch(
-            `/api/exceptions/${item.id}`,
-            {
-              method: "DELETE",
-            }
-          );
+  disabled={deletingId === item.id}
+  className={`text-white px-3 py-1 rounded text-xs ${
+    deletingId === item.id
+      ? "bg-slate-400 cursor-not-allowed"
+      : "bg-red-600 hover:bg-red-700"
+  }`}
+  onClick={async () => {
 
-          setExceptions(prev =>
-            prev.filter(
-              exception =>
-                exception.id !== item.id
-            )
-          );
-        }}
-      >
-        Delete
-      </button>
+    if (deletingId === item.id)
+      return;
+
+    setDeletingId(item.id);
+
+    try {
+
+      await fetch(
+        `/api/exceptions/${item.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      setExceptions(prev =>
+        prev.filter(
+          exception =>
+            exception.id !== item.id
+        )
+      );
+
+    } finally {
+
+      setDeletingId(null);
+
+    }
+
+  }}
+>
+  {deletingId === item.id
+    ? "Deleting..."
+    : "Delete"}
+</button>
     )}
 </td>
         </tr>
