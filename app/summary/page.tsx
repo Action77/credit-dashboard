@@ -328,20 +328,25 @@ const regionSummary = Object.entries(
           invoice
         );
 
-      if (
-        !isException &&
-        !isCollected
-      ) {
+      const isBlocked =
+  String(row["Status"] || "")
+    .trim()
+    .toUpperCase() === "BLOCK";
 
-        acc[region].invoices++;
+if (
+  isBlocked &&
+  !isException &&
+  !isCollected
+) {
 
-        acc[region].amount +=
-          Number(
-            row["Credit Invoice Amount"]
-          ) || 0;
+  acc[region].invoices++;
 
-      }
+  acc[region].amount +=
+    Number(
+      row["Credit Invoice Amount"]
+    ) || 0;
 
+}
       return acc;
 
     },
