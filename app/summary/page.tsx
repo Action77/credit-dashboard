@@ -464,7 +464,6 @@ const regionSummary = Object.entries(
         </h1>
 <div className="grid grid-cols-4 gap-4 mb-6">
 
-  <div className="grid grid-cols-4 gap-4 mb-6">
 
   <div className="bg-white border rounded-xl p-5 shadow-sm">
 
