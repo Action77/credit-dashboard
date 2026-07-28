@@ -719,7 +719,8 @@ const regionSummary = Object.entries(
               {[...info.ids].join(" or ")}
             </td>
 
-            <td className="px-3 py-2 border-r border-b border-slate-300 font-semibold text-slate-800">  {van}
+            <td className="px-3 py-2 text-center border-r border-b border-slate-300 font-semibold text-slate-800">
+  {van}
 </td>
 
 <td className="px-3 py-2 text-center border-r border-b border-slate-300">
