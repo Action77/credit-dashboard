@@ -17,11 +17,11 @@ today.setHours(
 const todayDate =
   today.toISOString().split("T")[0];
 
-  // حذف جميع الاستثناءات المنتهية
-  await supabase
-    .from("exceptions")
-    .delete()
-    .lt("till_date", today);
+ // حذف جميع الاستثناءات المنتهية
+await supabase
+  .from("exceptions")
+  .delete()
+  .lt("till_date", todayDate);
 
   // جلب الاستثناءات الحالية
   const { data } =
