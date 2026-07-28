@@ -316,20 +316,29 @@ const regionSummary = Object.entries(
     .replace(/\s/g, "")
     .toUpperCase();
 
+const normalizedInvoice = String(
+  row["Invoice #"] || ""
+)
+  .trim()
+  .replace(/\s/g, "")
+  .toUpperCase();
+
 const isException =
   exceptions.some(
     (e: any) =>
-      String(e.invoice)
+      String(e.invoice || "")
+        .trim()
         .replace(/\s/g, "")
-        .toUpperCase() === invoice
+        .toUpperCase() === normalizedInvoice
   );
 
 const isCollected =
   collectedInvoices.some(
     (i: string) =>
-      String(i)
+      String(i || "")
+        .trim()
         .replace(/\s/g, "")
-        .toUpperCase() === invoice
+        .toUpperCase() === normalizedInvoice
   );
   
 if (
