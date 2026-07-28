@@ -71,7 +71,7 @@ const latestLegal =
 
     const data =
       await response.json();
-
+console.log(data[0]);
     setExceptions(data || []);
 
   };
