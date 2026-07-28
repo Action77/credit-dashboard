@@ -121,7 +121,10 @@ const [loadedExceptions,
           0
         );
 
-        return tillDate >= today;
+        return (
+  item.permanent ||
+  tillDate >= today
+);
 
       });
 
