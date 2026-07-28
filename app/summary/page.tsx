@@ -588,7 +588,7 @@ const regionSummary = Object.entries(
 
 </div>
 
-<div className="flex gap-6 items-start">
+<div className="flex gap-6 items-stretch">
 
 <div
   className="
@@ -761,8 +761,7 @@ const regionSummary = Object.entries(
 
 </div>
 
-<div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-100 h-fit">
-    <div className="px-5 py-4 border-b border-slate-100">
+<div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col">    <div className="px-5 py-4 border-b border-slate-100">
 
     <h2 className="text-lg font-bold text-slate-800">
       Region Summary
@@ -774,7 +773,7 @@ const regionSummary = Object.entries(
 
   </div>
 
-  <div className="p-6">
+  <div className="p-6 flex-1">
 
     <div className="space-y-5">
 
