@@ -301,10 +301,14 @@ P1316600015512`}
     try {
 
       const currentUser =
-        await localStorage.getItem(
-          "currentUser"
-        );
+  await localStorage.getItem(
+    "currentUser"
+  );
 
+console.log(
+  "CURRENT USER =",
+  currentUser
+);
       if (!currentUser) {
 
         alert(
@@ -649,9 +653,7 @@ P1316600015512`}
           <td className="p-3">
             {item.invoice}
           </td>
-<td className="p-3">
-  {item.created_by}
-</td>
+
           <td className="p-3">
             {item.till_date}
           </td>
