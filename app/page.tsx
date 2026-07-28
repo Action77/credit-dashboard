@@ -625,10 +625,7 @@ const filteredData = filterBaseData
       !whatsAppVan ||
       row["Van Code."] === whatsAppVan;
 
-    return (
-      matchesWhatsappVan &&
-      !isException
-    );
+return matchesWhatsappVan;
 
   })
   .sort((a, b) =>
