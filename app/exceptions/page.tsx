@@ -533,19 +533,7 @@ setShowLoginModal(false);
                   return;
                 }
 
-                localStorage.setItem(
-  "currentUser",
-  user.username
-);
-
-setCurrentUser(
-  user.username
-);
-
-                setIsLoggedIn(true);
-
-                setShowLoginModal(false);
-
+                
               }}
             >
               Login
