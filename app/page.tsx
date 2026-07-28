@@ -929,7 +929,7 @@ return (
 
   <Link
     href="/"
-    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"
   >
     <LayoutDashboard size={18} />
     <span>Dashboard</span>
@@ -961,7 +961,7 @@ return (
 
   <Link
     href="/summary"
-    className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
   >
     <BarChart3 size={18} />
     <span>Summary</span>
