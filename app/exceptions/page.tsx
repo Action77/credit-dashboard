@@ -55,18 +55,24 @@ const [searchTerm, setSearchTerm] = useState("");
 }, []);
 useEffect(() => {
 
-  const savedUser =
-    localStorage.getItem(
-      "currentUser"
-    );
+  const loadUser = async () => {
 
-  if (savedUser) {
+    const savedUser =
+      await localStorage.getItem(
+        "currentUser"
+      );
 
-    setCurrentUser(savedUser);
+    if (savedUser) {
 
-    setIsLoggedIn(true);
+      setCurrentUser(savedUser);
 
-  }
+      setIsLoggedIn(true);
+
+    }
+
+  };
+
+  loadUser();
 
 }, []);
   return (
@@ -218,8 +224,9 @@ P1316600015512`}
 
 
     const currentUser =
-      localStorage.getItem("currentUser");
-
+  await localStorage.getItem(
+    "currentUser"
+  );
     if (
       !currentUser ||
       !tillDate ||
