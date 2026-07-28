@@ -364,8 +364,7 @@ return (
       <h1 className="text-3xl font-bold mb-6">
         Reports
       </h1>
-      <div className="bg-white border rounded-xl p-5 mb-6 overflow-hidden">
-
+      <div className="bg-white border rounded-xl p-5 mb-6 max-w-full overflow-hidden">
   <div className="flex justify-between items-center mb-4">
 
     <h2 className="text-xl font-bold text-amber-700">
@@ -578,7 +577,7 @@ return (
 
         <div className="overflow-x-auto">
 
-  <table className="w-full table-fixed border">
+  <table className="w-full max-w-full table-fixed border">
 
     <thead>
 
