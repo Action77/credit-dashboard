@@ -345,12 +345,7 @@ useEffect(() => {
 />
                 </div>
 
-                <div className="mt-6 text-sm text-gray-600 space-y-1">
-                  <p>✓ At least 8 characters</p>
-                  <p>✓ Include uppercase and lowercase letters</p>
-                  <p>✓ Include numbers</p>
-                  <p>✓ Include special characters</p>
-                </div>
+
 
 <button
   className="mt-6 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
