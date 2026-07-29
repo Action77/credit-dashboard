@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
+    const [exceptionDeleteAlert, setExceptionDeleteAlert] = useState(true);
     const [isUpdatingPassword, setIsUpdatingPassword] =
   useState(false);
     const [invoiceAlert, setInvoiceAlert] = useState(true);
@@ -59,6 +60,9 @@ useEffect(() => {
     setInvoiceAlert(
       data.invoice_disappeared_alert
     );
+setExceptionDeleteAlert(
+  data.exception_delete_alert
+);
 
     setExceptionAlert(
       data.exception_alert
@@ -248,6 +252,16 @@ useEffect(() => {
                     Exception Alerts
                   </label>
 
+<label className="flex items-center gap-3">
+  <input
+    type="checkbox"
+    checked={exceptionDeleteAlert}
+    onChange={(e) =>
+      setExceptionDeleteAlert(e.target.checked)
+    }
+  />
+  Exception Delete Alerts
+</label>
                   <label className="flex items-center gap-3">
                     <input
   type="checkbox"
@@ -300,6 +314,8 @@ const { error } = await supabase
 
     exception_alert:
       exceptionAlert,
+exception_delete_alert:
+  exceptionDeleteAlert,
 
     credit_import_alert:
       creditImportAlert,
@@ -323,6 +339,14 @@ exception_disabled_at:
         now
       ),
 
+      exception_delete_disabled_at:
+  exceptionDeleteAlert
+    ? currentSettings?.exception_delete_disabled_at
+    : (
+        currentSettings?.exception_delete_disabled_at ||
+        now
+      ),
+      
 credit_disabled_at:
   creditImportAlert
     ? currentSettings?.credit_disabled_at
