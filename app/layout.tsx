@@ -43,6 +43,7 @@ export default function RootLayout({
       </div>
 
       <UserWelcome />
+      {children}
 
 </body>
 </html>
