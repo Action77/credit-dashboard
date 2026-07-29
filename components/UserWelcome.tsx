@@ -27,20 +27,38 @@ export default function UserWelcome() {
     loadUser();
   }, []);
 
-  if (!fullName) return null;
+  if (!fullName) {
+    return (
+      <div className="flex items-center gap-3 text-white">
+        <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center font-bold border border-white/20">
+          ?
+        </div>
+
+        <div>
+          <p className="text-xs text-blue-100">
+            Not Signed In
+          </p>
+
+          <p className="font-semibold">
+            Guest User
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+    <div className="flex items-center gap-3 text-white">
+      <div className="w-11 h-11 rounded-full bg-blue-500 flex items-center justify-center font-bold shadow">
         {fullName.charAt(0).toUpperCase()}
       </div>
 
       <div>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-blue-100">
           Welcome Back
         </p>
 
-        <p className="font-semibold text-slate-800">
+        <p className="font-semibold text-base">
           {fullName}
         </p>
       </div>
