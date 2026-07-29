@@ -56,21 +56,7 @@ const legalCount =
     item => item.permanent
   ).length;
 
-const latestAdded =
-  exceptions
-    .filter(item => !item.permanent)
-    .sort(
-      (a, b) =>
-        b.id - a.id
-    )[0];
-
-const latestLegal =
-  exceptions
-    .filter(item => item.permanent)
-    .sort(
-      (a, b) =>
-        b.id - a.id
-    )[0];            useEffect(() => {
+useEffect(() => {
 
   const loadExceptions = async () => {
 
@@ -572,9 +558,6 @@ await supabase
       Records Added
     </div>
 
-<div className="mt-3 text-sm font-medium">
-  By {latestLegal?.created_by || "-"}
-</div>
     <div className="text-xs text-slate-400">
       Latest Added Record
     </div>
@@ -595,9 +578,6 @@ await supabase
       Records Added
     </div>
 
-<div className="mt-3 text-sm font-medium">
-  By {latestAdded?.created_by || "-"}
-</div>
 
     <div className="text-xs text-slate-400">
       Latest Legal Record
