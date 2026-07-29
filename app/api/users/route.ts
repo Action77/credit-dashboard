@@ -25,7 +25,12 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
 
-    const users = await req.json();
+    const body = await req.json();
+
+const users = body.users;
+
+const uploadedBy =
+  body.uploadedBy || "Unknown";
 
     const deleteResult =
       await supabase
@@ -66,7 +71,7 @@ await supabase
   .insert({
     username: null,
     title: "👥 Users Imported",
-    message: `${users.length} users imported successfully.`,
+    message: `${users.length} users imported successfully by ${uploadedBy}.`,
   });
     return NextResponse.json({
       success: true

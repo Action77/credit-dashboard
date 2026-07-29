@@ -71,11 +71,14 @@ useEffect(() => {
   const load = async () => {
   await loadUsers();
 
-  const currentUser =
-    await localStorage.getItem("currentUser");
+const currentUser =
+  await localStorage.getItem("currentUser");
 
-  setIsLoggedIn(!!currentUser);
-};
+if (currentUser) {
+  setCurrentUser(currentUser);
+}
+
+setIsLoggedIn(!!currentUser);
 
   load();
 }, []);
@@ -147,12 +150,12 @@ const response =
         "Content-Type":
           "application/json",
       },
-      body: JSON.stringify(
-        usersData
-      ),
+      body: JSON.stringify({
+        users: usersData,
+        uploadedBy: currentUser,
+      }),
     }
   );
-
 const result =
   await response.json();
 
