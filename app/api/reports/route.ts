@@ -10,7 +10,7 @@ export async function GET() {
 
   const { data: creditData } =
     await supabase
-      .from("credit_data")
+      .from("credit_data_full")
       .select("*");
 
   const { data: collections } =

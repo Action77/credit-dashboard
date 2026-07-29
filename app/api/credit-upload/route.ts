@@ -74,12 +74,54 @@ await supabase
       .from("credit_data")
       .delete()
       .neq("invoice", "");
-
+await supabase
+  .from("credit_data_full")
+  .delete()
+  .neq("invoice", "");
     if (deleteError) {
       console.error("DELETE ERROR:", deleteError);
       throw deleteError;
     }
+const allRecords = jsonData.map((row) => ({
+  invoice: String(row["Invoice #"]).replace(/\s/g, ""),
 
+  van_code: row["Van Code."],
+  employee_name: row["Employee Name."],
+  employee_ats_code: row["Employee ATS Code."],
+
+  customer_code: row["Customer Code"],
+  customer_name: row["Customer Name"],
+
+  central_invoice: row["Central Invoice"],
+  payment_term: row["Payment Term"],
+
+  trx_date: String(row["Trx Date"]),
+
+  credit_invoice_amount:
+    Number(row["Credit Invoice Amount"]) || 0,
+
+  pending_cim:
+    Number(row["Pending CIM"]) || 0,
+
+  credit_days:
+    Number(row["Credit_Days"]) || 0,
+
+  total_rejected_count:
+    Number(row["Total Rejected Count"]) || 0,
+
+  region: row["Region"],
+  city: row["City"],
+
+  status_user_block:
+    row["Status User Block"],
+
+  invoice_status:
+    row["Invoice status (Due/ Overdue)"],
+
+  uploaded_by: uploadedBy,
+  file_name: file.name,
+  file_date: creditFileDate,
+}));
     const records = blockedRows.map((row) => ({
       invoice: String(row["Invoice #"]).replace(/\s/g, ""),
       van_code: row["Van Code."],
@@ -106,7 +148,9 @@ await supabase
     if (records.length > 0) {
       console.log("Sample Record:", records[0]);
     }
-
+await supabase
+  .from("credit_data_full")
+  .insert(allRecords);
     const { data, error } = await supabase
       .from("credit_data")
       .insert(records)

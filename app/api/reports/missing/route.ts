@@ -65,9 +65,9 @@ export async function GET() {
 
       if (!nextSet.has(invoice)) {
 
-        const { data: creditRow } =
-          await supabase
-            .from("credit_data")
+const { data: creditRow } =
+  await supabase
+    .from("credit_data_full")
             .select(
   `
   invoice,
