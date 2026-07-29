@@ -1950,9 +1950,11 @@ row["City"] === city
 
         {exceptions
   .filter(
-    (item) => !item.permanent
+    (item) =>
+      !item.permanent &&
+      item.created_by === currentUser
   )
-  .map((item, index) => {
+    .map((item, index) => {
           const tillDate =
             new Date(item.till_date);
 
