@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
+    const [exceptionExpiredAlert, setExceptionExpiredAlert] =
+  useState(true);
     const [exceptionDeleteAlert, setExceptionDeleteAlert] = useState(true);
     const [isUpdatingPassword, setIsUpdatingPassword] =
   useState(false);
@@ -63,7 +65,9 @@ useEffect(() => {
 setExceptionDeleteAlert(
   data.exception_delete_alert
 );
-
+setExceptionExpiredAlert(
+  data.exception_expired_alert
+);
     setExceptionAlert(
       data.exception_alert
     );
@@ -240,7 +244,18 @@ setExceptionDeleteAlert(
 />
                     Invoice Disappeared Alerts
                   </label>
-
+<label className="flex items-center gap-3">
+  <input
+    type="checkbox"
+    checked={exceptionExpiredAlert}
+    onChange={(e) =>
+      setExceptionExpiredAlert(
+        e.target.checked
+      )
+    }
+  />
+  Exception Expired Alerts
+</label>
                   <label className="flex items-center gap-3">
                     <input
   type="checkbox"
@@ -249,7 +264,7 @@ setExceptionDeleteAlert(
     setExceptionAlert(e.target.checked)
   }
 />
-                    Exception Alerts
+                    Exception Add Alerts
                   </label>
 
 <label className="flex items-center gap-3">
@@ -316,7 +331,8 @@ const { error } = await supabase
       exceptionAlert,
 exception_delete_alert:
   exceptionDeleteAlert,
-
+exception_expired_alert:
+  exceptionExpiredAlert,
     credit_import_alert:
       creditImportAlert,
 
@@ -330,7 +346,13 @@ exception_delete_alert:
         currentSettings?.disappeared_disabled_at ||
         now
       ),
-
+exception_expired_disabled_at:
+  exceptionExpiredAlert
+    ? currentSettings?.exception_expired_disabled_at
+    : (
+        currentSettings?.exception_expired_disabled_at ||
+        now
+      ),
 exception_disabled_at:
   exceptionAlert
     ? currentSettings?.exception_disabled_at
@@ -346,7 +368,7 @@ exception_disabled_at:
         currentSettings?.exception_delete_disabled_at ||
         now
       ),
-      
+
 credit_disabled_at:
   creditImportAlert
     ? currentSettings?.credit_disabled_at

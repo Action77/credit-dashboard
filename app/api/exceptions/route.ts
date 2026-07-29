@@ -35,28 +35,46 @@ const { data: expiredExceptions } =
 
 if (expiredExceptions?.length) {
 
-  await supabase
-    .from("notifications")
-    .insert(
+  const notifications = [];
 
-      expiredExceptions.map(
-        item => ({
-          username: item.created_by,
-          title: "⌛ Exception Expired",
-          message:
-            `Exception invoice ${item.invoice} has expired.`,
-        })
-      )
+  for (const item of expiredExceptions) {
 
-    );
+    const { data: settings } =
+      await supabase
+        .from("user_settings")
+        .select("exception_expired_alert")
+        .eq("username", item.created_by)
+        .single();
+
+    if (
+      settings?.exception_expired_alert !== false
+    ) {
+
+      notifications.push({
+        username: item.created_by,
+        title: "⌛ Exception Expired",
+        message:
+          `Exception invoice ${item.invoice} has expired.`,
+      });
+
+    }
+
+  }
+
+  if (notifications.length) {
+
+    await supabase
+      .from("notifications")
+      .insert(notifications);
+
+  }
 
   await supabase
     .from("exceptions")
     .delete()
     .lt("till_date", todayDate);
 
-}
-  // جلب الاستثناءات الحالية
+}  // جلب الاستثناءات الحالية
   const { data } =
     await supabase
       .from("exceptions")
