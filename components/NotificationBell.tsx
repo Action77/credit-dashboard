@@ -18,18 +18,91 @@ export default function NotificationBell() {
 
   if (!username) return;
 
-  const { data } = await supabase
-    .from("notifications")
-    .select("*")
-    .or(
-      `username.eq.${username},username.is.null`
+  const saudiNow = new Date(
+    new Date().toLocaleString(
+      "en-US",
+      {
+        timeZone: "Asia/Riyadh",
+      }
     )
-    .order("created_at", {
-      ascending: false,
-    });
+  );
 
-  setNotifications(data || []);
+  const saudiTodayStart =
+    new Date(
+      saudiNow.getFullYear(),
+      saudiNow.getMonth(),
+      saudiNow.getDate(),
+      0,
+      0,
+      0,
+      0
+    );
 
+  await supabase
+    .from("notifications")
+    .delete()
+    .lt(
+      "created_at",
+      saudiTodayStart.toISOString()
+    );
+
+  const { data } = await supabase
+  .from("notifications")
+  .select("*")
+  .or(
+    `username.eq.${username},username.is.null`
+  )
+  .order("created_at", {
+    ascending: false,
+  });
+
+const { data: settings } = await supabase
+  .from("user_settings")
+  .select("*")
+  .eq("username", username)
+  .single();
+
+let filtered = data || [];
+
+if (settings) {
+
+  filtered = filtered.filter((n) => {
+
+    if (
+      n.title.includes("Credit File Imported") &&
+      !settings.credit_import_alert
+    ) {
+      return false;
+    }
+
+    if (
+      n.title.includes("Collection File Imported") &&
+      !settings.collection_import_alert
+    ) {
+      return false;
+    }
+
+    if (
+      n.title.includes("Disappeared") &&
+      !settings.invoice_disappeared_alert
+    ) {
+      return false;
+    }
+
+    if (
+      n.title.includes("Exception") &&
+      !settings.exception_alert
+    ) {
+      return false;
+    }
+
+    return true;
+
+  });
+
+}
+
+setNotifications(filtered);
 };
 
 useEffect(() => {
