@@ -163,18 +163,26 @@ await supabase
   throw error;
 }
 
+const { data: user } = await supabase
+  .from("app_users")
+  .select("full_name")
+  .eq("username", uploadedBy)
+  .single();
+
 const notificationResult = await supabase
   .from("notifications")
   .insert({
     username: null,
     title: "✅ Credit File Imported",
-    message: `Credit file uploaded successfully by ${uploadedBy}.`,
+    message: `Credit file uploaded successfully by ${user?.full_name || uploadedBy}.`,
   })
   .select();
+
 console.log(
   "NOTIFICATION RESULT:",
   notificationResult
 );
+
 
 return NextResponse.json({
   success: true,
