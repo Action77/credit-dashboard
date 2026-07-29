@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
+    const [username, setUsername] = useState("");
+const [fullName, setFullName] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
     const [exceptionExpiredAlert, setExceptionExpiredAlert] =
   useState(true);
@@ -35,6 +37,28 @@ const [confirmPassword, setConfirmPassword] = useState("");
 const [showLoginModal, setShowLoginModal] = useState(false);
 const [currentUser, setCurrentUser] = useState("");
   const [activeTab, setActiveTab] = useState("notifications");
+  useEffect(() => {
+  const loadProfile = async () => {
+    const currentUser =
+      localStorage.getItem("currentUser");
+
+    if (!currentUser) return;
+
+    const { data } = await supabase
+      .from("app_users")
+      .select("*")
+      .eq("username", currentUser)
+      .single();
+
+    if (data) {
+      setUsername(data.username);
+      setFullName(data.full_name || "");
+    }
+  };
+
+  loadProfile();
+}, []);
+
   useEffect(() => {
   const savedUser =
     localStorage.getItem("currentUser");
@@ -410,6 +434,99 @@ collection_disabled_at:
                 <p className="text-gray-500 mb-6">
                   Manage your security settings
                 </p>
+
+<div className="mb-8">
+  <h3 className="text-lg font-semibold mb-4">
+    Profile Information
+  </h3>
+
+  <div className="space-y-4">
+
+    <input
+      type="text"
+      placeholder="Username"
+      value={username}
+      onChange={(e) =>
+        setUsername(e.target.value)
+      }
+      className="w-full border rounded-lg p-3"
+    />
+
+    <input
+      type="text"
+      placeholder="Full Name"
+      value={fullName}
+      onChange={(e) =>
+        setFullName(e.target.value)
+      }
+      className="w-full border rounded-lg p-3"
+    />
+
+  </div>
+
+  <button
+    className="mt-4 px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+    onClick={async () => {
+
+  const currentUser =
+    localStorage.getItem("currentUser");
+
+  if (!currentUser) {
+    alert("Please Login First");
+    return;
+  }
+
+  // التحقق من عدم وجود اسم المستخدم مسبقاً
+  if (username !== currentUser) {
+
+    const { data: existingUser } =
+      await supabase
+        .from("app_users")
+        .select("id")
+        .eq("username", username)
+        .single();
+
+    if (existingUser) {
+      alert("Username Already Exists");
+      return;
+    }
+  }
+
+  const { error } = await supabase
+    .from("app_users")
+    .update({
+      username,
+      full_name: fullName,
+    })
+    .eq("username", currentUser);
+
+  if (error) {
+    alert("Failed To Update Profile");
+    return;
+  }
+
+  await supabase
+    .from("user_settings")
+    .update({
+      username,
+    })
+    .eq("username", currentUser);
+
+  localStorage.setItem(
+    "currentUser",
+    username
+  );
+
+  setCurrentUser(username);
+
+  alert(
+    "Profile Updated Successfully"
+  );
+}}
+  >
+    Save Profile
+  </button>
+</div>
 
                 <div className="space-y-4">
                   <input
