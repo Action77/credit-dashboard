@@ -186,32 +186,70 @@ useEffect(() => {
   }
 
 }, [currentUser]);
-useEffect(() => {
+
+  useEffect(() => {
 
   const loadFilters = async () => {
 
-    const filterKey =
-  currentUser
-    ? `savedFilters_${currentUser}`
-    : "savedFilters_guest";
+    if (currentUser) {
 
-const saved =
-  await localStorage.getItem(filterKey);
+      const { data: userFilters } =
+        await supabase
+          .from("user_filters")
+          .select("*")
+          .eq("username", currentUser)
+          .single();
+
+      if (userFilters) {
+
+        setSelectedRegions(
+          userFilters.regions || []
+        );
+
+        setSelectedCities(
+          userFilters.cities || []
+        );
+
+        setSelectedVans(
+          userFilters.vans || []
+        );
+
+        return;
+      }
+    }
+
+    const filterKey =
+      currentUser
+        ? `savedFilters_${currentUser}`
+        : "savedFilters_guest";
+
+    const saved =
+      await localStorage.getItem(
+        filterKey
+      );
 
     if (!saved) return;
 
-    const filters = JSON.parse(saved);
+    const filters =
+      JSON.parse(saved);
 
-    setSelectedRegions(filters.regions || []);
-    setSelectedCities(filters.cities || []);
-    setSelectedVans(filters.vans || []);
+    setSelectedRegions(
+      filters.regions || []
+    );
+
+    setSelectedCities(
+      filters.cities || []
+    );
+
+    setSelectedVans(
+      filters.vans || []
+    );
 
   };
 
   loadFilters();
 
 }, [currentUser]);
-
 useEffect(() => {
 
   const loadCollection =
