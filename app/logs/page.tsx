@@ -341,7 +341,7 @@ export default function LogsPage() {
                 </td>
 
                 <td className="p-4 font-medium">
-                  {log.username}
+                  {log.full_name}
                 </td>
 
                 <td className="p-4">
