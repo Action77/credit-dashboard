@@ -135,8 +135,14 @@ const handleDateChange = (
     selectedDate.getDay() === 5
   ) {
 
-    alert(
-      "Friday cannot be selected"
+    selectedDate.setDate(
+      selectedDate.getDate() + 1
+    );
+
+    setTillDate(
+      selectedDate
+        .toISOString()
+        .split("T")[0]
     );
 
     return;
