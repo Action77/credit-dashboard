@@ -122,12 +122,11 @@ await supabase
 const notificationResult = await supabase
   .from("notifications")
   .insert({
-    username: uploadedBy,
+    username: null,
     title: "✅ Credit File Imported",
     message: `Credit file uploaded successfully by ${uploadedBy}.`,
   })
   .select();
-
 console.log(
   "NOTIFICATION RESULT:",
   notificationResult
