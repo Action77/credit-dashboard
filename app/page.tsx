@@ -27,6 +27,8 @@ import {
 
 
 export default function Home() {
+  const [currentUser, setCurrentUser] = useState("");
+  const [currentFullName, setCurrentFullName] = useState("");
   const pathname = usePathname();
 const [whatsAppVan, setWhatsAppVan] =
   useState("");
@@ -49,10 +51,7 @@ const [searchText, setSearchText] =
   const [showFilters,
   setShowFilters] =
   useState(false);
-  const [currentUser,
-  setCurrentUser] =
-  useState("");
-
+  
 const [isLoggedIn,
   setIsLoggedIn] =
   useState(false);
@@ -377,6 +376,7 @@ formData.append(
 }
 await addLog(
   currentUser,
+  currentFullName,
   "IMPORT_CREDIT",
   file.name
 );
@@ -494,6 +494,7 @@ await fetch(
 
 await addLog(
   currentUser,
+  currentFullName,
   "IMPORT_COLLECTION",
   file.name
 );
@@ -1128,6 +1129,7 @@ return (
 
   await addLog(
     currentUser,
+    currentFullName,
     "LOGOUT",
     "User logged out"
   );
@@ -1943,6 +1945,7 @@ await localStorage.setItem(
     );
 await addLog(
   currentUser,
+  currentFullName,
   "ADD_EXCEPTION",
   invoice
 );
@@ -2092,6 +2095,7 @@ await addLog(
                       );
 await addLog(
   currentUser,
+  currentFullName,
   "DELETE_EXCEPTION",
   item.invoice
 );
@@ -2396,11 +2400,14 @@ if (user.password !== password) {
 }
 
 setCurrentUser(user.username);
+setCurrentFullName(user.full_name);
 
 setIsLoggedIn(true);
 
+
 await addLog(
   user.username,
+  user.full_name,
   "LOGIN",
   "User logged in"
 );
