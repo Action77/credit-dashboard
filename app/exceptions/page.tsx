@@ -421,10 +421,7 @@ const saveResponse =
               item.customerCode,
             customer_name:
               item.customerName,
-            created_by:
-              user?.full_name ||
-              currentUser,
-          })
+            created_by: currentUser,          })
         )
       ),
     }
