@@ -55,11 +55,40 @@ useEffect(() => {
   return (
     <div className="relative">
 
-      <button
-        onClick={() => setOpen(!open)}
-        className="relative"
-      >
+<button
+  onClick={async () => {
 
+    const nextState = !open;
+
+    setOpen(nextState);
+
+    if (nextState) {
+
+      const username =
+        localStorage.getItem(
+          "currentUser"
+        );
+
+      if (username) {
+
+        await supabase
+          .from("notifications")
+          .update({
+            is_read: true,
+          })
+          .or(
+            `username.eq.${username},username.is.null`
+          );
+
+        loadNotifications();
+
+      }
+
+    }
+
+  }}
+  className="relative"
+>
         <Bell size={22} />
 
         {unreadCount > 0 && (
@@ -90,23 +119,22 @@ useEffect(() => {
       {open && (
 
         <div
-          className="
-            absolute
-            right-0
-            top-8
-            w-96
-            bg-white
-            border
-            rounded-xl
-            shadow-xl
-            z-50
-          "
-        >
-
+  className="
+    absolute
+    right-0
+    top-8
+    w-[420px]
+    bg-white
+    border
+    rounded-xl
+    shadow-xl
+    z-50
+  "
+>
           <div className="p-4 border-b">
             <h3 className="font-bold">
-              Notifications
-            </h3>
+  Notifications ({notifications.length})
+</h3>
           </div>
 
           <div className="max-h-80 overflow-auto">
@@ -122,22 +150,34 @@ useEffect(() => {
               notifications.map((n) => (
 
                 <div
-                  key={n.id}
-                  className="
-                    p-3
-                    border-b
-                    hover:bg-gray-50
-                  "
-                >
-                  <div className="font-medium">
-                    {n.title}
-                  </div>
+  key={n.id}
+  className={`p-4 border-b transition ${
+    !n.is_read
+      ? "bg-blue-50"
+      : "hover:bg-slate-50"
+  }`}
+>
+  <div className="font-semibold text-slate-800">
+    {n.title}
+  </div>
 
-                  <div className="text-sm text-gray-500">
-                    {n.message}
-                  </div>
-                </div>
+  <div className="text-sm text-slate-500 mt-1">
+    {n.message}
+  </div>
 
+  <div className="text-xs text-slate-400 mt-2">
+    {new Date(n.created_at).toLocaleString(
+      "en-GB",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }
+    )}
+  </div>
+</div>
               ))
 
             )}

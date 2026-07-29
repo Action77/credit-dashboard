@@ -7,7 +7,16 @@ const supabase = createClient(
 );
 
 export async function GET() {
-
+await supabase
+  .from("notifications")
+  .delete()
+  .lt(
+    "created_at",
+    new Date(
+      Date.now() -
+      30 * 24 * 60 * 60 * 1000
+    ).toISOString()
+  );
   const today = new Date();
 
 today.setHours(
