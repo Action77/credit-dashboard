@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell } from "lucide-react";
+import { BellDot } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export default function NotificationBell() {
@@ -166,20 +166,15 @@ useEffect(() => {
 
 <button
   onClick={async () => {
-
     const nextState = !open;
 
     setOpen(nextState);
 
     if (nextState) {
-
       const username =
-        localStorage.getItem(
-          "currentUser"
-        );
+        localStorage.getItem("currentUser");
 
       if (username) {
-
         await supabase
           .from("notifications")
           .update({
@@ -190,41 +185,49 @@ useEffect(() => {
           );
 
         loadNotifications();
-
       }
-
     }
-
   }}
-  className="relative"
+  className="
+    relative
+    flex
+    items-center
+    justify-center
+    w-11
+    h-11
+    rounded-xl
+    bg-white/10
+    hover:bg-white/20
+    text-white
+    transition-all
+    duration-200
+  "
 >
-        <Bell size={22} />
+  <BellDot size={22} />
 
-        {unreadCount > 0 && (
-
-          <span
-            className="
-              absolute
-              -top-2
-              -right-2
-              bg-red-600
-              text-white
-              text-xs
-              rounded-full
-              w-5
-              h-5
-              flex
-              items-center
-              justify-center
-            "
-          >
-            {unreadCount}
-          </span>
-
-        )}
-
-      </button>
-
+  {unreadCount > 0 && (
+    <span
+      className="
+        absolute
+        -top-1
+        -right-1
+        bg-red-500
+        text-white
+        text-[10px]
+        rounded-full
+        min-w-[18px]
+        h-[18px]
+        px-1
+        flex
+        items-center
+        justify-center
+        font-bold
+      "
+    >
+      {unreadCount}
+    </span>
+  )}
+</button>
       {open && (
 
         <div
