@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { addLog } from "@/lib/activityLog";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -68,7 +69,16 @@ if (expiredExceptions?.length) {
       .insert(notifications);
 
   }
+for (const item of expiredExceptions) {
 
+  await addLog(
+    "SYSTEM",
+    "Automated Maintenance Service",
+    "DELETE_EXCEPTION",
+    `Expired exception removed: ${item.invoice}`
+  );
+
+}
   await supabase
     .from("exceptions")
     .delete()

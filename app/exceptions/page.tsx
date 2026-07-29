@@ -1,6 +1,6 @@
 
 "use client";
-
+import { addLog } from "@/lib/activityLog";
 import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 import { useEffect, useState } from "react";
@@ -14,6 +14,8 @@ import {
   Settings,
   Users,
   LogOut,
+    ClipboardList,
+  PieChart,
 } from "lucide-react";
 
 
@@ -169,7 +171,7 @@ useEffect(() => {
     href="/invoices"
     className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
   >
-    <FileText size={18} />
+    <ClipboardList size={18} />
     <span>Invoices</span>
   </Link>
 
@@ -193,7 +195,7 @@ useEffect(() => {
     href="/reports"
     className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
   >
-    <BarChart3 size={18} />
+    <PieChart size={18} />
     <span>Reports</span>
   </Link>
 
@@ -220,10 +222,29 @@ useEffect(() => {
 
     <div
       className="flex items-center gap-3 bg-red-600 p-3 rounded-lg cursor-pointer"
-      onClick={() => {
-        localStorage.removeItem("currentUser");
-        setIsLoggedIn(false);
-      }}
+      onClick={async () => {
+
+  const { data: user } = await supabase
+    .from("app_users")
+    .select("full_name")
+    .eq("username", currentUser)
+    .single();
+
+  await addLog(
+    currentUser,
+    user?.full_name || currentUser,
+    "LOGOUT",
+    "User logged out"
+  );
+
+  await localStorage.removeItem(
+    "currentUser"
+  );
+
+  setCurrentUser("");
+  setIsLoggedIn(false);
+
+}}
     >
       <LogOut size={18} />
       Logout
@@ -467,6 +488,12 @@ const saveResponse =
         return;
 
       }
+await addLog(
+  currentUser,
+  user?.full_name || currentUser,
+  "ADD_EXCEPTION",
+  invoices.join(", ")
+);
 
 await supabase
   .from("notifications")
@@ -720,7 +747,18 @@ await supabase
           method: "DELETE",
         }
       );
+const { data: userInfo } = await supabase
+  .from("app_users")
+  .select("full_name")
+  .eq("username", currentUser)
+  .single();
 
+await addLog(
+  currentUser,
+  userInfo?.full_name || currentUser,
+  "DELETE_EXCEPTION",
+  item.invoice
+);
       setExceptions(prev =>
         prev.filter(
           exception =>
@@ -831,11 +869,16 @@ await supabase
   setCurrentUser(data.username);
 
   setIsLoggedIn(true);
-
+await addLog(
+  data.username,
+  data.full_name,
+  "LOGIN",
+  "User logged in"
+);
   setShowLoginModal(false);
 
 }}            >
-              Cancel
+              Login
             </button>
 
           </div>
