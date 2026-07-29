@@ -282,7 +282,12 @@ useEffect(() => {
       alert("Please Login First");
       return;
     }
-
+const { data: currentSettings } =
+  await supabase
+    .from("user_settings")
+    .select("*")
+    .eq("username", currentUser)
+    .single();
     const now =
   new Date().toISOString();
 
@@ -303,25 +308,36 @@ const { error } = await supabase
       collectionImportAlert,
 
     disappeared_disabled_at:
-      invoiceAlert
-        ? null
-        : now,
+  invoiceAlert
+    ? currentSettings?.disappeared_disabled_at
+    : (
+        currentSettings?.disappeared_disabled_at ||
+        now
+      ),
 
-    exception_disabled_at:
-      exceptionAlert
-        ? null
-        : now,
+exception_disabled_at:
+  exceptionAlert
+    ? currentSettings?.exception_disabled_at
+    : (
+        currentSettings?.exception_disabled_at ||
+        now
+      ),
 
-    credit_disabled_at:
-      creditImportAlert
-        ? null
-        : now,
+credit_disabled_at:
+  creditImportAlert
+    ? currentSettings?.credit_disabled_at
+    : (
+        currentSettings?.credit_disabled_at ||
+        now
+      ),
 
-    collection_disabled_at:
-      collectionImportAlert
-        ? null
-        : now,
-
+collection_disabled_at:
+  collectionImportAlert
+    ? currentSettings?.collection_disabled_at
+    : (
+        currentSettings?.collection_disabled_at ||
+        now
+      ),
   })
   .eq("username", currentUser);
 
