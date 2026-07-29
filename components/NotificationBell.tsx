@@ -61,7 +61,7 @@ const { data: settings } = await supabase
   .select("*")
   .eq("username", username)
   .single();
-
+console.log("SETTINGS", settings);
 let filtered = data || [];
 
 if (settings) {
