@@ -91,14 +91,19 @@ const { error } = await supabase
 if (error) {
   throw error;
 }
+const { data: user } = await supabase
+  .from("app_users")
+  .select("full_name")
+  .eq("username", uploadedBy)
+  .single();
+
 await supabase
   .from("notifications")
   .insert({
     username: null,
     title: "📦 Collection File Imported",
-    message: `Collection ${uploadRecord.id} uploaded successfully by ${uploadedBy}.`,
+    message: `Collection ${uploadRecord.id} uploaded successfully by ${user?.full_name || uploadedBy}.`,
   });
-
 const previousUploadId =
   uploadRecord.id - 1;
 
