@@ -18,11 +18,35 @@ const todayDate =
   today.toISOString().split("T")[0];
 
  // حذف جميع الاستثناءات المنتهية
-await supabase
-  .from("exceptions")
-  .delete()
-  .lt("till_date", todayDate);
+const { data: expiredExceptions } =
+  await supabase
+    .from("exceptions")
+    .select("*")
+    .lt("till_date", todayDate);
 
+if (expiredExceptions?.length) {
+
+  await supabase
+    .from("notifications")
+    .insert(
+
+      expiredExceptions.map(
+        item => ({
+          username: item.created_by,
+          title: "⌛ Exception Expired",
+          message:
+            `Exception invoice ${item.invoice} has expired.`,
+        })
+      )
+
+    );
+
+  await supabase
+    .from("exceptions")
+    .delete()
+    .lt("till_date", todayDate);
+
+}
   // جلب الاستثناءات الحالية
   const { data } =
     await supabase

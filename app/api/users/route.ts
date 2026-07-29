@@ -61,7 +61,13 @@ export async function POST(req: Request) {
       );
 
     }
-
+await supabase
+  .from("notifications")
+  .insert({
+    username: null,
+    title: "👥 Users Imported",
+    message: `${users.length} users imported successfully.`,
+  });
     return NextResponse.json({
       success: true
     });

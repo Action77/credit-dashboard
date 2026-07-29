@@ -432,6 +432,15 @@ P1316600015512`}
         return;
 
       }
+      await supabase
+  .from("notifications")
+  .insert(
+    invoices.map(invoice => ({
+      username: currentUser,
+      title: "⚠️ New Exception Added",
+      message: `Invoice ${invoice} added to exceptions.`,
+    }))
+  );
       const response =
         await fetch(
           "/api/exceptions"

@@ -13,25 +13,39 @@ export default function NotificationBell() {
 
   const loadNotifications = async () => {
 
-    const username =
-      localStorage.getItem("currentUser");
+  const username =
+    localStorage.getItem("currentUser");
 
-    if (!username) return;
+  if (!username) return;
 
-    const { data } = await supabase
-      .from("notifications")
-      .select("*")
-      .eq("username", username)
-      .order("created_at", {
-        ascending: false,
-      });
+  const { data } = await supabase
+    .from("notifications")
+    .select("*")
+    .or(
+      `username.eq.${username},username.is.null`
+    )
+    .order("created_at", {
+      ascending: false,
+    });
 
-    setNotifications(data || []);
-  };
+  setNotifications(data || []);
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
+};
+
+useEffect(() => {
+
+  loadNotifications();
+
+  const interval =
+    setInterval(
+      loadNotifications,
+      5000
+    );
+
+  return () =>
+    clearInterval(interval);
+
+}, []);
 
   const unreadCount =
     notifications.filter(

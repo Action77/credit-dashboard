@@ -91,7 +91,13 @@ const { error } = await supabase
 if (error) {
   throw error;
 }
-
+await supabase
+  .from("notifications")
+  .insert({
+    username: null,
+    title: "📦 Collection File Imported",
+    message: `Collection ${uploadRecord.id} uploaded successfully by ${uploadedBy}.`,
+  });
     return NextResponse.json({
       success: true,
       invoices: invoices.length,

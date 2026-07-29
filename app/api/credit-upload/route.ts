@@ -123,6 +123,13 @@ await supabase
       success: true,
       rows: records.length,
     });
+await supabase
+  .from("notifications")
+  .insert({
+    username: null,
+    title: "✅ Credit File Imported",
+    message: `Credit file uploaded successfully by ${uploadedBy}.`,
+  });
 
   } catch (err) {
     console.error("UPLOAD ERROR:", err);
