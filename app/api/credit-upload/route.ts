@@ -116,31 +116,27 @@ await supabase
     console.log("Insert Error:", error);
 
     if (error) {
-      throw error;
-    }
+  throw error;
+}
+
 const notificationResult = await supabase
   .from("notifications")
   .insert({
-    username: null,
+    username: uploadedBy,
     title: "✅ Credit File Imported",
     message: `Credit file uploaded successfully by ${uploadedBy}.`,
-  });
+  })
+  .select();
 
 console.log(
-  "NOTIFICATION RESULT",
+  "NOTIFICATION RESULT:",
   notificationResult
 );
-    return NextResponse.json({
-      success: true,
-      rows: records.length,
-    });
-await supabase
-  .from("notifications")
-  .insert({
-    username: null,
-    title: "✅ Credit File Imported",
-    message: `Credit file uploaded successfully by ${uploadedBy}.`,
-  });
+
+return NextResponse.json({
+  success: true,
+  rows: records.length,
+});
 
   } catch (err) {
     console.error("UPLOAD ERROR:", err);
