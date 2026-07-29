@@ -48,7 +48,7 @@ const [searchText, setSearchText] =
   useState("");
   const [collectionRows, setCollectionRows] =
     useState<any[]>([]);
-    useEffect(() => {
+useEffect(() => {
 
   const loadFilters = async () => {
 
@@ -64,6 +64,7 @@ const [searchText, setSearchText] =
       );
 
       return;
+
     }
 
     const filters =
@@ -169,57 +170,56 @@ useEffect(() => {
         await response.json();
 
       const saved =
-  await localStorage.getItem(
-    "summaryFilters"
-  );
-
-if (!saved) {
-
-  setMissingInvoices(data);
-
-} else {
-
-  const filters =
-    JSON.parse(saved);
-
-  const filtered =
-    data.filter((row: any) => {
-
-      const regionMatch =
-        filters.regions?.length === 0 ||
-        filters.regions?.includes(
-          row.region
+        await localStorage.getItem(
+          "summaryFilters"
         );
 
-      const cityMatch =
-        filters.cities?.length === 0 ||
-        filters.cities?.includes(
-          row.city
-        );
+      if (!saved) {
 
-      const vanMatch =
-        filters.vans?.length === 0 ||
-        filters.vans?.includes(
-          row.van_code
-        );
+        setMissingInvoices(data);
+        return;
 
-      return (
-        regionMatch &&
-        cityMatch &&
-        vanMatch
-      );
+      }
 
-    });
+      const filters =
+        JSON.parse(saved);
 
-  setMissingInvoices(filtered);
+      const filtered =
+        data.filter((row: any) => {
 
-}
+          const regionMatch =
+            filters.regions?.length === 0 ||
+            filters.regions?.includes(
+              row.region
+            );
+
+          const cityMatch =
+            filters.cities?.length === 0 ||
+            filters.cities?.includes(
+              row.city
+            );
+
+          const vanMatch =
+            filters.vans?.length === 0 ||
+            filters.vans?.includes(
+              row.van_code
+            );
+
+          return (
+            regionMatch &&
+            cityMatch &&
+            vanMatch
+          );
+
+        });
+
+      setMissingInvoices(filtered);
+
     };
 
   loadMissingInvoices();
 
 }, []);
-
   const loadCollection =
     async (id: number) => {
 
