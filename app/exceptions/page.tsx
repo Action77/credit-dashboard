@@ -385,44 +385,50 @@ P1316600015512`}
 
         });
 
-      const saveResponse =
-        await fetch(
-          "/api/exceptions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify(
-              newExceptions.map(
-                item => ({
-                  invoice:
-                    item.invoice,
-                  till_date:
-                    isPermanent
-                      ? null
-                      : item.tillDate,
-                  permanent:
-                    isPermanent,
-                  van_code:
-                    item.vanCode,
-                  employee_name:
-                    item.employeeName,
-                  ats_code:
-                    item.atsCode,
-                  customer_code:
-                    item.customerCode,
-                  customer_name:
-                    item.customerName,
-                  created_by:
-                    currentUser,
-                })
-              )
-            ),
-          }
-        );
+     const { data: user } = await supabase
+  .from("app_users")
+  .select("full_name")
+  .eq("username", currentUser)
+  .single();
 
+const saveResponse =
+  await fetch(
+    "/api/exceptions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+      body: JSON.stringify(
+        newExceptions.map(
+          item => ({
+            invoice:
+              item.invoice,
+            till_date:
+              isPermanent
+                ? null
+                : item.tillDate,
+            permanent:
+              isPermanent,
+            van_code:
+              item.vanCode,
+            employee_name:
+              item.employeeName,
+            ats_code:
+              item.atsCode,
+            customer_code:
+              item.customerCode,
+            customer_name:
+              item.customerName,
+            created_by:
+              user?.full_name ||
+              currentUser,
+          })
+        )
+      ),
+    }
+  );
       if (!saveResponse.ok) {
 
         alert(
@@ -432,13 +438,15 @@ P1316600015512`}
         return;
 
       }
-      await supabase
+
+await supabase
   .from("notifications")
   .insert(
     invoices.map(invoice => ({
       username: null,
-title: "⚠️ Exception Added",
-message: `${currentUser} added invoice ${invoice}.`,    }))
+      title: "⚠️ Exception Added",
+      message: `${user?.full_name || currentUser} added invoice ${invoice}.`,
+    }))
   );
       const response =
         await fetch(
@@ -508,8 +516,8 @@ message: `${currentUser} added invoice ${invoice}.`,    }))
       Records Added
     </div>
 
-    <div className="mt-3 text-sm font-medium">
-  By {latestAdded?.created_by || "-"}
+<div className="mt-3 text-sm font-medium">
+  By {latestLegal?.created_by || "-"}
 </div>
     <div className="text-xs text-slate-400">
       Latest Added Record
@@ -531,9 +539,9 @@ message: `${currentUser} added invoice ${invoice}.`,    }))
       Records Added
     </div>
 
-    <div className="mt-3 text-sm font-medium">
-      By {latestLegal?.created_by || "-"}
-    </div>
+<div className="mt-3 text-sm font-medium">
+  By {latestAdded?.created_by || "-"}
+</div>
 
     <div className="text-xs text-slate-400">
       Latest Legal Record
