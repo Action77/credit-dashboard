@@ -3,6 +3,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { Toaster } from "sonner";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import UserWelcome from "@/components/UserWelcome";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,25 +26,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
+  <html
+    lang="en"
+    className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+  >
+    <body className="min-h-full flex flex-col">
 
-        <Toaster
-          position="top-right"
-          richColors
-          closeButton
-        />
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+      />
 
-        <div className="fixed top-4 right-4 z-[9999]">
-          <NotificationBell />
-        </div>
+      <div className="fixed top-4 right-4 z-[9999]">
+        <NotificationBell />
+      </div>
 
-        {children}
+      <UserWelcome />
 
-      </body>
-    </html>
-  );
-}
+      {children}
+
+    </body>
+  </html>
+);
