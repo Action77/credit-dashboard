@@ -124,7 +124,71 @@ useEffect(() => {
   loadUser();
 
 }, []);
-  return (
+const handleDateChange = (
+  value: string
+) => {
+
+  const selectedDate =
+    new Date(value);
+
+  if (
+    selectedDate.getDay() === 5
+  ) {
+
+    alert(
+      "Friday cannot be selected"
+    );
+
+    return;
+
+  }
+
+  setTillDate(value);
+
+};
+const calculateBusinessDays = (
+  dateString: string
+) => {
+
+  if (!dateString) return 0;
+
+  const today = new Date();
+
+  today.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  const endDate =
+    new Date(dateString);
+
+  let count = 0;
+
+  const current =
+    new Date(today);
+
+  while (
+    current <= endDate
+  ) {
+
+    if (
+      current.getDay() !== 5
+    ) {
+      count++;
+    }
+
+    current.setDate(
+      current.getDate() + 1
+    );
+
+  }
+
+  return count;
+
+};
+return (
   <div className="min-h-screen bg-[#f4f7fc] flex">
 
    <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
@@ -296,16 +360,46 @@ P1316600015512`}
       Legal
     </label>
 
-    {!isPermanent && (
-      <input
-        type="date"
-        value={tillDate}
-        onChange={(e) =>
-          setTillDate(e.target.value)
-        }
-        className="border rounded-lg p-3 mb-4 w-full"
-      />
+{!isPermanent && (
+
+  <>
+
+    <input
+      type="date"
+      value={tillDate}
+      min={new Date().toISOString().split("T")[0]}
+      onChange={(e) =>
+        handleDateChange(
+          e.target.value
+        )
+      }
+      className="border rounded-lg p-3 mb-4 w-full"
+    />
+
+    {tillDate && (
+
+      <div className="mb-4 text-sm text-green-600 font-semibold">
+
+        Exception Duration:
+
+        <span className="ml-2">
+
+          {calculateBusinessDays(
+            tillDate
+          )}
+
+          {" "}
+          Working Days
+
+        </span>
+
+      </div>
+
     )}
+
+  </>
+
+)}
 
     {/* Add Exceptions Button هنا */}
 
@@ -328,6 +422,7 @@ P1316600015512`}
 
     try {
 
+      
       const currentUser =
   await localStorage.getItem(
     "currentUser"
@@ -370,7 +465,6 @@ P1316600015512`}
         await fetch(
           "/api/credit-data"
         );
-
       const creditResult =
         await creditResponse.json();
 
@@ -639,17 +733,10 @@ await supabase
   .map(
         (item, index) => {
 
-      const tillDate =
-  new Date(item.till_date);
       const daysLeft =
-        Math.ceil(
-          (
-            tillDate.getTime() -
-            new Date().getTime()
-          ) /
-          (1000 * 60 * 60 * 24)
-        );
-
+  calculateBusinessDays(
+    item.till_date
+  );
       return (
 
 <tr
