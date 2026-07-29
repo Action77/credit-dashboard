@@ -334,6 +334,14 @@ formData.append(
   return;
 }
 
+await localStorage.removeItem(
+  "vanPermissions"
+);
+
+await localStorage.removeItem(
+  "lastUpdatedVans"
+);
+
 /* Reset جميع الـ Checkboxes */
 await localStorage.removeItem(
   "vanPermissions"
