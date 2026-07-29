@@ -1,4 +1,5 @@
 "use client";
+import { addLog } from "@/lib/activityLog";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
@@ -374,6 +375,11 @@ formData.append(
   alert(uploadResult.error);
   return;
 }
+await addLog(
+  currentUser,
+  "IMPORT_CREDIT",
+  file.name
+);
 
 await localStorage.removeItem(
   "vanPermissions"
@@ -478,16 +484,22 @@ formData.append("file", file);
     currentUsername
   );
 
-  await fetch(
-    "/api/collection-upload",
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
+await fetch(
+  "/api/collection-upload",
+  {
+    method: "POST",
+    body: formData,
+  }
+);
 
-  const reader =
-    new FileReader();
+await addLog(
+  currentUser,
+  "IMPORT_COLLECTION",
+  file.name
+);
+
+const reader =
+  new FileReader();
 
   reader.onload =
     async (e) => {
@@ -1112,10 +1124,21 @@ return (
 
     <div
       className="flex items-center gap-3 bg-red-600 p-3 rounded-lg cursor-pointer"
-      onClick={() => {
-        localStorage.removeItem("currentUser");
-        setIsLoggedIn(false);
-      }}
+      onClick={async () => {
+
+  await addLog(
+    currentUser,
+    "LOGOUT",
+    "User logged out"
+  );
+
+  localStorage.removeItem(
+    "currentUser"
+  );
+
+  setIsLoggedIn(false);
+
+}}
     >
       <LogOut size={18} />
       Logout
@@ -1918,7 +1941,11 @@ await localStorage.setItem(
         ]),
       }
     );
-
+await addLog(
+  currentUser,
+  "ADD_EXCEPTION",
+  invoice
+);
     const response =
       await fetch(
         "/api/exceptions"
@@ -2063,7 +2090,11 @@ await localStorage.setItem(
                           method: "DELETE",
                         }
                       );
-
+await addLog(
+  currentUser,
+  "DELETE_EXCEPTION",
+  item.invoice
+);
                       setExceptions(
                         prev =>
                           prev.filter(
@@ -2367,6 +2398,12 @@ if (user.password !== password) {
 setCurrentUser(user.username);
 
 setIsLoggedIn(true);
+
+await addLog(
+  user.username,
+  "LOGIN",
+  "User logged in"
+);
 
 localStorage.setItem(
   "currentUser",

@@ -1,6 +1,6 @@
 
 "use client";
-import { addLog } from "@/lib/activityLog";
+
 import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 import { useEffect, useState } from "react";
