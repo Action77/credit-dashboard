@@ -270,18 +270,51 @@ useEffect(() => {
 
     const file = event.target.files?.[0];
 
-    if (!file) return;
+if (!file) return;
 
-    const formData = new FormData();
+/* التحقق من ملف Credit */
 
-    formData.append("file", file);
+const buffer = await file.arrayBuffer();
 
-    const currentUsername = currentUser;
-    formData.append(
-      "uploadedBy",
-      currentUsername
-    );
+const workbook = XLSX.read(buffer, {
+  type: "array",
+});
 
+const sheetName =
+  workbook.SheetNames[0];
+
+const worksheet =
+  workbook.Sheets[sheetName];
+
+const b6 = String(
+  worksheet["B6"]?.v || ""
+).trim();
+
+if (b6 !== "Region") {
+
+  alert(
+    "❌ الملف خاطئ، الرجاء اختيار ملف Credit الصحيح"
+  );
+
+  event.target.value = "";
+
+  setIsUploadingCredit(false);
+
+  return;
+}
+
+/* في حال نجاح التحقق يكمل الرفع */
+
+const formData = new FormData();
+
+formData.append("file", file);
+
+const currentUsername = currentUser;
+
+formData.append(
+  "uploadedBy",
+  currentUsername
+);
     const uploadResponse =
       await fetch(
         "/api/credit-upload",
@@ -336,20 +369,52 @@ useEffect(() => {
   setIsUploadingCollection(true);
 
   const file =
-    event.target.files?.[0];
+  event.target.files?.[0];
 
-  if (!file) {
+if (!file) {
 
-    setIsUploadingCollection(false);
+  setIsUploadingCollection(false);
 
-    return;
+  return;
 
-  }
+}
 
-  const formData = new FormData();
+/* التحقق من أن الملف هو ملف Collection الصحيح */
 
-  formData.append("file", file);
+const buffer = await file.arrayBuffer();
 
+const workbook = XLSX.read(buffer, {
+  type: "array",
+});
+
+const sheetName =
+  workbook.SheetNames[0];
+
+const worksheet =
+  workbook.Sheets[sheetName];
+
+const a1 = String(
+  worksheet["A1"]?.v || ""
+).trim();
+
+if (a1 !== "Collection Submit Time") {
+
+  alert(
+    "❌ الملف خاطئ، الرجاء اختيار ملف Collection الصحيح"
+  );
+
+  event.target.value = "";
+
+  setIsUploadingCollection(false);
+
+  return;
+}
+
+/* إذا التحقق نجح يكمل الرفع */
+
+const formData = new FormData();
+
+formData.append("file", file);
   const currentUsername = currentUser;
 
   formData.append(
