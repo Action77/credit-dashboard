@@ -30,8 +30,20 @@ export default function UserWelcome() {
   if (!fullName) return null;
 
   return (
-    <div className="fixed top-4 left-4 z-[9999] bg-white shadow-lg rounded-xl px-4 py-2">
-      👋 Welcome, <b>{fullName}</b>
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+        {fullName.charAt(0).toUpperCase()}
+      </div>
+
+      <div>
+        <p className="text-xs text-gray-500">
+          Welcome Back
+        </p>
+
+        <p className="font-semibold text-slate-800">
+          {fullName}
+        </p>
+      </div>
     </div>
   );
 }
