@@ -330,29 +330,37 @@ formData.append(
     console.log(uploadResult);
 
     if (!uploadResult.success) {
-      alert(uploadResult.error);
-      return;
-    }
+  alert(uploadResult.error);
+  return;
+}
 
-    const response =
-      await fetch("/api/credit-data");
+/* Reset جميع الـ Checkboxes */
+await localStorage.removeItem(
+  "vanPermissions"
+);
 
-    const result =
-      await response.json();
+await localStorage.removeItem(
+  "lastUpdatedVans"
+);
 
-    setData(result.data || []);
+const response =
+  await fetch("/api/credit-data");
 
-    setCreditFileInfo(
-      result.fileInfo || ""
-    );
+const result =
+  await response.json();
 
-    await fetch(
-      "/api/collection-reset",
-      {
-        method: "POST",
-      }
-    );
+setData(result.data || []);
 
+setCreditFileInfo(
+  result.fileInfo || ""
+);
+
+await fetch(
+  "/api/collection-reset",
+  {
+    method: "POST",
+  }
+);
   } finally {
 
     setIsUploadingCredit(false);
