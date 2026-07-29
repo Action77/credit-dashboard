@@ -69,29 +69,29 @@ if (settings) {
   filtered = filtered.filter((n) => {
 
    if (
-  n.title.includes("Credit") &&
-  settings.credit_import === false
+  n.title.toLowerCase().includes("credit") &&
+  settings.credit_import_alert === false
 ) {
   return false;
 }
 
 if (
-  n.title.includes("Collection") &&
-  settings.collection_in === false
+  n.title.toLowerCase().includes("collection") &&
+  settings.collection_import_alert === false
 ) {
   return false;
 }
 
 if (
-  n.title.includes("Disappeared") &&
-  settings.invoice_disap === false
+  n.title.toLowerCase().includes("disappeared") &&
+  settings.invoice_disappeared_alert === false
 ) {
   return false;
 }
 
 if (
-  n.title.includes("Exception") &&
-  settings.exception_ale === false
+  n.title.toLowerCase().includes("exception") &&
+  settings.exception_alert === false
 ) {
   return false;
 }
