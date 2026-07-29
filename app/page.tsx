@@ -167,8 +167,21 @@ useEffect(() => {
     );
 
     if (savedUser) {
+
+      const { data: user } = await supabase
+        .from("app_users")
+        .select("full_name")
+        .eq("username", savedUser)
+        .single();
+
       setCurrentUser(savedUser);
+
+      setCurrentFullName(
+        user?.full_name || ""
+      );
+
       setIsLoggedIn(true);
+
     }
 
   };
@@ -176,7 +189,6 @@ useEffect(() => {
   loadUser();
 
 }, []);
-
 useEffect(() => {
 
   if (currentUser) {
@@ -1120,7 +1132,7 @@ return (
 
     <div
       className="flex items-center gap-3 bg-red-600 p-3 rounded-lg cursor-pointer"
-      onClick={async () => {
+onClick={async () => {
 
   await addLog(
     currentUser,
@@ -1129,10 +1141,12 @@ return (
     "User logged out"
   );
 
-  localStorage.removeItem(
+  await localStorage.removeItem(
     "currentUser"
   );
 
+  setCurrentUser("");
+  setCurrentFullName("");
   setIsLoggedIn(false);
 
 }}
