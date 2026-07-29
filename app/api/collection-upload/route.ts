@@ -98,6 +98,110 @@ await supabase
     title: "📦 Collection File Imported",
     message: `Collection ${uploadRecord.id} uploaded successfully by ${uploadedBy}.`,
   });
+
+const previousUploadId =
+  uploadRecord.id - 1;
+
+if (previousUploadId > 0) {
+
+  const { data: previousInvoices } =
+    await supabase
+      .from("collection_invoices")
+      .select("invoice")
+      .eq(
+        "upload_id",
+        previousUploadId
+      );
+
+  const currentSet = new Set(
+    invoices.map(i =>
+      String(i)
+        .trim()
+        .toUpperCase()
+    )
+  );
+
+  const disappearedInvoices =
+    (previousInvoices || [])
+      .map((x: any) =>
+        String(x.invoice)
+          .trim()
+          .toUpperCase()
+      )
+      .filter(
+        invoice =>
+          !currentSet.has(invoice)
+      );
+
+  if (
+    disappearedInvoices.length > 0
+  ) {
+
+    const { data: invoiceInfo } =
+      await supabase
+        .from("credit_data_full")
+        .select(
+          "invoice, van_code"
+        )
+        .in(
+          "invoice",
+          disappearedInvoices
+        );
+
+    const vanGroups: any = {};
+
+    (invoiceInfo || []).forEach(
+      (row: any) => {
+
+        const van =
+          row.van_code ||
+          "Unknown";
+
+        vanGroups[van] =
+          (vanGroups[van] || 0) + 1;
+
+      }
+    );
+
+    const { data: userFilters } =
+      await supabase
+        .from("user_filters")
+        .select("*");
+
+    for (const vanCode in vanGroups) {
+
+      const count =
+        vanGroups[vanCode];
+
+      const matchedUsers =
+        (userFilters || [])
+          .filter(
+            (user: any) =>
+              user.vans?.includes(
+                vanCode
+              )
+          );
+
+      for (const user of matchedUsers) {
+
+        await supabase
+          .from("notifications")
+          .insert({
+            username:
+              user.username,
+            title:
+              "🚨 Disappeared Invoices",
+            message:
+              `${count} invoices disappeared in ${vanCode}.`,
+          });
+
+      }
+
+    }
+
+  }
+
+}
     return NextResponse.json({
       success: true,
       invoices: invoices.length,

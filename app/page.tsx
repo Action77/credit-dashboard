@@ -351,7 +351,7 @@ useEffect(() => {
   formData.append("file", file);
 
   const currentUsername = currentUser;
-  
+
   formData.append(
     "uploadedBy",
     currentUsername
@@ -1434,20 +1434,33 @@ row["City"] === city
   onClick={async () => {
 
     const filterData = {
-  regions: selectedRegions,
-  cities: selectedCities,
-  vans: selectedVans,
-};
+      regions: selectedRegions,
+      cities: selectedCities,
+      vans: selectedVans,
+    };
 
-await localStorage.setItem(
-  `savedFilters_${currentUser}`,
-  JSON.stringify(filterData)
-);
+    await localStorage.setItem(
+      `savedFilters_${currentUser}`,
+      JSON.stringify(filterData)
+    );
 
-await localStorage.setItem(
-  "summaryFilters",
-  JSON.stringify(filterData)
-);
+    await localStorage.setItem(
+      "summaryFilters",
+      JSON.stringify(filterData)
+    );
+
+    if (currentUser) {
+
+      await supabase
+        .from("user_filters")
+        .upsert({
+          username: currentUser,
+          regions: selectedRegions,
+          cities: selectedCities,
+          vans: selectedVans,
+        });
+
+    }
 
     setShowFilters(false);
 
@@ -1455,7 +1468,6 @@ await localStorage.setItem(
 >
   Apply
 </button>
-
     </div>
 
   </div>
