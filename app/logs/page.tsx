@@ -1,18 +1,29 @@
 "use client";
-
+import { storage as localStorage } from "@/utils/storage";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
+import { addLog } from "@/lib/activityLog";
 import {
   Activity,
   Upload,
   Shield,
   Trash2,
   LogIn,
+  FileText,
+  AlertCircle,
+  BarChart3,
+  Settings,
+  Users,
   LogOut,
+  LayoutDashboard,
 } from "lucide-react";
 
 export default function LogsPage() {
-
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [showLoginModal, setShowLoginModal] = useState(false);
+const [currentUser, setCurrentUser] = useState("");
+const [currentFullName, setCurrentFullName] = useState("");
   const [logs, setLogs] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedAction, setSelectedAction] = useState("");
@@ -164,9 +175,133 @@ export default function LogsPage() {
     ),
   ];
 
-  return (
+return (
 
-    <div className="min-h-screen bg-[#f4f7fc] p-6">
+<>
+  <div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
+
+    {/* Sidebar */}
+    <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
+
+      <div className="p-4">
+        <h1 className="text-xl font-bold leading-tight">
+          Credit With Route Block
+        </h1>
+      </div>
+
+
+        <nav className="px-4 space-y-2">
+
+  <Link
+    href="/"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <LayoutDashboard size={18} />
+    <span>Dashboard</span>
+  </Link>
+
+  <Link
+    href="/import"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <Upload size={18} />
+    <span>Import File</span>
+  </Link>
+
+  <Link
+    href="/logs"
+className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"
+  >
+    <FileText size={18} />
+    <span>logs</span>
+  </Link>
+
+  <Link
+    href="/exceptions"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <AlertCircle size={18} />
+    <span>Exceptions</span>
+  </Link>
+
+  <Link
+    href="/summary"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <BarChart3 size={18} />
+    <span>Summary</span>
+  </Link>
+
+  <Link
+    href="/reports"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <BarChart3 size={18} />
+    <span>Reports</span>
+  </Link>
+
+  <Link
+    href="/settings"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <Settings size={18} />
+    <span>Settings</span>
+  </Link>
+
+  <Link
+    href="/users"
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+  >
+    <Users size={18} />
+    <span>Users</span>
+  </Link>
+
+</nav>
+<div className="p-6 border-t border-white/10">
+
+  {isLoggedIn ? (
+
+    <div
+      className="flex items-center gap-3 bg-red-600 p-3 rounded-lg cursor-pointer"
+      onClick={async () => {
+
+  await addLog(
+    currentUser,
+    currentFullName,
+    "LOGOUT",
+    "User logged out"
+  );
+
+  localStorage.removeItem(
+    "currentUser"
+  );
+
+  setIsLoggedIn(false);
+
+}}
+    >
+      <LogOut size={18} />
+      Logout
+    </div>
+
+  ) : (
+
+    <div
+      className="flex items-center gap-3 bg-blue-600 p-3 rounded-lg cursor-pointer"
+      onClick={() => setShowLoginModal(true)}
+    >
+      <Users size={18} />
+      Login
+    </div>
+
+  )}
+
+</div>
+
+    </aside>
+
+    {/* Content */}
+    <main className="flex-1 p-6">
 
       <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
 
@@ -377,9 +512,12 @@ export default function LogsPage() {
 
         </table>
 
-      </div>
+            </div>
 
-    </div>
+    </main>
+
+  </div>
+</>
 
   );
 
