@@ -7,9 +7,6 @@ import { addLog } from "@/lib/activityLog";
 import {
   Activity,
   Upload,
-  Shield,
-  Trash2,
-  LogIn,
   FileText,
   AlertCircle,
   BarChart3,
@@ -20,6 +17,10 @@ import {
 } from "lucide-react";
 
 export default function LogsPage() {
+
+
+const [username, setUsername] = useState("");
+const [password, setPassword] = useState("");
 const [isLoggedIn, setIsLoggedIn] = useState(false);
 const [showLoginModal, setShowLoginModal] = useState(false);
 const [currentUser, setCurrentUser] = useState("");
@@ -27,7 +28,37 @@ const [currentFullName, setCurrentFullName] = useState("");
   const [logs, setLogs] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedAction, setSelectedAction] = useState("");
+useEffect(() => {
 
+  const loadUser = async () => {
+
+    const savedUser =
+      await localStorage.getItem(
+        "currentUser"
+      );
+
+    if (savedUser) {
+
+  setCurrentUser(savedUser);
+
+  const { data: user } = await supabase
+    .from("app_users")
+    .select("full_name")
+    .eq("username", savedUser)
+    .single();
+
+  if (user) {
+    setCurrentFullName(user.full_name);
+  }
+
+  setIsLoggedIn(true);
+
+}
+  };
+
+  loadUser();
+
+}, []);
   useEffect(() => {
 
     const loadLogs = async () => {
@@ -265,20 +296,22 @@ className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"
       className="flex items-center gap-3 bg-red-600 p-3 rounded-lg cursor-pointer"
       onClick={async () => {
 
-  await addLog(
-    currentUser,
-    currentFullName,
-    "LOGOUT",
-    "User logged out"
-  );
+        await addLog(
+          currentUser,
+          currentFullName,
+          "LOGOUT",
+          "User logged out"
+        );
 
-  localStorage.removeItem(
-    "currentUser"
-  );
+        localStorage.removeItem(
+          "currentUser"
+        );
 
-  setIsLoggedIn(false);
+        setCurrentUser("");
+        setCurrentFullName("");
+        setIsLoggedIn(false);
 
-}}
+      }}
     >
       <LogOut size={18} />
       Logout
@@ -297,7 +330,6 @@ className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"
   )}
 
 </div>
-
     </aside>
 
     {/* Content */}
@@ -517,6 +549,101 @@ className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"
     </main>
 
   </div>
+  {showLoginModal && (
+
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center">
+
+    <div className="bg-white w-[420px] rounded-2xl shadow-2xl p-8">
+
+      <div className="text-center mb-6">
+
+        <h2 className="text-3xl font-bold text-slate-800">
+          Welcome Back
+        </h2>
+
+        <p className="text-slate-500 mt-2">
+          Sign in to access management features
+        </p>
+
+      </div>
+
+      <input
+        type="text"
+        placeholder="Username"
+        value={username}
+        onChange={(e) =>
+          setUsername(e.target.value)
+        }
+        className="w-full border p-3 rounded-xl mb-4"
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) =>
+          setPassword(e.target.value)
+        }
+        className="w-full border p-3 rounded-xl mb-4"
+      />
+
+      <button
+        className="w-full bg-blue-600 text-white py-3 rounded-xl"
+        onClick={async () => {
+
+          const { data: user } = await supabase
+            .from("app_users")
+            .select("*")
+            .eq("username", username)
+            .single();
+
+          if (!user) {
+            alert("Invalid Username");
+            return;
+          }
+
+          if (user.password !== password) {
+            alert("Invalid Password");
+            return;
+          }
+
+          setCurrentUser(user.username);
+          setCurrentFullName(user.full_name);
+
+          setIsLoggedIn(true);
+
+          await addLog(
+            user.username,
+            user.full_name,
+            "LOGIN",
+            "User logged in"
+          );
+
+          await localStorage.setItem(
+            "currentUser",
+            user.username
+          );
+
+          setShowLoginModal(false);
+
+        }}
+      >
+        Login
+      </button>
+
+      <button
+        className="w-full mt-3 border py-3 rounded-xl"
+        onClick={() => setShowLoginModal(false)}
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+)}
+
 </>
 
   );
