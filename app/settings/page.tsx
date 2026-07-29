@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
+    const [loginPassword, setLoginPassword] = useState("");
     const [exceptionExpiredAlert, setExceptionExpiredAlert] =
   useState(true);
     const [exceptionDeleteAlert, setExceptionDeleteAlert] = useState(true);
@@ -544,24 +545,53 @@ collection_disabled_at:
         }
         className="w-full border p-3 rounded-xl mb-4"
       />
-
+<input
+  type="password"
+  placeholder="Password"
+  value={loginPassword}
+  onChange={(e) => setLoginPassword(e.target.value)}
+  className="w-full border p-3 rounded-xl mb-4"
+/>
       <button
-        className="w-full bg-blue-600 text-white py-3 rounded-xl"
-        onClick={() => {
+  className="w-full bg-blue-600 text-white py-3 rounded-xl"
+  onClick={async () => {
 
-          localStorage.setItem(
-            "currentUser",
-            currentUser
-          );
+    if (!currentUser || !loginPassword) {
+      alert("Enter Username And Password");
+      return;
+    }
 
-          setIsLoggedIn(true);
+    const { data: user, error } = await supabase
+      .from("app_users")
+      .select("*")
+      .eq("username", currentUser)
+      .single();
 
-          setShowLoginModal(false);
+    if (error || !user) {
+      alert("User Not Found");
+      return;
+    }
 
-        }}
-      >
-        Login
-      </button>
+    if (user.password !== loginPassword) {
+      alert("Invalid Password");
+      return;
+    }
+
+    localStorage.setItem(
+      "currentUser",
+      currentUser
+    );
+
+    setIsLoggedIn(true);
+    setShowLoginModal(false);
+
+    setLoginPassword("");
+
+    alert("Login Successful");
+  }}
+>
+  Login
+</button>
 
       <button
         className="w-full mt-3 border py-3 rounded-xl"
