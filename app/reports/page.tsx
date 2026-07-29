@@ -168,8 +168,52 @@ useEffect(() => {
       const data =
         await response.json();
 
-      setMissingInvoices(data);
+      const saved =
+  await localStorage.getItem(
+    "summaryFilters"
+  );
 
+if (!saved) {
+
+  setMissingInvoices(data);
+
+} else {
+
+  const filters =
+    JSON.parse(saved);
+
+  const filtered =
+    data.filter((row: any) => {
+
+      const regionMatch =
+        filters.regions?.length === 0 ||
+        filters.regions?.includes(
+          row.region
+        );
+
+      const cityMatch =
+        filters.cities?.length === 0 ||
+        filters.cities?.includes(
+          row.city
+        );
+
+      const vanMatch =
+        filters.vans?.length === 0 ||
+        filters.vans?.includes(
+          row.van_code
+        );
+
+      return (
+        regionMatch &&
+        cityMatch &&
+        vanMatch
+      );
+
+    });
+
+  setMissingInvoices(filtered);
+
+}
     };
 
   loadMissingInvoices();

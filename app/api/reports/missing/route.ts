@@ -69,8 +69,15 @@ export async function GET() {
           await supabase
             .from("credit_data")
             .select(
-              "invoice, customer_code, customer_name"
-            )
+  `
+  invoice,
+  customer_code,
+  customer_name,
+  region,
+  city,
+  van_code
+  `
+)
             .eq(
               "invoice",
               invoice
@@ -78,16 +85,22 @@ export async function GET() {
             .maybeSingle();
 
         results.push({
-          invoice,
-          customer_code:
-            creditRow?.customer_code || "",
-          customer_name:
-            creditRow?.customer_name || "",
-          first_seen:
-            currentUpload.id,
-          missing_from:
-            nextUpload.id,
-        });
+  invoice,
+  customer_code:
+    creditRow?.customer_code || "",
+  customer_name:
+    creditRow?.customer_name || "",
+  region:
+    creditRow?.region || "",
+  city:
+    creditRow?.city || "",
+  van_code:
+    creditRow?.van_code || "",
+  first_seen:
+    currentUpload.id,
+  missing_from:
+    nextUpload.id,
+});
 
       }
 
