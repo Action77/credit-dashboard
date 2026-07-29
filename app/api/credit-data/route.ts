@@ -47,21 +47,36 @@ export async function GET() {
   "Region": row.region,
   "City": row.city,
 }));
+const { data: user } = data.length
+  ? await supabase
+      .from("app_users")
+      .select("full_name")
+      .eq(
+        "username",
+        data[0].uploaded_by
+      )
+      .single()
+  : { data: null };
+
 return NextResponse.json({
   data: formattedData,
+
   fileInfo:
     data.length > 0
       ? `${data[0].file_name} | ${data[0].file_date} | Uploaded By ${
-          data[0].uploaded_by || "Unknown"
-        } | ${uploadTime?.toLocaleString("en-US", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })}`
+          user?.full_name ||
+          data[0].uploaded_by ||
+          "Unknown"
+        } | ${uploadTime?.toLocaleString(
+          "en-US",
+          {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }
+        )}`
       : "",
 });
-
-}
