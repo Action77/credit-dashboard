@@ -118,7 +118,18 @@ await supabase
     if (error) {
       throw error;
     }
+const notificationResult = await supabase
+  .from("notifications")
+  .insert({
+    username: null,
+    title: "✅ Credit File Imported",
+    message: `Credit file uploaded successfully by ${uploadedBy}.`,
+  });
 
+console.log(
+  "NOTIFICATION RESULT",
+  notificationResult
+);
     return NextResponse.json({
       success: true,
       rows: records.length,
