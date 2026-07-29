@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 
 export default function UsersPage() {
+  const [isImportingUsers, setIsImportingUsers] =
+  useState(false);
   const [currentUser, setCurrentUser] =
   useState("");
   const [editingUserId, setEditingUserId] =
@@ -83,9 +85,15 @@ useEffect(() => {
 
   load();
 }, []);
-const handleImport = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+const handleImport = async (
+  event: React.ChangeEvent<HTMLInputElement>
+) => {
+
+  if (isImportingUsers) return;
+
+  setIsImportingUsers(true);
+
+  try {
 
     const file =
       event.target.files?.[0];
@@ -97,80 +105,74 @@ const handleImport = (
 
     reader.onload = async (e) => {
 
-  const workbook = XLSX.read(
-    e.target?.result,
-    {
-      type: "binary",
-    }
-  );
+      try {
 
-  const sheet =
-    workbook.Sheets[
-      workbook.SheetNames[0]
-    ];
+        const workbook = XLSX.read(
+          e.target?.result,
+          {
+            type: "binary",
+          }
+        );
 
-  const rows: any[] =
-    XLSX.utils.sheet_to_json(sheet);
+        const sheet =
+          workbook.Sheets[
+            workbook.SheetNames[0]
+          ];
 
-  console.log("ROWS", rows);
+        const rows: any[] =
+          XLSX.utils.sheet_to_json(sheet);
 
-  const usersData =
-    rows.map((row) => ({
-      region:
-        row["Region"] || "",
+        const usersData =
+          rows.map((row) => ({
+            region:
+              row["Region"] || "",
+            city:
+              row["City"] || "",
+            organization_code:
+              row["Organization Code"] || "",
+            user_code:
+              row["User Code"] || "",
+            organization_name:
+              row["Organization Name"] || "",
+            van_sub_inventory:
+              row["Van Sub Inventory"] || "",
+            contact:
+              row["Contact"] || "",
+          }));
 
-      city:
-        row["City"] || "",
+        await fetch(
+          "/api/users",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              users: usersData,
+              uploadedBy: currentUser,
+            }),
+          }
+        );
 
-      organization_code:
-        row["Organization Code"] || "",
+        await loadUsers();
 
-      user_code:
-        row["User Code"] || "",
+      } finally {
 
-      organization_name:
-        row["Organization Name"] || "",
+        setIsImportingUsers(false);
 
-      van_sub_inventory:
-        row["Van Sub Inventory"] || "",
+      }
 
-      contact:
-        row["Contact"] || "",
-    }));
-
-  console.log(
-    "USERS DATA",
-    usersData
-  );
-const response =
-  await fetch(
-    "/api/users",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type":
-          "application/json",
-      },
-      body: JSON.stringify({
-        users: usersData,
-        uploadedBy: currentUser,
-      }),
-    }
-  );
-const result =
-  await response.json();
-
-console.log(
-  "RESULT",
-  result
-);
-
-loadUsers();
-  setUsers(await (await fetch("/api/users")).json());
-};
+    };
 
     reader.readAsBinaryString(file);
-  };
+
+  } catch {
+
+    setIsImportingUsers(false);
+
+  }
+};
 
   const handleDelete =
   async (id: number) => {
@@ -423,9 +425,16 @@ return (
         </h1>
 
         {isLoggedIn && (
-  <label className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer">
-    Import Users
-
+  <label
+  className={`text-white px-4 py-2 rounded ${
+    isImportingUsers
+      ? "bg-slate-400 pointer-events-none"
+      : "bg-blue-600 cursor-pointer"
+  }`}
+>
+  {isImportingUsers
+    ? "Importing..."
+    : "Import Users"}
     <input
       type="file"
       accept=".xlsx,.xls"
