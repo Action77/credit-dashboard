@@ -283,22 +283,47 @@ useEffect(() => {
       return;
     }
 
-    const { error } = await supabase
-      .from("user_settings")
-      .update({
-        invoice_disappeared_alert:
-          invoiceAlert,
+    const now =
+  new Date().toISOString();
 
-        exception_alert:
-          exceptionAlert,
+const { error } = await supabase
+  .from("user_settings")
+  .update({
 
-        credit_import_alert:
-          creditImportAlert,
+    invoice_disappeared_alert:
+      invoiceAlert,
 
-        collection_import_alert:
-          collectionImportAlert,
-      })
-      .eq("username", currentUser);
+    exception_alert:
+      exceptionAlert,
+
+    credit_import_alert:
+      creditImportAlert,
+
+    collection_import_alert:
+      collectionImportAlert,
+
+    disappeared_disabled_at:
+      invoiceAlert
+        ? null
+        : now,
+
+    exception_disabled_at:
+      exceptionAlert
+        ? null
+        : now,
+
+    credit_disabled_at:
+      creditImportAlert
+        ? null
+        : now,
+
+    collection_disabled_at:
+      collectionImportAlert
+        ? null
+        : now,
+
+  })
+  .eq("username", currentUser);
 
     if (error) {
       alert("Failed To Save Settings");

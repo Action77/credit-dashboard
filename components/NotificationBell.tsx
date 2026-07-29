@@ -68,32 +68,68 @@ if (settings) {
 
   filtered = filtered.filter((n) => {
 
-   if (
-  n.title.toLowerCase().includes("credit") &&
-  settings.credit_import_alert === false
+  if (
+  n.title.toLowerCase().includes("credit")
 ) {
-  return false;
+
+  if (
+    settings.credit_disabled_at &&
+    new Date(n.created_at) <=
+      new Date(
+        settings.credit_disabled_at
+      )
+  ) {
+    return false;
+  }
+
 }
 
 if (
-  n.title.toLowerCase().includes("collection") &&
-  settings.collection_import_alert === false
+  n.title.toLowerCase().includes("collection")
 ) {
-  return false;
+
+  if (
+    settings.collection_disabled_at &&
+    new Date(n.created_at) <=
+      new Date(
+        settings.collection_disabled_at
+      )
+  ) {
+    return false;
+  }
+
 }
 
 if (
-  n.title.toLowerCase().includes("disappeared") &&
-  settings.invoice_disappeared_alert === false
+  n.title.toLowerCase().includes("disappeared")
 ) {
-  return false;
+
+  if (
+    settings.disappeared_disabled_at &&
+    new Date(n.created_at) <=
+      new Date(
+        settings.disappeared_disabled_at
+      )
+  ) {
+    return false;
+  }
+
 }
 
 if (
-  n.title.toLowerCase().includes("exception") &&
-  settings.exception_alert === false
+  n.title.toLowerCase().includes("exception")
 ) {
-  return false;
+
+  if (
+    settings.exception_disabled_at &&
+    new Date(n.created_at) <=
+      new Date(
+        settings.exception_disabled_at
+      )
+  ) {
+    return false;
+  }
+
 }
 
     return true;
