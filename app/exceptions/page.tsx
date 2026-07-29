@@ -84,6 +84,37 @@ const latestLegal =
 
 }, []);
 useEffect(() => {
+  const loadGuestFilter = async () => {
+    const currentUser = await localStorage.getItem("currentUser");
+
+    if (!currentUser) {
+      const savedFilter = await localStorage.getItem(
+        "guest_exceptions_filter"
+      );
+
+      if (savedFilter) {
+        setSearchTerm(savedFilter);
+      }
+    }
+  };
+
+  loadGuestFilter();
+}, []);
+useEffect(() => {
+  const saveGuestFilter = async () => {
+    const currentUser = await localStorage.getItem("currentUser");
+
+    if (!currentUser) {
+      await localStorage.setItem(
+        "guest_exceptions_filter",
+        searchTerm
+      );
+    }
+  };
+
+  saveGuestFilter();
+}, [searchTerm]);
+useEffect(() => {
 
   const loadUser = async () => {
 

@@ -190,10 +190,13 @@ useEffect(() => {
 
   const loadFilters = async () => {
 
-    const saved =
-      await localStorage.getItem(
-        `savedFilters_${currentUser}`
-      );
+    const filterKey =
+  currentUser
+    ? `savedFilters_${currentUser}`
+    : "savedFilters_guest";
+
+const saved =
+  await localStorage.getItem(filterKey);
 
     if (!saved) return;
 
@@ -1519,11 +1522,15 @@ row["City"] === city
       vans: selectedVans,
     };
 
-    await localStorage.setItem(
-      `savedFilters_${currentUser}`,
-      JSON.stringify(filterData)
-    );
+    const filterKey =
+  currentUser
+    ? `savedFilters_${currentUser}`
+    : "savedFilters_guest";
 
+await localStorage.setItem(
+  filterKey,
+  JSON.stringify(filterData)
+);
     await localStorage.setItem(
       "summaryFilters",
       JSON.stringify(filterData)
