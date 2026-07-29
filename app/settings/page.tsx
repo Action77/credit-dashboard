@@ -463,6 +463,58 @@ const { error } = await supabase
           </div>
         </div>
       </main>
+      {showLoginModal && (
+
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center">
+
+    <div className="bg-white w-[420px] rounded-2xl shadow-2xl p-8">
+
+      <h2 className="text-3xl font-bold text-slate-800 mb-6">
+        Welcome Back
+      </h2>
+
+      <input
+        type="text"
+        placeholder="Username"
+        value={currentUser}
+        onChange={(e) =>
+          setCurrentUser(e.target.value)
+        }
+        className="w-full border p-3 rounded-xl mb-4"
+      />
+
+      <button
+        className="w-full bg-blue-600 text-white py-3 rounded-xl"
+        onClick={() => {
+
+          localStorage.setItem(
+            "currentUser",
+            currentUser
+          );
+
+          setIsLoggedIn(true);
+
+          setShowLoginModal(false);
+
+        }}
+      >
+        Login
+      </button>
+
+      <button
+        className="w-full mt-3 border py-3 rounded-xl"
+        onClick={() =>
+          setShowLoginModal(false)
+        }
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+)}
     </div>
   );
 }
