@@ -308,7 +308,7 @@ return (
       </h1>
     </div>
 
-    <nav className="px-4 space-y-2">
+      <nav className="px-4 space-y-2">
 
   <Link
     href="/"
@@ -327,11 +327,11 @@ return (
   </Link>
 
   <Link
-    href="/invoices"
+    href="/logs"
     className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
   >
-    <FileText size={18} />
-    <span>Invoices</span>
+    <ClipboardList size={18} />
+    <span>Logs</span>
   </Link>
 
   <Link
@@ -354,7 +354,7 @@ return (
     href="/reports"
     className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
   >
-    <BarChart3 size={18} />
+    <PieChart size={18} />
     <span>Reports</span>
   </Link>
 
@@ -375,7 +375,6 @@ return (
   </Link>
 
 </nav>
-
 
       <div className="p-6 border-t border-white/10">
 
