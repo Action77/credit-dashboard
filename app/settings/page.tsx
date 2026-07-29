@@ -587,7 +587,7 @@ collection_disabled_at:
 
     setLoginPassword("");
 
-    alert("Login Successful");
+  
   }}
 >
   Login
