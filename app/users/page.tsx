@@ -69,16 +69,17 @@ const [password, setPassword] = useState("");
 };
 useEffect(() => {
   const load = async () => {
-  await loadUsers();
+    await loadUsers();
 
-const currentUser =
-  await localStorage.getItem("currentUser");
+    const currentUser =
+      await localStorage.getItem("currentUser");
 
-if (currentUser) {
-  setCurrentUser(currentUser);
-}
+    if (currentUser) {
+      setCurrentUser(currentUser);
+    }
 
-setIsLoggedIn(!!currentUser);
+    setIsLoggedIn(!!currentUser);
+  };
 
   load();
 }, []);
