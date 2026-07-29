@@ -66,12 +66,18 @@ const uploadedBy =
       );
 
     }
+const { data: user } = await supabase
+  .from("app_users")
+  .select("full_name")
+  .eq("username", uploadedBy)
+  .single();
+
 await supabase
   .from("notifications")
   .insert({
     username: null,
     title: "👥 Users Imported",
-    message: `${users.length} users imported successfully by ${uploadedBy}.`,
+    message: `${users.length} users imported successfully by ${user?.full_name || uploadedBy}.`,
   });
     return NextResponse.json({
       success: true

@@ -23,6 +23,24 @@ export async function GET() {
     });
   }
 
+  let fullName = "";
+
+  if (data.length > 0) {
+    const { data: user } = await supabase
+      .from("app_users")
+      .select("full_name")
+      .eq(
+        "username",
+        data[0].uploaded_by
+      )
+      .single();
+
+    fullName =
+      user?.full_name ||
+      data[0].uploaded_by ||
+      "Unknown";
+  }
+
   const uploadTime =
     data.length > 0
       ? new Date(
@@ -40,9 +58,7 @@ export async function GET() {
 
     fileInfo:
       data.length > 0
-        ? `Uploaded By ${
-            data[0].uploaded_by || "Unknown"
-          } | ${uploadTime?.toLocaleString(
+        ? `Uploaded By ${fullName} | ${uploadTime?.toLocaleString(
             "en-US",
             {
               year: "numeric",

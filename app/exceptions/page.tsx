@@ -698,13 +698,19 @@ message: `${currentUser} added invoice ${invoice}.`,    }))
 
 if (settings?.exception_delete_alert) {
 
-  await supabase
-    .from("notifications")
-    .insert({
-      username: null,
-      title: "🗑️ Exception Deleted",
-      message: `${currentUser} removed invoice ${item.invoice}.`,
-    });
+const { data: user } = await supabase
+  .from("app_users")
+  .select("full_name")
+  .eq("username", currentUser)
+  .single();
+
+await supabase
+  .from("notifications")
+  .insert({
+    username: null,
+    title: "🗑️ Exception Deleted",
+    message: `${user?.full_name || currentUser} removed invoice ${item.invoice}.`,
+  });
 
 }
     } finally {
