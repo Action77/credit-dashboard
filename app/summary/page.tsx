@@ -89,11 +89,16 @@ setExceptions(validExceptions);
         "lastUpdatedVans"
       );
 
-    const savedFilters =
-      await localStorage.getItem(
-        `savedFilters_${currentUser}`
-      );
+    const filterKey =
+  currentUser
+    ? `savedFilters_${currentUser}`
+    : "savedFilters_guest";
 
+const savedFilters =
+  await localStorage.getItem(
+    filterKey
+  );
+  
     if (savedFilters) {
       setFilters(JSON.parse(savedFilters));
     }
