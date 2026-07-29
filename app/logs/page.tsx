@@ -42,7 +42,7 @@ export default function LogsPage() {
 
       const userMatch =
         !selectedUser ||
-        log.username === selectedUser;
+        log.full_name === selectedUser;
 
       const actionMatch =
         !selectedAction ||
@@ -154,7 +154,7 @@ export default function LogsPage() {
 
   const users = [
     ...new Set(
-      logs.map(log => log.username)
+      logs.map(log => log.full_name)
     ),
   ];
 
