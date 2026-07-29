@@ -23,7 +23,10 @@ import {
   LogOut,
   Search,
   Filter,
+     ClipboardList,
+  PieChart,
 } from "lucide-react";
+
 
 
 export default function Home() {
@@ -381,13 +384,6 @@ await addLog(
   file.name
 );
 
-await localStorage.removeItem(
-  "vanPermissions"
-);
-
-await localStorage.removeItem(
-  "lastUpdatedVans"
-);
 
 /* Reset جميع الـ Checkboxes */
 await localStorage.removeItem(
@@ -1043,21 +1039,21 @@ return (
 
   <div className="min-h-screen bg-[#f4f7fc] flex text-slate-900">
 
+  <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
+
+    <div className="p-4">
+      <h1 className="text-xl font-bold leading-tight">
+        Credit With Route Block
+      </h1>
+    </div>
+
+  
       {/* Sidebar */}
-     <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
-
-        <div className="p-4">
-          <h1 className="text-xl font-bold leading-tight">
-            Credit With Route Block
-          </h1>
-        </div>
-
-        <nav className="px-4 space-y-2">
+       <nav className="px-4 space-y-2">
 
   <Link
     href="/"
-    className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"
-  >
+    className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600"  >
     <LayoutDashboard size={18} />
     <span>Dashboard</span>
   </Link>
@@ -1074,14 +1070,13 @@ return (
     href="/logs"
     className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
   >
-    <FileText size={18} />
-    <span>logs</span>
+    <ClipboardList size={18} />
+    <span>Logs</span>
   </Link>
 
   <Link
     href="/exceptions"
-    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
-  >
+    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"  >
     <AlertCircle size={18} />
     <span>Exceptions</span>
   </Link>
@@ -1098,7 +1093,7 @@ return (
     href="/reports"
     className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
   >
-    <BarChart3 size={18} />
+    <PieChart size={18} />
     <span>Reports</span>
   </Link>
 

@@ -11,7 +11,10 @@ import {
   Settings,
   Users,
   LogOut,
+      ClipboardList,
+  PieChart,
 } from "lucide-react";
+
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 

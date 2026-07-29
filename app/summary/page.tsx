@@ -15,7 +15,10 @@ import {
   CircleAlert,
   CheckCircle,
   Receipt,
+      ClipboardList,
+  PieChart,
 } from "lucide-react";
+
 import { useEffect, useState } from "react";
 
 export default function SummaryPage() {
@@ -361,7 +364,7 @@ const regionSummary = Object.entries(
           </h1>
         </div>
 
-        <nav className="px-4 space-y-2">
+          <nav className="px-4 space-y-2">
 
   <Link
     href="/"
@@ -380,11 +383,11 @@ const regionSummary = Object.entries(
   </Link>
 
   <Link
-    href="/invoices"
+    href="/logs"
     className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
   >
-    <FileText size={18} />
-    <span>Invoices</span>
+    <ClipboardList size={18} />
+    <span>Logs</span>
   </Link>
 
   <Link
@@ -407,7 +410,7 @@ const regionSummary = Object.entries(
     href="/reports"
     className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
   >
-    <BarChart3 size={18} />
+    <PieChart size={18} />
     <span>Reports</span>
   </Link>
 
