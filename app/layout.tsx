@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import NotificationBell from "@/components/NotificationBell";
+import { Toaster } from "sonner";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -30,13 +31,19 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
 
-  <div className="fixed top-4 right-4 z-[9999]">
-    <NotificationBell />
-  </div>
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+        />
 
-  {children}
+        <div className="fixed top-4 right-4 z-[9999]">
+          <NotificationBell />
+        </div>
 
-</body>
+        {children}
+
+      </body>
     </html>
   );
 }
