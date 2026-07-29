@@ -436,10 +436,9 @@ P1316600015512`}
   .from("notifications")
   .insert(
     invoices.map(invoice => ({
-      username: currentUser,
-      title: "⚠️ New Exception Added",
-      message: `Invoice ${invoice} added to exceptions.`,
-    }))
+      username: null,
+title: "⚠️ Exception Added",
+message: `${currentUser} added invoice ${invoice}.`,    }))
   );
       const response =
         await fetch(
@@ -691,7 +690,13 @@ P1316600015512`}
             exception.id !== item.id
         )
       );
-
+await supabase
+  .from("notifications")
+  .insert({
+    username: null,
+ title: "🗑️ Exception Deleted",
+message: `${currentUser} removed invoice ${item.invoice}.`,
+  });
     } finally {
 
       setDeletingId(null);
