@@ -44,8 +44,7 @@ export default function RootLayout({
 
       <UserWelcome />
 
-      {children}
-
-    </body>
-  </html>
+</body>
+</html>
 );
+}
