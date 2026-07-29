@@ -61,40 +61,40 @@ const { data: settings } = await supabase
   .select("*")
   .eq("username", username)
   .single();
-console.log("SETTINGS", settings);
+
 let filtered = data || [];
 
 if (settings) {
 
   filtered = filtered.filter((n) => {
 
-    if (
-      n.title.includes("Credit File Imported") &&
-      !settings.credit_import_alert
-    ) {
-      return false;
-    }
+   if (
+  n.title.includes("Credit") &&
+  settings.credit_import === false
+) {
+  return false;
+}
 
-    if (
-      n.title.includes("Collection File Imported") &&
-      !settings.collection_import_alert
-    ) {
-      return false;
-    }
+if (
+  n.title.includes("Collection") &&
+  settings.collection_in === false
+) {
+  return false;
+}
 
-    if (
-      n.title.includes("Disappeared") &&
-      !settings.invoice_disappeared_alert
-    ) {
-      return false;
-    }
+if (
+  n.title.includes("Disappeared") &&
+  settings.invoice_disap === false
+) {
+  return false;
+}
 
-    if (
-      n.title.includes("Exception") &&
-      !settings.exception_alert
-    ) {
-      return false;
-    }
+if (
+  n.title.includes("Exception") &&
+  settings.exception_ale === false
+) {
+  return false;
+}
 
     return true;
 
