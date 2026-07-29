@@ -1,4 +1,5 @@
 "use client";
+import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 import WhatsAppReport from "@/components/WhatsAppReport";
@@ -292,17 +293,16 @@ const b6 = String(
 
 if (b6 !== "Region") {
 
-  alert(
-    "❌ الملف خاطئ، الرجاء اختيار ملف Credit الصحيح"
-  );
+  toast.error("Invalid Credit File", {
+    description:
+      "The selected file is not a valid Credit report. Please upload the correct file.",
+  });
 
   event.target.value = "";
-
   setIsUploadingCredit(false);
 
   return;
 }
-
 /* في حال نجاح التحقق يكمل الرفع */
 
 const formData = new FormData();
@@ -399,17 +399,16 @@ const a1 = String(
 
 if (a1 !== "Collection Submit Time") {
 
-  alert(
-    "❌ الملف خاطئ، الرجاء اختيار ملف Collection الصحيح"
-  );
+  toast.error("Invalid Collection File", {
+    description:
+      "The selected file is not a valid Collection report. Please upload the correct file.",
+  });
 
   event.target.value = "";
-
   setIsUploadingCollection(false);
 
   return;
 }
-
 /* إذا التحقق نجح يكمل الرفع */
 
 const formData = new FormData();
