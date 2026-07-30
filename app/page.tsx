@@ -935,6 +935,10 @@ return matchesWhatsappVan;
 const blockedCount =
   filteredData.filter((row) => {
 
+    if (!isBlockedInvoice(row)) {
+      return false;
+    }
+
     const invoice =
       String(
         row["Invoice #"]
@@ -966,7 +970,7 @@ const blockedCount =
     );
 
   }).length;
-  const employeeCount =
+    const employeeCount =
   new Set(
     filteredData.map(
       (row) => row["Employee Name."]
@@ -2050,13 +2054,23 @@ await localStorage.setItem(
 <td className="p-3">
   {row["Total Rejected Count"]}
 </td>
-                      <td className="p-3">
+<td className="p-3">
 
-                        <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
-                          Block
-                        </span>
+  {isBlockedInvoice(row) ? (
 
-                      </td>
+    <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
+      Block
+    </span>
+
+  ) : (
+
+    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+      Open
+    </span>
+
+  )}
+
+</td>
                     </tr>
                   ))}
 
