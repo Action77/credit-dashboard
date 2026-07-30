@@ -30,6 +30,8 @@ import {
 
 
 export default function Home() {
+  const [isSendingWhatsApp, setIsSendingWhatsApp] =
+  useState(false);
   const [deletingExceptionId, setDeletingExceptionId] =
   useState<number | null>(null);
   const [currentUser, setCurrentUser] = useState("");
@@ -916,80 +918,99 @@ const toggleCity = (
 const generateReportImage =
   async () => {
 
-    const report =
-      document.getElementById(
-        "whatsapp-report"
+    if (isSendingWhatsApp) return;
+
+    setIsSendingWhatsApp(true);
+
+    try {
+
+      const report =
+        document.getElementById(
+          "whatsapp-report"
+        );
+
+      if (!report) {
+        alert("Report Not Found");
+        return;
+      }
+
+      const canvas =
+        await html2canvas(
+          report,
+          {
+            scale: 2,
+            backgroundColor:
+              "#ffffff",
+          }
+        );
+
+      const blob =
+        await new Promise<
+          Blob | null
+        >(
+          (resolve) =>
+            canvas.toBlob(
+              (blob) =>
+                resolve(blob),
+              "image/png"
+            )
+        );
+
+      if (!blob) {
+        alert(
+          "Failed to create image"
+        );
+        return;
+      }
+
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "image/png": blob,
+        }),
+      ]);
+
+      const response =
+        await fetch("/api/users");
+
+      const users =
+        await response.json();
+
+      const selectedUser =
+        users.find(
+          (user: any) =>
+            user.van_sub_inventory ===
+            whatsAppVan
+        );
+
+      if (!selectedUser) {
+        alert(
+          `Van ${whatsAppVan} not found in Users`
+        );
+        return;
+      }
+
+      const phoneNumber =
+        String(
+          selectedUser.contact
+        ).replace(/\s/g, "");
+
+      const whatsappNumber =
+        phoneNumber.startsWith(
+          "05"
+        )
+          ? `966${phoneNumber.slice(1)}`
+          : phoneNumber;
+
+      window.open(
+        `https://wa.me/${whatsappNumber}`,
+        "_blank"
       );
 
-    if (!report) {
-      alert("Report Not Found");
-      return;
+    } finally {
+
+      setIsSendingWhatsApp(false);
+
     }
-
-    const canvas =
-  await html2canvas(
-    report,
-    {
-      scale: 2,
-      backgroundColor: "#ffffff",
-    }
-  );
-    const blob =
-  await new Promise<Blob | null>(
-    (resolve) =>
-      canvas.toBlob(
-        (blob) =>
-          resolve(blob),
-        "image/png"
-      )
-  );
-
-if (!blob) {
-  alert(
-    "Failed to create image"
-  );
-  return;
-}
-
-await navigator.clipboard.write([
-  new ClipboardItem({
-    "image/png": blob,
-  }),
-]);
-const response =
-  await fetch("/api/users");
-
-const users =
-  await response.json();
-
-const selectedUser =
-  users.find(
-    (user: any) =>
-      user.van_sub_inventory ===
-      whatsAppVan
-  );
-
-if (!selectedUser) {
-  alert(
-    `Van ${whatsAppVan} not found in Users`
-  );
-  return;
-}
-
-const phoneNumber =
-  String(selectedUser.contact)
-    .replace(/\s/g, "");
-
-const whatsappNumber =
-  phoneNumber.startsWith("05")
-    ? `966${phoneNumber.slice(1)}`
-    : phoneNumber;
-    window.open(
-  `https://wa.me/${whatsappNumber}`,
-  "_blank"
-);
-
-
 
   };
 const whatsappData =
@@ -1725,10 +1746,21 @@ await localStorage.setItem(
     </select>
 
 <button
+  disabled={
+    isSendingWhatsApp ||
+    !whatsAppVan
+  }
   onClick={generateReportImage}
-  className="bg-green-600 text-white px-4 py-2 rounded-lg"
+  className={`text-white px-4 py-2 rounded-lg ${
+    isSendingWhatsApp ||
+    !whatsAppVan
+      ? "bg-slate-400 cursor-not-allowed"
+      : "bg-green-600 hover:bg-green-700"
+  }`}
 >
-  WhatsApp
+  {isSendingWhatsApp
+    ? "Processing..."
+    : "WhatsApp"}
 </button>
 
   </div>
