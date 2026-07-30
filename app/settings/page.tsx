@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
+  const [creditRules, setCreditRules] = useState<any[]>([]);
+const [loadingRules, setLoadingRules] = useState(false);
   const [isImportingUsers, setIsImportingUsers] =
   useState(false);
 
@@ -388,6 +390,89 @@ const [confirmPassword, setConfirmPassword] = useState("");
 const [showLoginModal, setShowLoginModal] = useState(false);
 const [currentUser, setCurrentUser] = useState("");
   const [activeTab, setActiveTab] = useState("notifications");
+  const getDefaultBlockDay = (term: string) => {
+
+  const upper = term.toUpperCase();
+
+  if (upper.includes("IMMEDIATE")) {
+    return 1;
+  }
+
+  const match = upper.match(/ATS\s+(\d+)/);
+
+  if (!match) {
+    return 1;
+  }
+
+  return Number(match[1]) + 4;
+};
+const loadCreditRules = async () => {
+
+  setLoadingRules(true);
+
+  try {
+
+    const { data: termsData } =
+      await supabase
+        .from("credit_data_full")
+        .select("payment_term");
+
+    const paymentTerms = [
+      ...new Set(
+        (termsData || [])
+          .map(
+            (x: any) => x.payment_term
+          )
+          .filter(Boolean)
+      ),
+    ];
+
+    const { data: existingRules } =
+      await supabase
+        .from("credit_block_rules")
+        .select("*");
+
+    const existingTerms =
+      existingRules?.map(
+        (x: any) => x.payment_term
+      ) || [];
+
+    const newRules =
+      paymentTerms
+        .filter(
+          term =>
+            !existingTerms.includes(term)
+        )
+        .map(term => ({
+          payment_term: term,
+          block_at_day:
+            getDefaultBlockDay(term),
+        }));
+
+    if (newRules.length > 0) {
+
+      await supabase
+        .from("credit_block_rules")
+        .insert(newRules);
+
+    }
+
+    const { data: finalRules } =
+      await supabase
+        .from("credit_block_rules")
+        .select("*")
+        .order("payment_term");
+
+    setCreditRules(
+      finalRules || []
+    );
+
+  } finally {
+
+    setLoadingRules(false);
+
+  }
+};
   useEffect(() => {
   const loadProfile = async () => {
     const currentUser =
@@ -463,6 +548,11 @@ setExceptionExpiredAlert(
 
   loadSettings();
 }, []);
+useEffect(() => {
+  if (activeTab !== "creditRules") return;
+
+  loadCreditRules();
+}, [activeTab]);
   return (
     <div className="flex min-h-screen bg-slate-100">
       {/* Sidebar */}
@@ -600,6 +690,17 @@ setExceptionExpiredAlert(
             >
               🔒 Security
             </button>
+            <button
+  onClick={() => setActiveTab("creditRules")}
+  className={`w-full text-left px-4 py-3 rounded-lg ${
+    activeTab === "creditRules"
+      ? "bg-blue-100 text-blue-600"
+      : "hover:bg-gray-100"
+  }`}
+>
+  🚫 Credit Block Rules
+</button>
+
           </div>
 
           {/* Right Content */}
@@ -780,6 +881,7 @@ collection_disabled_at:
 </button>
               </>
             )}
+            
 
             {activeTab === "security" && (
               <>
@@ -996,7 +1098,126 @@ collection_disabled_at:
 </button>
               </>
             )}
-          </div>
+
+{activeTab === "creditRules" && (
+  <>
+    <h2 className="text-2xl font-semibold mb-2">
+      Credit Block Rules
+    </h2>
+
+    <p className="text-gray-500 mb-6">
+      Configure invoice block thresholds.
+    </p>
+
+    {loadingRules ? (
+      <div>Loading...</div>
+    ) : (
+      <>
+        <div className="space-y-3">
+
+          {creditRules.map((rule, index) => (
+
+            <div
+              key={rule.id}
+              className="flex items-center justify-between border rounded-lg p-3"
+            >
+
+              <div className="font-medium">
+                {rule.payment_term}
+              </div>
+
+              <input
+                type="number"
+                value={rule.block_at_day}
+                onChange={(e) => {
+
+                  const updated =
+                    [...creditRules];
+
+                  updated[index] = {
+                    ...updated[index],
+                    block_at_day:
+                      Number(e.target.value),
+                  };
+
+                  setCreditRules(updated);
+
+                }}
+                className="border rounded-lg px-3 py-2 w-28 text-center"
+              />
+
+            </div>
+
+          ))}
+
+        </div>
+
+        <div className="mt-6 flex gap-3">
+
+          <button
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+            onClick={async () => {
+
+              for (const rule of creditRules) {
+
+                await supabase
+                  .from("credit_block_rules")
+                  .update({
+                    block_at_day:
+                      rule.block_at_day,
+                  })
+                  .eq("id", rule.id);
+
+              }
+
+              alert(
+                "Rules Saved Successfully"
+              );
+
+            }}
+          >
+            Save Changes
+          </button>
+
+          <button
+            className="bg-red-600 text-white px-5 py-2 rounded-lg"
+            onClick={async () => {
+
+              for (const rule of creditRules) {
+
+                await supabase
+                  .from("credit_block_rules")
+                  .update({
+                    block_at_day:
+                      getDefaultBlockDay(
+                        rule.payment_term
+                      ),
+                  })
+                  .eq("id", rule.id);
+
+              }
+
+              await loadCreditRules();
+
+              alert(
+                "Rules Reset Successfully"
+              );
+
+            }}
+          >
+            Reset To Default
+          </button>
+
+        </div>
+
+      </>
+    )}
+  </>
+)}
+
+</div>
+            
+         
         </div>
       </main>
       {showLoginModal && (
