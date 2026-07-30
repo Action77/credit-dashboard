@@ -1,4 +1,5 @@
 
+import { useSearchParams } from "next/navigation";
 "use client";
 import { addLog } from "@/lib/activityLog";
 import { supabase } from "@/lib/supabase";
@@ -20,6 +21,8 @@ import {
 
 
 export default function ExceptionsPage() {
+  const [searchTerm, setSearchTerm] =
+  useState("");
     const [deletingId, setDeletingId] =
   useState<number | null>(null);
   const [isAddingExceptions, setIsAddingExceptions] =
@@ -44,7 +47,19 @@ const [currentUser, setCurrentUser] =
 const [tillDate, setTillDate] = useState("");
 const [isPermanent, setIsPermanent] =
   useState(false);
-const [searchTerm, setSearchTerm] = useState("");
+const searchParams = useSearchParams();
+
+useEffect(() => {
+
+  const invoice =
+    searchParams.get("invoice");
+
+  if (invoice) {
+    setSearchTerm(invoice);
+  }
+
+}, [searchParams]);
+
 
 const addedCount =
   exceptions.filter(

@@ -2080,23 +2080,29 @@ await addLog(
                 );
 
           return (
-            <tr key={index}>
 
-              <td className="p-2">
-                {item.invoice}
-              </td>
 
-              <td className="p-2">
-                {item.till_date
-                  ? new Date(
-                      item.till_date
-                    ).toLocaleDateString()
-                  : "-"}
-              </td>
+<tr key={index}>
 
-              <td className="p-2">
-                {daysLeft}
-              </td>
+<td className="p-2">
+  <Link
+    href={`/exceptions?invoice=${encodeURIComponent(item.invoice)}`}
+    className="text-blue-600 hover:underline font-medium"
+  >
+    {item.invoice}
+  </Link>
+</td>
+<td className="p-2">
+  {item.till_date
+    ? new Date(
+        item.till_date
+      ).toLocaleDateString()
+    : "-"}
+</td>
+
+<td className="p-2">
+  {daysLeft}
+</td>
 
               <td className="p-2">
 
