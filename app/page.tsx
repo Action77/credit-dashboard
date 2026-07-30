@@ -964,16 +964,13 @@ const filteredData = filterBaseData
       (r) => r.payment_term === paymentTerm
     );
 
-    let showInvoice = true;
+    const creditDays =
+  Number(row["Credit_Days"]) || 0;
 
-    if (rule) {
-      const creditDays =
-        Number(row["Credit_Days"]) || 0;
-
-      showInvoice =
-        creditDays >= rule.block_at_day;
-    }
-
+const showInvoice =
+  rule
+    ? creditDays >= rule.block_at_day
+    : false;
     return (
       !isException &&
       !isCollected &&
