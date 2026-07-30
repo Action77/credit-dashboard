@@ -1,13 +1,12 @@
 "use client";
+
 import { addLog } from "@/lib/activityLog";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 import WhatsAppReport from "@/components/WhatsAppReport";
 import html2canvas from "html2canvas";
-import {
-  openWhatsApp
-} from "@/utils/whatsapp";
+import { openWhatsApp } from "@/utils/whatsapp";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
@@ -23,61 +22,46 @@ import {
   LogOut,
   Search,
   Filter,
-     ClipboardList,
+  ClipboardList,
   PieChart,
 } from "lucide-react";
 
-
-
 export default function Home() {
-  const [isImportingUsers, setIsImportingUsers] =
-  useState(false);
+  const [isImportingUsers, setIsImportingUsers] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
-const [showImportModal, setShowImportModal] =
-  useState(false);
+  const isBusy = isImportingUsers;
 
-const isBusy =
-
-  isImportingUsers;
   const handleImport = async (
-  event: React.ChangeEvent<HTMLInputElement>
-) => {
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (isImportingUsers) return;
 
-  if (isImportingUsers) return;
+    setIsImportingUsers(true);
 
-  setIsImportingUsers(true);
+    try {
+      const file = event.target.files?.[0];
 
-  try {
+      if (!file) {
+        setIsImportingUsers(false);
+        return;
+      }
 
-    const file =
-      event.target.files?.[0];
+      const reader = new FileReader();
 
-    if (!file) return;
-
-    const reader =
-      new FileReader();
-
-    reader.onload = async (e) => {
-
-      try {
-
-        const workbook = XLSX.read(
-          e.target?.result,
-          {
+      reader.onload = async (e) => {
+        try {
+          const workbook = XLSX.read(e.target?.result, {
             type: "binary",
-          }
-        );
+          });
 
-        const sheet =
-          workbook.Sheets[
-            workbook.SheetNames[0]
-          ];
+          const sheet =
+            workbook.Sheets[workbook.SheetNames[0]];
 
-        const rows: any[] =
-          XLSX.utils.sheet_to_json(sheet);
+          const rows: any[] =
+            XLSX.utils.sheet_to_json(sheet);
 
-        const usersData =
-          rows.map((row) => ({
+          const usersData = rows.map((row) => ({
             region: row["Region"] || "",
             city: row["City"] || "",
             organization_code:
@@ -92,70 +76,56 @@ const isBusy =
               row["Contact"] || "",
           }));
 
-        await fetch("/api/users", {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            users: usersData,
-          }),
-        });
+          await fetch("/api/users", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              users: usersData,
+            }),
+          });
 
-        const currentUser =
-          await localStorage.getItem(
-            "currentUser"
-          );
+          const currentUser =
+            await localStorage.getItem("currentUser");
 
-        let fullName = "";
+          let fullName = "";
 
-        if (currentUser) {
-
-          const { data: user } =
-            await supabase
+          if (currentUser) {
+            const { data: user } = await supabase
               .from("app_users")
               .select("full_name")
-              .eq(
-                "username",
-                currentUser
-              )
+              .eq("username", currentUser)
               .single();
 
-          fullName =
-            user?.full_name || "";
+            fullName = user?.full_name || "";
+          }
+
+          await addLog(
+            currentUser || "",
+            fullName,
+            "IMPORT_USERS",
+            `${usersData.length} users`
+          );
+        } catch (error) {
+          console.error(error);
+          toast.error("Failed to import users");
+        } finally {
+          setIsImportingUsers(false);
+          setShowImportModal(false);
+          window.location.reload();
         }
+      };
 
-        await addLog(
-          currentUser || "",
-          fullName,
-          "IMPORT_USERS",
-          `${usersData.length} users`
-        );
+      reader.readAsBinaryString(file);
+    } catch (error) {
+      console.error(error);
+      setIsImportingUsers(false);
+      toast.error("Failed to import users");
+    }
+  };
 
-        setShowImportModal(false);
-
-        window.location.reload();
-
-      } finally {
-
-        setIsImportingUsers(false);
-
-      }
-
-    };
-
-    reader.readAsBinaryString(file);
-
-  } catch {
-
-    setIsImportingUsers(false);
-
-  }
-
-};
-
-  const [isSendingWhatsApp, setIsSendingWhatsApp] =
+   const [isSendingWhatsApp, setIsSendingWhatsApp] =
   useState(false);
   const [deletingExceptionId, setDeletingExceptionId] =
   useState<number | null>(null);
