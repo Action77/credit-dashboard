@@ -234,16 +234,16 @@ const [isAddingException,
     if (!currentUser) return;
 
     const { data } = await supabase
-      .from("credit_block_rules")
-      .select("*")
-      .eq("username", current*ser);
+  .from("credit_block_rules")
+  .select("*")
+  .eq("username", currentUser);
 
-    setCreditRules(data || *]);
+setCreditRules(data || []);
 
-    console.log(
-      "Rules*Count:",
-      data?.length || 0
- *  );
+console.log(
+  "Rules Count:",
+  data?.length || 0
+);
 
   };
 
