@@ -1,4 +1,6 @@
 "use client";
+import * as XLSX from "xlsx";
+import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 import Link from "next/link";
@@ -22,6 +24,20 @@ import {
 import { useEffect, useState } from "react";
 
 export default function SummaryPage() {
+  
+const [isImportingUsers,
+  setIsImportingUsers] =
+  useState(false);
+
+  const [showImportModal, setShowImportModal] =
+  useState(false);
+  const [isUploadingCredit,
+  setIsUploadingCredit] =
+  useState(false);
+
+const [isUploadingCollection,
+  setIsUploadingCollection] =
+  useState(false);
   const [data, setData] = useState<any[]>([]);
   const [exceptions, setExceptions] = useState<any[]>([]);
   const [collectedInvoices, setCollectedInvoices] = useState<string[]>([]);
@@ -31,6 +47,148 @@ export default function SummaryPage() {
   cities: [],
   vans: [],
 });
+const handleCreditImport = async (
+  event: React.ChangeEvent<HTMLInputElement>
+) => {
+
+  if (isUploadingCredit) return;
+
+  setIsUploadingCredit(true);
+
+  try {
+
+    const file =
+      event.target.files?.[0];
+
+    if (!file) return;
+
+    const buffer =
+      await file.arrayBuffer();
+
+    const workbook =
+      XLSX.read(buffer, {
+        type: "array",
+      });
+
+    const worksheet =
+      workbook.Sheets[
+        workbook.SheetNames[0]
+      ];
+
+    const b6 = String(
+      worksheet["B6"]?.v || ""
+    ).trim();
+
+    if (b6 !== "Region") {
+
+      toast.error(
+        "Invalid Credit File"
+      );
+
+      return;
+    }
+
+    const formData =
+      new FormData();
+
+    formData.append(
+      "file",
+      file
+    );
+
+    await fetch(
+      "/api/credit-upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    setShowImportModal(false);
+
+    window.location.reload();
+
+  } finally {
+
+    setIsUploadingCredit(false);
+
+  }
+
+};
+const handleCollectionImport = async (
+  event: React.ChangeEvent<HTMLInputElement>
+) => {
+
+  if (isUploadingCollection)
+    return;
+
+  setIsUploadingCollection(true);
+
+  try {
+
+    const file =
+      event.target.files?.[0];
+
+    if (!file) return;
+
+    const buffer =
+      await file.arrayBuffer();
+
+    const workbook =
+      XLSX.read(buffer, {
+        type: "array",
+      });
+
+    const worksheet =
+      workbook.Sheets[
+        workbook.SheetNames[0]
+      ];
+
+    const a1 = String(
+      worksheet["A1"]?.v || ""
+    ).trim();
+
+    if (
+      a1 !==
+      "Collection Submit Time"
+    ) {
+
+      toast.error(
+        "Invalid Collection File"
+      );
+
+      return;
+    }
+
+    const formData =
+      new FormData();
+
+    formData.append(
+      "file",
+      file
+    );
+
+    await fetch(
+      "/api/collection-upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    setShowImportModal(false);
+
+    window.location.reload();
+
+  } finally {
+
+    setIsUploadingCollection(
+      false
+    );
+
+  }
+
+};
   const [lastUpdatedVans,
   setLastUpdatedVans] =
   useState<string[]>([]);
@@ -374,13 +532,15 @@ const regionSummary = Object.entries(
     <span>Dashboard</span>
   </Link>
 
-  <Link
-    href="/import"
-    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
-  >
-    <Upload size={18} />
-    <span>Import File</span>
-  </Link>
+  <div
+  onClick={() =>
+    setShowImportModal(true)
+  }
+  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+>
+  <Upload size={18} />
+  <span>Import File</span>
+</div>
 
   <Link
     href="/logs"
@@ -935,6 +1095,66 @@ const regionSummary = Object.entries(
 
   </div>
 )}
+
+{showImportModal && (
+  <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center">
+
+    <div className="bg-white w-[500px] rounded-2xl p-6">
+
+      <div className="flex justify-between mb-5">
+
+        <h2 className="text-2xl font-bold">
+          Import Files
+        </h2>
+
+        <button
+          onClick={() =>
+            setShowImportModal(false)
+          }
+        >
+          ✕
+        </button>
+
+      </div>
+
+      <div className="space-y-4">
+
+        <label className="block bg-blue-600 text-white text-center p-4 rounded-xl cursor-pointer">
+  Import Credit
+  <input
+    type="file"
+    accept=".xlsx,.xls"
+    className="hidden"
+    onChange={handleCreditImport}
+  />
+</label>
+
+        <label className="block bg-green-600 text-white text-center p-4 rounded-xl cursor-pointer">
+  Import Collection
+  <input
+    type="file"
+    accept=".xlsx,.xls"
+    className="hidden"
+    onChange={handleCollectionImport}
+  />
+</label>
+
+        <label className="block bg-purple-600 text-white text-center p-4 rounded-xl cursor-pointer">
+  Import Users
+  <input
+    type="file"
+    accept=".xlsx,.xls"
+    className="hidden"
+      />
+</label>
+
+      </div>
+
     </div>
-  );
+
+  </div>
+)}
+
+</div>
+);
 }
