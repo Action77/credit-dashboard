@@ -236,15 +236,20 @@ const [isAddingException,
     const { data } = await supabase
       .from("credit_block_rules")
       .select("*")
-      .eq("username", currentUser);
+      .eq("username", current*ser);
 
-    setCreditRules(data || []);
+    setCreditRules(data || *]);
+
+    console.log(
+      "Rules*Count:",
+      data?.length || 0
+ *  );
+
   };
 
   loadRules();
 
 }, [currentUser]);
-
     useEffect(() => {
 
   const loadExceptions = async () => {
@@ -811,11 +816,7 @@ const isBlockedInvoice = (row: any) => {
     );
   }
 
-  // إذا المستخدم عطّل الـ Payment Term
-  if (!rule.enabled) {
-    return false;
-  }
-
+  
   return (
     creditDays >= rule.block_at_day &&
     !invoiceStatus.includes("legal")
@@ -843,8 +844,7 @@ const rule = creditRules.find(
       .trim()
       .toUpperCase()
 );
-const isPaymentTermEnabled =
-  !rule || rule.enabled;
+const isPaymentTermEnabled = true;
     const matchesFilters =
       (
         selectedRegions.length === 0 ||
@@ -970,10 +970,17 @@ const filteredData = filterBaseData
       row["Payment Term"] || ""
     ).trim();
 
-    const rule = creditRules.find(
-      (r) => r.payment_term === paymentTerm
-    );
+    const normalize = (value: string) =>
+  String(value || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
 
+const rule = creditRules.find(
+  r =>
+    normalize(r.payment_term) ===
+    normalize(paymentTerm)
+);
     const creditDays =
   Number(row["Credit_Days"]) || 0;
 
