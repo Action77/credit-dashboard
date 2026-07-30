@@ -835,9 +835,14 @@ const filterBaseData =
 ).trim();
 
 const rule = creditRules.find(
-  r => r.payment_term === paymentTerm
+  (r) =>
+    String(r.payment_term || "")
+      .trim()
+      .toUpperCase() ===
+    String(paymentTerm || "")
+      .trim()
+      .toUpperCase()
 );
-
 const isPaymentTermEnabled =
   !rule || rule.enabled;
     const matchesFilters =
