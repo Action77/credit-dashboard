@@ -794,9 +794,14 @@ const isBlockedInvoice = (row: any) => {
   ).toLowerCase();
 
   const rule = creditRules.find(
-    r => r.payment_term === paymentTerm
-  );
-
+  r =>
+    String(r.payment_term || "")
+      .trim()
+      .toUpperCase() ===
+    String(paymentTerm || "")
+      .trim()
+      .toUpperCase()
+);
   // إذا ما فيه Rule لهذا الـ Payment Term
   // اعتبره Block مثل النظام القديم
   if (!rule) {
