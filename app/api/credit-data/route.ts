@@ -10,9 +10,8 @@ export async function GET() {
   const { data, error } = await supabase
   .from("credit_data_full")
   .select("*")
-  .order("created_at", {
-    ascending: false,
-  });
+  .order("created_at", { ascending: false })
+  .range(0, 10000000);
 
   if (error) {
     return NextResponse.json({
