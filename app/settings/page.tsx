@@ -427,11 +427,14 @@ const loadCreditRules = async () => {
       ),
     ];
 
-    const { data: existingRules } =
-      await supabase
-        .from("credit_block_rules")
-        .select("*");
+    const currentUser =
+  localStorage.getItem("currentUser");
 
+const { data: existingRules } =
+  await supabase
+    .from("credit_block_rules")
+    .select("*")
+    .eq("username", currentUser);
     const existingTerms =
       existingRules?.map(
         (x: any) => x.payment_term
@@ -444,11 +447,10 @@ const loadCreditRules = async () => {
             !existingTerms.includes(term)
         )
         .map(term => ({
-          payment_term: term,
-          block_at_day:
-            getDefaultBlockDay(term),
-        }));
-
+  username: currentUser,
+  payment_term: term,
+  block_at_day: getDefaultBlockDay(term),
+}));
     if (newRules.length > 0) {
 
       await supabase
@@ -458,10 +460,11 @@ const loadCreditRules = async () => {
     }
 
     const { data: finalRules } =
-      await supabase
-        .from("credit_block_rules")
-        .select("*")
-        .order("payment_term");
+await supabase
+  .from("credit_block_rules")
+  .select("*")
+  .eq("username", currentUser)
+  .order("payment_term");
 
     setCreditRules(
       finalRules || []
