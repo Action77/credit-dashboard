@@ -24,7 +24,26 @@ import {
 import { useEffect, useState } from "react";
 
 export default function SummaryPage() {
-  const handleImport = async (
+  
+  
+const [isImportingUsers,
+  setIsImportingUsers] =
+  useState(false);
+
+  const [showImportModal, setShowImportModal] =
+  useState(false);
+  const [isUploadingCredit,
+  setIsUploadingCredit] =
+  useState(false);
+
+const [isUploadingCollection,
+  setIsUploadingCollection] =
+  useState(false);
+  const isBusy =
+  isUploadingCredit ||
+  isUploadingCollection ||
+  isImportingUsers;
+    const handleImport = async (
   event: React.ChangeEvent<HTMLInputElement>
 ) => {
 
@@ -107,20 +126,7 @@ export default function SummaryPage() {
   }
 
 };
-  
-const [isImportingUsers,
-  setIsImportingUsers] =
-  useState(false);
 
-  const [showImportModal, setShowImportModal] =
-  useState(false);
-  const [isUploadingCredit,
-  setIsUploadingCredit] =
-  useState(false);
-
-const [isUploadingCollection,
-  setIsUploadingCollection] =
-  useState(false);
   const [data, setData] = useState<any[]>([]);
   const [exceptions, setExceptions] = useState<any[]>([]);
   const [collectedInvoices, setCollectedInvoices] = useState<string[]>([]);
@@ -1180,92 +1186,171 @@ const regionSummary = Object.entries(
 )}
 
 {showImportModal && (
-  <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center">
+  <div
+  className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center"
+  onClick={() => {
 
-    <div className="bg-white w-[500px] rounded-2xl p-6">
+    if (isBusy) return;
 
-      <div className="flex justify-between mb-5">
+    setShowImportModal(false);
 
-        <h2 className="text-2xl font-bold">
-          Import Files
-        </h2>
+  }}
+>
+<div
+  className="bg-white w-[540px] rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+  onClick={(e) => e.stopPropagation()}
+>
 
-        <button
-          onClick={() =>
-            setShowImportModal(false)
-          }
-        >
-          ✕
-        </button>
+
+      <button
+      disabled={isBusy}
+      onClick={() => {
+
+        if (isBusy) return;
+
+        setShowImportModal(false);
+
+      }}
+      className={`w-10 h-10 rounded-full flex items-center justify-center transition ${
+        isBusy
+          ? "opacity-40 cursor-not-allowed"
+          : "hover:bg-white/20"
+      }`}
+    >
+      ✕
+    </button>
+
+  </div>
+
+  <div className="p-6">
+<div className="bg-[#071d5c] text-white px-6 py-5 flex items-center justify-between">
+
+  <div>
+
+    <h2 className="text-2xl font-bold">
+      Import Files
+    </h2>
+
+    <p className="text-blue-100 text-sm mt-1">
+      Upload and process system files
+    </p>
+
+  </div>
+
+  <button
+    disabled={isBusy}
+    onClick={() => {
+
+      if (isBusy) return;
+
+      setShowImportModal(false);
+
+    }}
+    className={`w-10 h-10 rounded-full flex items-center justify-center transition ${
+      isBusy
+        ? "opacity-40 cursor-not-allowed"
+        : "hover:bg-white/20"
+    }`}
+  >
+    ✕
+  </button>
+
+</div>
 
       </div>
 
       <div className="space-y-4">
+<label
+  className={`block rounded-2xl transition-all duration-200 ${
+    isUploadingCredit
+      ? "bg-slate-300 cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-700 hover:scale-[1.02] cursor-pointer"
+  }`}
+>
+  <div className="p-5 text-white text-center">
 
-  <label
-    className={`block text-white text-center p-4 rounded-xl ${
-      isUploadingCredit
-        ? "bg-slate-400 cursor-not-allowed pointer-events-none"
-        : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-    }`}
-  >
-    {isUploadingCredit
-      ? "Uploading Credit..."
-      : "Import Credit"}
+    <div className="text-lg font-bold">
+      {isUploadingCredit
+        ? "Uploading Credit..."
+        : "Import Credit"}
+    </div>
 
-    <input
-      type="file"
-      accept=".xlsx,.xls"
-      className="hidden"
-      onChange={handleCreditImport}
-      disabled={isUploadingCredit}
-    />
-  </label>
-
-  <label
-    className={`block text-white text-center p-4 rounded-xl ${
-      isUploadingCollection
-        ? "bg-slate-400 cursor-not-allowed pointer-events-none"
-        : "bg-green-600 hover:bg-green-700 cursor-pointer"
-    }`}
-  >
-    {isUploadingCollection
-      ? "Uploading Collection..."
-      : "Import Collection"}
-
-    <input
-      type="file"
-      accept=".xlsx,.xls"
-      className="hidden"
-      onChange={handleCollectionImport}
-      disabled={isUploadingCollection}
-    />
-  </label>
-
-  <label
-    className={`block text-white text-center p-4 rounded-xl ${
-      isImportingUsers
-        ? "bg-slate-400 cursor-not-allowed pointer-events-none"
-        : "bg-purple-600 hover:bg-purple-700 cursor-pointer"
-    }`}
-  >
-    {isImportingUsers
-      ? "Importing Users..."
-      : "Import Users"}
-
-    <input
-      type="file"
-      accept=".xlsx,.xls"
-      className="hidden"
-      onChange={handleImport}
-      disabled={isImportingUsers}
-    />
-  </label>
-
-</div>
+    <div className="text-sm text-blue-100 mt-1">
+      Credit Block File
     </div>
 
   </div>
+
+  <input
+    type="file"
+    accept=".xlsx,.xls"
+    className="hidden"
+    onChange={handleCreditImport}
+    disabled={isUploadingCredit}
+  />
+</label>
+<label
+  className={`block mt-4 rounded-2xl transition-all duration-200 ${
+    isUploadingCollection
+      ? "bg-slate-300 cursor-not-allowed"
+      : "bg-green-600 hover:bg-green-700 hover:scale-[1.02] cursor-pointer"
+  }`}
+>
+  <div className="p-5 text-white text-center">
+
+    <div className="text-lg font-bold">
+      {isUploadingCollection
+        ? "Uploading Collection..."
+        : "Import Collection"}
+    </div>
+
+    <div className="text-sm text-green-100 mt-1">
+      Collected Invoices File
+    </div>
+
+  </div>
+
+  <input
+    type="file"
+    accept=".xlsx,.xls"
+    className="hidden"
+    onChange={handleCollectionImport}
+    disabled={isUploadingCollection}
+  />
+</label><label
+  className={`block mt-4 rounded-2xl transition-all duration-200 ${
+    isImportingUsers
+      ? "bg-slate-300 cursor-not-allowed"
+      : "bg-purple-600 hover:bg-purple-700 hover:scale-[1.02] cursor-pointer"
+  }`}
+>
+  <div className="p-5 text-white text-center">
+
+    <div className="text-lg font-bold">
+      {isImportingUsers
+        ? "Importing Users..."
+        : "Import Users"}
+    </div>
+
+    <div className="text-sm text-purple-100 mt-1">
+      Users & Van Mapping File
+    </div>
+
+  </div>
+
+  <input
+    type="file"
+    accept=".xlsx,.xls"
+    className="hidden"
+    onChange={handleImport}
+    disabled={isImportingUsers}
+  />
+</label>
+
+
+  </div>
+
+</div>
 )}
 
 </div>
