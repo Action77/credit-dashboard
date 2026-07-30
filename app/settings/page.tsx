@@ -1,6 +1,5 @@
 "use client";
 import { addLog } from "@/lib/activityLog";
-import { storage as localStorage } from "@/utils/storage";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -398,14 +397,18 @@ const [currentUser, setCurrentUser] = useState("");
   loadProfile();
 }, []);
 
-  useEffect(() => {
-  const savedUser =
-    localStorage.getItem("currentUser");
+useEffect(() => {
+  const loadUser = async () => {
+    const savedUser =
+      await localStorage.getItem("currentUser");
 
-  if (savedUser) {
-    setCurrentUser(savedUser);
-    setIsLoggedIn(true);
-  }
+    if (savedUser) {
+      setCurrentUser(savedUser);
+      setIsLoggedIn(true);
+    }
+  };
+
+  loadUser();
 }, []);
 useEffect(() => {
   const loadSettings = async () => {
@@ -820,11 +823,11 @@ collection_disabled_at:
   if (username !== currentUser) {
 
     const { data: existingUser } =
-      await supabase
-        .from("app_users")
-        .select("id")
-        .eq("username", username)
-        .single();
+  await supabase
+    .from("app_users")
+    .select("id")
+    .eq("username", username)
+    .maybeSingle();
 
     if (existingUser) {
       alert("Username Already Exists");
