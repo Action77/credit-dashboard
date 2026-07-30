@@ -24,6 +24,89 @@ import {
 import { useEffect, useState } from "react";
 
 export default function SummaryPage() {
+  const handleImport = async (
+  event: React.ChangeEvent<HTMLInputElement>
+) => {
+
+  if (isImportingUsers) return;
+
+  setIsImportingUsers(true);
+
+  try {
+
+    const file =
+      event.target.files?.[0];
+
+    if (!file) return;
+
+    const reader =
+      new FileReader();
+
+    reader.onload = async (e) => {
+
+      try {
+
+        const workbook = XLSX.read(
+          e.target?.result,
+          {
+            type: "binary",
+          }
+        );
+
+        const sheet =
+          workbook.Sheets[
+            workbook.SheetNames[0]
+          ];
+
+        const rows: any[] =
+          XLSX.utils.sheet_to_json(sheet);
+
+        const usersData =
+          rows.map((row) => ({
+            region: row["Region"] || "",
+            city: row["City"] || "",
+            organization_code:
+              row["Organization Code"] || "",
+            user_code:
+              row["User Code"] || "",
+            organization_name:
+              row["Organization Name"] || "",
+            van_sub_inventory:
+              row["Van Sub Inventory"] || "",
+            contact:
+              row["Contact"] || "",
+          }));
+
+        await fetch("/api/users", {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            users: usersData,
+          }),
+        });
+
+        setShowImportModal(false);
+
+      } finally {
+
+        setIsImportingUsers(false);
+
+      }
+
+    };
+
+    reader.readAsBinaryString(file);
+
+  } catch {
+
+    setIsImportingUsers(false);
+
+  }
+
+};
   
 const [isImportingUsers,
   setIsImportingUsers] =
@@ -1119,28 +1202,67 @@ const regionSummary = Object.entries(
 
       <div className="space-y-4">
 
-        <label className="block bg-blue-600 text-white text-center p-4 rounded-xl cursor-pointer">
-          Import Credit
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            className="hidden"
-            onChange={handleCreditImport}
-          />
-        </label>
+  <label
+    className={`block text-white text-center p-4 rounded-xl ${
+      isUploadingCredit
+        ? "bg-slate-400 cursor-not-allowed pointer-events-none"
+        : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+    }`}
+  >
+    {isUploadingCredit
+      ? "Uploading Credit..."
+      : "Import Credit"}
 
-        <label className="block bg-green-600 text-white text-center p-4 rounded-xl cursor-pointer">
-          Import Collection
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            className="hidden"
-            onChange={handleCollectionImport}
-          />
-        </label>
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleCreditImport}
+      disabled={isUploadingCredit}
+    />
+  </label>
 
-      </div>
+  <label
+    className={`block text-white text-center p-4 rounded-xl ${
+      isUploadingCollection
+        ? "bg-slate-400 cursor-not-allowed pointer-events-none"
+        : "bg-green-600 hover:bg-green-700 cursor-pointer"
+    }`}
+  >
+    {isUploadingCollection
+      ? "Uploading Collection..."
+      : "Import Collection"}
 
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleCollectionImport}
+      disabled={isUploadingCollection}
+    />
+  </label>
+
+  <label
+    className={`block text-white text-center p-4 rounded-xl ${
+      isImportingUsers
+        ? "bg-slate-400 cursor-not-allowed pointer-events-none"
+        : "bg-purple-600 hover:bg-purple-700 cursor-pointer"
+    }`}
+  >
+    {isImportingUsers
+      ? "Importing Users..."
+      : "Import Users"}
+
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleImport}
+      disabled={isImportingUsers}
+    />
+  </label>
+
+</div>
     </div>
 
   </div>
