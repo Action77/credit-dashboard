@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  const [creditRules, setCreditRules] =
+  useState<any[]>([]);
   const [isImportingUsers, setIsImportingUsers] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
 
@@ -229,6 +231,24 @@ const [isUploadingCollection,
 const [isAddingException,
   setIsAddingException] =
   useState(false);
+  useEffect(() => {
+
+  const loadRules = async () => {
+
+    if (!currentUser) return;
+
+    const { data } = await supabase
+      .from("credit_block_rules")
+      .select("*")
+      .eq("username", currentUser);
+
+    setCreditRules(data || []);
+  };
+
+  loadRules();
+
+}, [currentUser]);
+
     useEffect(() => {
 
   const loadExceptions = async () => {
@@ -757,10 +777,40 @@ const reader =
     reader.readAsBinaryString(file);
 
 };
+const isBlockedInvoice = (
+  row: any
+) => {
 
+  const paymentTerm = String(
+    row["Payment Term"] || ""
+  ).trim();
+
+  const creditDays =
+    Number(row["Credit_Days"]) || 0;
+
+  const invoiceStatus = String(
+    row["Invoice status (Due/ Overdue)"] || ""
+  )
+    .toLowerCase();
+
+  const rule = creditRules.find(
+    r => r.payment_term === paymentTerm
+  );
+
+  if (!rule) {
+    return false;
+  }
+
+  return (
+    creditDays >= rule.block_at_day &&
+    !invoiceStatus.includes("legal")
+  );
+};
 const filterBaseData =
   data.filter((row) => {
-
+if (!isBlockedInvoice(row)) {
+  return false;
+}
     const isNotCentral =
       String(row["Central Invoice"] || "")
 

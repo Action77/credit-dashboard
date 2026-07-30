@@ -8,7 +8,7 @@ const supabase = createClient(
 
 export async function GET() {
   const { data, error } = await supabase
-    .from("credit_data")
+    .from("credit_data_full")
     .select("*")
     .order("created_at", {
       ascending: false,
