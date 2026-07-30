@@ -43,22 +43,37 @@ export async function POST(req: Request) {
     console.log("First Row:", jsonData[0]);
     console.log("Second Row:", jsonData[1]);
 
-    const blockedRows = jsonData.filter((row) => {
-      const userBlock = String(row["Status User Block"] || "")
-        .trim()
-        .toLowerCase();
+    const { data: creditRules } = await supabase
+  .from("credit_block_rules")
+  .select("*");
 
-      const invoiceStatus = String(
-        row["Invoice status (Due/ Overdue)"] || ""
-      )
-        .trim()
-        .toLowerCase();
+const blockedRows = jsonData.filter((row) => {
+  const paymentTerm = String(
+    row["Payment Term"] || ""
+  ).trim();
 
-      return (
-        userBlock === "block" &&
-        !invoiceStatus.includes("legal")
-      );
-    });
+  const creditDays =
+    Number(row["Credit_Days"]) || 0;
+
+  const invoiceStatus = String(
+    row["Invoice status (Due/ Overdue)"] || ""
+  )
+    .trim()
+    .toLowerCase();
+
+  const rule = creditRules?.find(
+    (r) => r.payment_term === paymentTerm
+  );
+
+  if (!rule) {
+    return false;
+  }
+
+  return (
+    creditDays >= rule.block_at_day &&
+    !invoiceStatus.includes("legal")
+  );
+});
 
     console.log("Blocked Rows:", blockedRows.length);
 await supabase
