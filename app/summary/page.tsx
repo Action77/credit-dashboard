@@ -220,7 +220,32 @@ const handleCreditImport = async (
         body: formData,
       }
     );
+const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
 
+let fullName = "";
+
+if (currentUser) {
+
+  const { data: user } =
+    await supabase
+      .from("app_users")
+      .select("full_name")
+      .eq("username", currentUser)
+      .single();
+
+  fullName =
+    user?.full_name || "";
+}
+
+await addLog(
+  currentUser || "",
+  fullName,
+  "IMPORT_CREDIT",
+  file.name
+);
     setShowImportModal(false);
 
     window.location.reload();
@@ -292,7 +317,32 @@ const handleCollectionImport = async (
         body: formData,
       }
     );
+const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
 
+let fullName = "";
+
+if (currentUser) {
+
+  const { data: user } =
+    await supabase
+      .from("app_users")
+      .select("full_name")
+      .eq("username", currentUser)
+      .single();
+
+  fullName =
+    user?.full_name || "";
+}
+
+await addLog(
+  currentUser || "",
+  fullName,
+  "IMPORT_COLLECTION",
+  file.name
+);
     setShowImportModal(false);
 
     window.location.reload();
