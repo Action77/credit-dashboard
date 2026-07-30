@@ -337,30 +337,44 @@ const handleImport = async (
         );
 
         const sheet =
-          workbook.Sheets[
-            workbook.SheetNames[0]
-          ];
+  workbook.Sheets[
+    workbook.SheetNames[0]
+  ];
 
-        const rows: any[] =
-          XLSX.utils.sheet_to_json(sheet);
+// التحقق من الملف
+const a1 = String(
+  sheet["A1"]?.v || ""
+).trim();
 
-        const usersData =
-          rows.map((row) => ({
-            region:
-              row["Region"] || "",
-            city:
-              row["City"] || "",
-            organization_code:
-              row["Organization Code"] || "",
-            user_code:
-              row["User Code"] || "",
-            organization_name:
-              row["Organization Name"] || "",
-            van_sub_inventory:
-              row["Van Sub Inventory"] || "",
-            contact:
-              row["Contact"] || "",
-          }));
+if (a1 !== "User Account") {
+
+  toast.error(
+    "Invalid Users File"
+  );
+
+  return;
+}
+
+const rows: any[] =
+  XLSX.utils.sheet_to_json(sheet);
+
+const usersData =
+  rows.map((row) => ({
+    region:
+      row["Region"] || "",
+    city:
+      row["City"] || "",
+    organization_code:
+      row["Organization Code"] || "",
+    user_code:
+      row["User Code"] || "",
+    organization_name:
+      row["Organization Name"] || "",
+    van_sub_inventory:
+      row["Van Sub Inventory"] || "",
+    contact:
+      row["Contact"] || "",
+  }));
 
         await fetch(
           "/api/users",
