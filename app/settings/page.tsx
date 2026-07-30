@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
+  const [userSettings, setUserSettings] = useState<any>(null);
   const [creditRules, setCreditRules] = useState<any[]>([]);
 const [loadingRules, setLoadingRules] = useState(false);
   const [isImportingUsers, setIsImportingUsers] =
@@ -383,6 +384,19 @@ const [exceptionAlert, setExceptionAlert] = useState(true);
 const [creditImportAlert, setCreditImportAlert] = useState(true);
 
 const [collectionImportAlert, setCollectionImportAlert] = useState(true);
+const [showOverdue, setShowOverdue] = useState(true);
+const [showDue, setShowDue] = useState(false);
+const [showLegal, setShowLegal] = useState(false);
+
+const [showNormalInvoices, setShowNormalInvoices] = useState(true);
+const [showExceptionInvoices, setShowExceptionInvoices] =
+  useState(true);
+
+const [hideCollectedInvoices, setHideCollectedInvoices] =
+  useState(true);
+
+const [hideUserBlock, setHideUserBlock] =
+  useState(false);
     const [currentPassword, setCurrentPassword] = useState("");
 const [newPassword, setNewPassword] = useState("");
 const [confirmPassword, setConfirmPassword] = useState("");
@@ -475,6 +489,30 @@ const { data: existingRules } =
 
   }
 };
+useEffect(() => {
+
+  const loadSettings = async () => {
+
+    const currentUser =
+      localStorage.getItem("currentUser");
+
+    if (!currentUser) return;
+
+    const { data } = await supabase
+      .from("user_settings")
+      .select("*")
+      .eq("username", currentUser)
+      .single();
+
+    if (data) {
+      setUserSettings(data);
+    }
+
+  };
+
+  loadSettings();
+
+}, []);
   useEffect(() => {
   const loadProfile = async () => {
     const currentUser =
@@ -526,26 +564,57 @@ useEffect(() => {
 
     if (!data) return;
 
-    setInvoiceAlert(
-      data.invoice_disappeared_alert
-    );
+setInvoiceAlert(
+  data.invoice_disappeared_alert ?? true
+);
+
 setExceptionDeleteAlert(
-  data.exception_delete_alert
+  data.exception_delete_alert ?? true
 );
+
 setExceptionExpiredAlert(
-  data.exception_expired_alert
+  data.exception_expired_alert ?? true
 );
-    setExceptionAlert(
-      data.exception_alert
-    );
 
-    setCreditImportAlert(
-      data.credit_import_alert
-    );
+setExceptionAlert(
+  data.exception_alert ?? true
+);
 
-    setCollectionImportAlert(
-      data.collection_import_alert
-    );
+setCreditImportAlert(
+  data.credit_import_alert ?? true
+);
+
+setCollectionImportAlert(
+  data.collection_import_alert ?? true
+);
+
+setShowOverdue(
+  data.show_overdue ?? true
+);
+
+setShowDue(
+  data.show_due ?? false
+);
+
+setShowLegal(
+  data.show_legal ?? false
+);
+
+setShowNormalInvoices(
+  data.show_normal_invoices ?? true
+);
+
+setShowExceptionInvoices(
+  data.show_exception_invoices ?? true
+);
+
+setHideCollectedInvoices(
+  data.hide_collected ?? true
+);
+
+setHideUserBlock(
+  data.hide_user_block ?? false
+);
   };
 
   loadSettings();
@@ -671,17 +740,27 @@ useEffect(() => {
         <div className="flex gap-6">
           {/* Left Menu */}
           <div className="w-64 border rounded-lg p-3 bg-white">
-            <button
-              onClick={() => setActiveTab("notifications")}
-              className={`w-full text-left px-4 py-3 rounded-lg mb-2 ${
-                activeTab === "notifications"
-                  ? "bg-blue-100 text-blue-600"
-                  : "hover:bg-gray-100"
-              }`}
-            >
-              🔔 Notifications
-            </button>
+<button
+  onClick={() => setActiveTab("dashboardFilters")}
+  className={`w-full text-left px-4 py-3 rounded-lg mb-2 ${
+    activeTab === "dashboardFilters"
+      ? "bg-blue-100 text-blue-600"
+      : "hover:bg-gray-100"
+  }`}
+>
+  🚫 Dashboard Filters
+</button>
 
+<button
+  onClick={() => setActiveTab("notifications")}
+  className={`w-full text-left px-4 py-3 rounded-lg mb-2 ${
+    activeTab === "notifications"
+      ? "bg-blue-100 text-blue-600"
+      : "hover:bg-gray-100"
+  }`}
+>
+  🔔 Notifications
+</button>
             <button
               onClick={() => setActiveTab("security")}
               className={`w-full text-left px-4 py-3 rounded-lg ${
@@ -707,6 +786,171 @@ useEffect(() => {
 
           {/* Right Content */}
           <div className="flex-1 border rounded-lg p-6 bg-white">
+            {activeTab === "dashboardFilters" && (
+  <>
+    <h2 className="text-2xl font-semibold mb-2">
+      Dashboard Filters
+    </h2>
+
+    <p className="text-gray-500 mb-8">
+      Configure which invoices appear on the dashboard.
+    </p>
+
+    <div className="space-y-8">
+
+      <div>
+        <h3 className="font-semibold mb-3">
+          Invoice Status
+        </h3>
+
+        <div className="space-y-3">
+
+          <label className="flex gap-3 items-center">
+            <input
+              type="checkbox"
+              checked={showOverdue}
+              onChange={(e) =>
+                setShowOverdue(e.target.checked)
+              }
+            />
+            Overdue
+          </label>
+
+          <label className="flex gap-3 items-center">
+            <input
+              type="checkbox"
+              checked={showDue}
+              onChange={(e) =>
+                setShowDue(e.target.checked)
+              }
+            />
+            Due
+          </label>
+
+          <label className="flex gap-3 items-center">
+            <input
+              type="checkbox"
+              checked={showLegal}
+              onChange={(e) =>
+                setShowLegal(e.target.checked)
+              }
+            />
+            Legal
+          </label>
+
+        </div>
+      </div>
+
+      <hr />
+
+      <div>
+        <h3 className="font-semibold mb-3">
+          Invoice Type
+        </h3>
+
+        <div className="space-y-3">
+
+          <label className="flex gap-3 items-center">
+            <input
+              type="checkbox"
+              checked={showNormalInvoices}
+              onChange={(e) =>
+                setShowNormalInvoices(
+                  e.target.checked
+                )
+              }
+            />
+            Normal Invoices
+          </label>
+
+          <label className="flex gap-3 items-center">
+            <input
+              type="checkbox"
+              checked={showExceptionInvoices}
+              onChange={(e) =>
+                setShowExceptionInvoices(
+                  e.target.checked
+                )
+              }
+            />
+            Exception Invoices
+          </label>
+
+        </div>
+      </div>
+
+      <hr />
+
+      <div>
+        <h3 className="font-semibold mb-3">
+          Invoice Visibility
+        </h3>
+
+        <div className="space-y-3">
+
+          <label className="flex gap-3 items-center">
+            <input
+              type="checkbox"
+              checked={hideCollectedInvoices}
+              onChange={(e) =>
+                setHideCollectedInvoices(
+                  e.target.checked
+                )
+              }
+            />
+            Hide Fully Collected Invoices
+          </label>
+
+          <label className="flex gap-3 items-center">
+            <input
+              type="checkbox"
+              checked={hideUserBlock}
+              onChange={(e) =>
+                setHideUserBlock(
+                  e.target.checked
+                )
+              }
+            />
+            Hide User Block
+          </label>
+
+        </div>
+      </div>
+
+      <button
+        className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+        onClick={async () => {
+
+          const currentUser =
+            localStorage.getItem("currentUser");
+
+          await supabase
+            .from("user_settings")
+            .update({
+              show_overdue: showOverdue,
+              show_due: showDue,
+              show_legal: showLegal,
+              show_normal_invoices:
+                showNormalInvoices,
+              show_exception_invoices:
+                showExceptionInvoices,
+              hide_collected:
+                hideCollectedInvoices,
+              hide_user_block:
+                hideUserBlock,
+            })
+            .eq("username", currentUser);
+
+          alert("Settings Saved Successfully");
+
+        }}
+      >
+        Save Changes
+      </button>
+
+    </div>
+  </>
+)}
             {activeTab === "notifications" && (
               <>
                 <h2 className="text-2xl font-semibold mb-2">
