@@ -443,7 +443,14 @@ useEffect(() => {
     const result = await response.json();
 
     setData(result.data || []);
+console.log("Total API Rows:", result.data.length);
 
+console.log(
+  result.data.filter(
+    (r: any) =>
+      r["Invoice #"] === "V2076000003195"
+  )
+);
     setCreditFileInfo(result.fileInfo || "");
 
   };
