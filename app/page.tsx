@@ -553,6 +553,8 @@ await fetch(
     method: "POST",
   }
 );
+setShowImportModal(false);
+window.location.reload();
   } finally {
 
     setIsUploadingCredit(false);
@@ -621,13 +623,10 @@ formData.append("file", file);
     currentUsername
   );
 
-await fetch(
-  "/api/collection-upload",
-  {
-    method: "POST",
-    body: formData,
-  }
-);
+await fetch("/api/collection-upload", {
+  method: "POST",
+  body: formData,
+});
 
 await addLog(
   currentUser,
@@ -761,13 +760,13 @@ const reader =
 
       } finally {
 
-        setIsUploadingCollection(
-          false
-        );
+  setIsUploadingCollection(false);
 
-      }
+  setShowImportModal(false);
 
-    };
+  window.location.reload();
+
+}
 
   reader.readAsBinaryString(
     file

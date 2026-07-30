@@ -160,6 +160,9 @@ const handleImport = async (
 
         await loadUsers();
 
+setIsImportingUsers(false);
+window.location.reload();
+
       } finally {
 
         setIsImportingUsers(false);
