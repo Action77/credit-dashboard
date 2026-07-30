@@ -1209,13 +1209,14 @@ collection_disabled_at:
       onChange={handleCreditImport}
       disabled={isUploadingCredit}
     />
-  </label>
-
+     </label>
 
       </div>
-
     </div>
+  </div>
+)}
 
-    </div>
-  );
+</div>
+
+);
 }
