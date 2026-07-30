@@ -435,7 +435,7 @@ const { data: existingRules } =
     .from("credit_block_rules")
     .select("*")
     .eq("username", currentUser);
-    const existingTerms =
+        const existingTerms =
       existingRules?.map(
         (x: any) => x.payment_term
       ) || [];
@@ -450,8 +450,8 @@ const { data: existingRules } =
   username: currentUser,
   payment_term: term,
   block_at_day: getDefaultBlockDay(term),
-}));
-    if (newRules.length > 0) {
+})) 
+   if (newRules.length > 0) {
 
       await supabase
         .from("credit_block_rules")
@@ -460,13 +460,12 @@ const { data: existingRules } =
     }
 
     const { data: finalRules } =
-await supabase
-  .from("credit_block_rules")
-  .select("*")
-  .eq("username", currentUser)
-  .order("payment_term");
-
-    setCreditRules(
+  await supabase
+    .from("credit_block_rules")
+    .select("*")
+    .eq("username", currentUser)
+    .order("payment_term");
+        setCreditRules(
       finalRules || []
     );
 
