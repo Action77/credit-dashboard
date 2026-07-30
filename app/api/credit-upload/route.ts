@@ -45,7 +45,8 @@ export async function POST(req: Request) {
 
     const { data: creditRules } = await supabase
   .from("credit_block_rules")
-  .select("*");
+  .select("*")
+  .eq("username", uploadedBy);
 
 const blockedRows = jsonData.filter((row) => {
   const paymentTerm = String(
