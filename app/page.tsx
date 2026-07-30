@@ -808,9 +808,7 @@ const isBlockedInvoice = (
 };
 const filterBaseData =
   data.filter((row) => {
-if (!isBlockedInvoice(row)) {
-  return false;
-}
+
     const isNotCentral =
       String(row["Central Invoice"] || "")
 
