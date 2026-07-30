@@ -96,24 +96,26 @@ const [isUploadingCollection,
               row["Contact"] || "",
           }));
 
-        await fetch("/api/users", {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            users: usersData,
-          }),
-        });
+await fetch("/api/users", {
+  method: "POST",
+  headers: {
+    "Content-Type":
+      "application/json",
+  },
+  body: JSON.stringify({
+    users: usersData,
+  }),
+});
 
-        setShowImportModal(false);
+setShowImportModal(false);
 
-      } finally {
+window.location.reload();
 
-        setIsImportingUsers(false);
+} finally {
 
-      }
+  setIsImportingUsers(false);
+
+}
 
     };
 
@@ -1187,43 +1189,21 @@ const regionSummary = Object.entries(
 
 {showImportModal && (
   <div
-  className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center"
-  onClick={() => {
+    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center"
+    onClick={() => {
 
-    if (isBusy) return;
+      if (isBusy) return;
 
-    setShowImportModal(false);
+      setShowImportModal(false);
 
-  }}
->
-<div
-  className="bg-white w-[540px] rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
-  onClick={(e) => e.stopPropagation()}
->
-
-
-      <button
-      disabled={isBusy}
-      onClick={() => {
-
-        if (isBusy) return;
-
-        setShowImportModal(false);
-
-      }}
-      className={`w-10 h-10 rounded-full flex items-center justify-center transition ${
-        isBusy
-          ? "opacity-40 cursor-not-allowed"
-          : "hover:bg-white/20"
-      }`}
+    }}
+  >
+    <div
+      className="bg-white w-[540px] rounded-3xl shadow-2xl overflow-hidden"
+      onClick={(e) => e.stopPropagation()}
     >
-      ✕
-    </button>
 
-  </div>
-
-  <div className="p-6">
-<div className="bg-[#071d5c] text-white px-6 py-5 flex items-center justify-between">
+      <div className="bg-[#071d5c] text-white px-6 py-5 flex items-center justify-between">
 
   <div>
 
@@ -1257,10 +1237,10 @@ const regionSummary = Object.entries(
 
 </div>
 
-      </div>
+      
 
-      <div className="space-y-4">
-<label
+      <div className="p-6 space-y-4">
+        <label
   className={`block rounded-2xl transition-all duration-200 ${
     isUploadingCredit
       ? "bg-slate-300 cursor-not-allowed"
@@ -1347,10 +1327,11 @@ const regionSummary = Object.entries(
   />
 </label>
 
+      </div>
+
+    </div>
 
   </div>
-
-</div>
 )}
 
 </div>
