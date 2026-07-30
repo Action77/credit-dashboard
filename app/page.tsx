@@ -981,6 +981,12 @@ const rule = creditRules.find(
     normalize(r.payment_term) ===
     normalize(paymentTerm)
 );
+if (!rule) {
+  console.log(
+    "R*LE NOT FOUND:",
+    JSON.stringify(paymentTerm)
+  );
+}
     const creditDays =
   Number(row["Credit_Days"]) || 0;
 
