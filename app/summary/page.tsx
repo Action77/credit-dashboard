@@ -2,6 +2,7 @@
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { addLog } from "@/lib/activityLog";
 import { storage as localStorage } from "@/utils/storage";
 import Link from "next/link";
 import {
@@ -106,7 +107,32 @@ await fetch("/api/users", {
     users: usersData,
   }),
 });
+const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
 
+let fullName = "";
+
+if (currentUser) {
+
+  const { data: user } =
+    await supabase
+      .from("app_users")
+      .select("full_name")
+      .eq("username", currentUser)
+      .single();
+
+  fullName =
+    user?.full_name || "";
+}
+
+await addLog(
+  currentUser || "",
+  fullName,
+  "IMPORT_USERS",
+  `${usersData.length} users`
+);
 setShowImportModal(false);
 
 window.location.reload();
