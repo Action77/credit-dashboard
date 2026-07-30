@@ -7,12 +7,39 @@ const supabase = createClient(
 );
 
 export async function GET() {
-const { data, error } = await supabase
-  .from("credit_data_full")
-  .select("*")
-  .order("created_at", { ascending: false })
-  .range(0, 10000000);
+let allData: any[] = [];
+let from = 0;
+const batchSize = 1000;
+let error = null;
 
+while (true) {
+  const { data, error: err } = await supabase
+    .from("credit_data_full")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .range(from, from + batchSize - 1);
+
+  if (err) {
+    error = err;
+    break;
+  }
+
+  if (!data || data.length === 0) {
+    break;
+  }
+
+  allData.push(...data);
+
+  if (data.length < batchSize) {
+    break;
+  }
+
+  from += batchSize;
+}
+
+const data = allData;
+
+console.log("Rows from Supabase:", data.length);
 console.log("Rows from Supabase:", data?.length);
 console.log("Error:", error);
 
