@@ -1316,92 +1316,100 @@ const regionSummary = Object.entries(
       
 
       <div className="p-6 space-y-4">
-        
-<label
-  className={`block mt-4 rounded-2xl transition-all duration-200 ${
-    isUploadingCollection
-      ? "bg-slate-300 cursor-not-allowed"
-      : "bg-green-600 hover:bg-green-700 hover:scale-[1.02] cursor-pointer"
-  }`}
->
-  <div className="p-5 text-white text-center">
-<label
-  className={`block mt-4 rounded-2xl transition-all duration-200 ${
-    isImportingUsers
-      ? "bg-slate-300 cursor-not-allowed"
-      : "bg-purple-600 hover:bg-purple-700 hover:scale-[1.02] cursor-pointer"
-  }`}
->
-  <div className="p-5 text-white text-center">
 
-    <div className="text-lg font-bold">
-      {isImportingUsers
-        ? "Importing Users..."
-        : "Import Users"}
+  {/* Import Collection */}
+  <label
+    className={`block rounded-2xl transition-all duration-200 ${
+      isUploadingCollection
+        ? "bg-slate-300 cursor-not-allowed"
+        : "bg-green-600 hover:bg-green-700 hover:scale-[1.02] cursor-pointer"
+    }`}
+  >
+    <div className="p-5 text-white text-center">
+
+      <div className="text-lg font-bold">
+        {isUploadingCollection
+          ? "Uploading Collection..."
+          : "Import Collection"}
+      </div>
+
+      <div className="text-sm text-green-100 mt-1">
+        Collected Invoices File
+      </div>
+
     </div>
 
-    <div className="text-sm text-purple-100 mt-1">
-      Users & Van Mapping File
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleCollectionImport}
+      disabled={isUploadingCollection}
+    />
+  </label>
+
+  {/* Import Users */}
+  <label
+    className={`block rounded-2xl transition-all duration-200 ${
+      isImportingUsers
+        ? "bg-slate-300 cursor-not-allowed"
+        : "bg-purple-600 hover:bg-purple-700 hover:scale-[1.02] cursor-pointer"
+    }`}
+  >
+    <div className="p-5 text-white text-center">
+
+      <div className="text-lg font-bold">
+        {isImportingUsers
+          ? "Importing Users..."
+          : "Import Users"}
+      </div>
+
+      <div className="text-sm text-purple-100 mt-1">
+        Users &amp; Van Mapping File
+      </div>
+
     </div>
 
-  </div>
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleImport}
+      disabled={isImportingUsers}
+    />
+  </label>
 
-  <input
-    type="file"
-    accept=".xlsx,.xls"
-    className="hidden"
-    onChange={handleImport}
-    disabled={isImportingUsers}
-  />
-</label>
-    <div className="text-lg font-bold">
-      {isUploadingCollection
-        ? "Uploading Collection..."
-        : "Import Collection"}
+  {/* Import Credit */}
+  <label
+    className={`block rounded-2xl transition-all duration-200 ${
+      isUploadingCredit
+        ? "bg-slate-300 cursor-not-allowed"
+        : "bg-blue-600 hover:bg-blue-700 hover:scale-[1.02] cursor-pointer"
+    }`}
+  >
+    <div className="p-5 text-white text-center">
+
+      <div className="text-lg font-bold">
+        {isUploadingCredit
+          ? "Uploading Credit..."
+          : "Import Credit"}
+      </div>
+
+      <div className="text-sm text-blue-100 mt-1">
+        Credit Block File
+      </div>
+
     </div>
 
-    <div className="text-sm text-green-100 mt-1">
-      Collected Invoices File
-    </div>
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleCreditImport}
+      disabled={isUploadingCredit}
+    />
+  </label>
 
-  </div>
-
-  <input
-    type="file"
-    accept=".xlsx,.xls"
-    className="hidden"
-    onChange={handleCollectionImport}
-    disabled={isUploadingCollection}
-  />
-</label><label
-  className={`block rounded-2xl transition-all duration-200 ${
-    isUploadingCredit
-      ? "bg-slate-300 cursor-not-allowed"
-      : "bg-blue-600 hover:bg-blue-700 hover:scale-[1.02] cursor-pointer"
-  }`}
->
-  <div className="p-5 text-white text-center">
-
-    <div className="text-lg font-bold">
-      {isUploadingCredit
-        ? "Uploading Credit..."
-        : "Import Credit"}
-    </div>
-
-    <div className="text-sm text-blue-100 mt-1">
-      Credit Block File
-    </div>
-
-  </div>
-
-  <input
-    type="file"
-    accept=".xlsx,.xls"
-    className="hidden"
-    onChange={handleCreditImport}
-    disabled={isUploadingCredit}
-  />
-</label>
 
       </div>
 
