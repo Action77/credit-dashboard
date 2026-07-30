@@ -723,30 +723,29 @@ const reader =
 
         await localStorage.setItem(
           "collectedInvoices",
-          JSON.stringify(
-            invoices
-          )
+          JSON.stringify(invoices)
         );
 
       } finally {
 
-  setIsUploadingCollection(false);
+        setIsUploadingCollection(false);
+        setShowImportModal(false);
+        window.location.reload();
 
-  setShowImportModal(false);
+      }
 
-  window.location.reload();
+    };
 
-}
-
-  reader.readAsBinaryString(
-    file
-  );
+    reader.readAsBinaryString(file);
 
 };
+
 const filterBaseData =
   data.filter((row) => {
-const isNotCentral =
-  String(row["Central Invoice"] || "")
+
+    const isNotCentral =
+      String(row["Central Invoice"] || "")
+
     .trim()
     .toUpperCase() === "NOT CENTRAL";
     const matchesFilters =
