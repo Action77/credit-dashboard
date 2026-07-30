@@ -30,6 +30,8 @@ import {
 
 
 export default function Home() {
+  const [deletingExceptionId, setDeletingExceptionId] =
+  useState<number | null>(null);
   const [currentUser, setCurrentUser] = useState("");
   const [currentFullName, setCurrentFullName] = useState("");
   const pathname = usePathname();
@@ -2049,12 +2051,20 @@ await addLog(
       <tbody>
 
         {exceptions
-  .filter(
-    (item) =>
-      !item.permanent &&
-      item.created_by === currentUser
-  )
-    .map((item, index) => {
+  .filter((item) => {
+    if (item.permanent) return false;
+
+    return filteredData.some(
+      (row) =>
+        String(row["Invoice #"])
+          .replace(/\s/g, "")
+          .toUpperCase() ===
+        String(item.invoice)
+          .replace(/\s/g, "")
+          .toUpperCase()
+    );
+  })
+  .map((item, index) => {
           const tillDate =
             new Date(item.till_date);
 
@@ -2090,39 +2100,59 @@ await addLog(
 
               <td className="p-2">
 
-                {isLoggedIn && (
+                {isLoggedIn &&
+item.created_by === currentUser && (
+<button
+  disabled={deletingExceptionId === item.id}
+  className={`px-2 py-1 rounded text-white ${
+    deletingExceptionId === item.id
+      ? "bg-slate-400"
+      : "bg-red-600"
+  }`}
+  onClick={async () => {
 
-                  <button
-                    className="bg-red-600 text-white px-2 py-1 rounded"
-                    onClick={async () => {
+    if (deletingExceptionId === item.id)
+      return;
 
-                      await fetch(
-                        `/api/exceptions/${item.id}`,
-                        {
-                          method: "DELETE",
-                        }
-                      );
-await addLog(
-  currentUser,
-  currentFullName,
-  "DELETE_EXCEPTION",
-  item.invoice
-);
-                      setExceptions(
-                        prev =>
-                          prev.filter(
-                            exception =>
-                              exception.id !== item.id
-                          )
-                      );
+    setDeletingExceptionId(item.id);
 
-                    }}
-                  >
-                    X
-                  </button>
+    try {
 
-                )}
+      await fetch(
+        `/api/exceptions/${item.id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
+      await addLog(
+        currentUser,
+        currentFullName,
+        "DELETE_EXCEPTION",
+        item.invoice
+      );
+
+      setExceptions(
+        prev =>
+          prev.filter(
+            exception =>
+              exception.id !== item.id
+          )
+      );
+
+    } finally {
+
+      setDeletingExceptionId(null);
+
+    }
+
+  }}
+>
+  {deletingExceptionId === item.id
+    ? "..."
+    : "X"}
+</button>
+)}
               </td>
 
             </tr>
