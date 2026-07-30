@@ -118,19 +118,21 @@ const rows: any[] =
           }
 
           await addLog(
-            currentUser || "",
-            fullName,
-            "IMPORT_USERS",
-            `${usersData.length} users`
-          );
+  currentUser || "",
+  fullName,
+  "IMPORT_USERS",
+  `${usersData.length} users`
+);
+
+setShowImportModal(false);
+
+window.location.reload();
         } catch (error) {
           console.error(error);
           toast.error("Failed to import users");
         } finally {
-          setIsImportingUsers(false);
-          setShowImportModal(false);
-          window.location.reload();
-        }
+  setIsImportingUsers(false);
+}
       };
 
       reader.readAsBinaryString(file);
