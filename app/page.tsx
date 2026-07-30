@@ -30,6 +30,132 @@ import {
 
 
 export default function Home() {
+  const [isImportingUsers, setIsImportingUsers] =
+  useState(false);
+
+const [showImportModal, setShowImportModal] =
+  useState(false);
+
+const isBusy =
+  isUploadingCredit ||
+  isUploadingCollection ||
+  isImportingUsers;
+  const handleImport = async (
+  event: React.ChangeEvent<HTMLInputElement>
+) => {
+
+  if (isImportingUsers) return;
+
+  setIsImportingUsers(true);
+
+  try {
+
+    const file =
+      event.target.files?.[0];
+
+    if (!file) return;
+
+    const reader =
+      new FileReader();
+
+    reader.onload = async (e) => {
+
+      try {
+
+        const workbook = XLSX.read(
+          e.target?.result,
+          {
+            type: "binary",
+          }
+        );
+
+        const sheet =
+          workbook.Sheets[
+            workbook.SheetNames[0]
+          ];
+
+        const rows: any[] =
+          XLSX.utils.sheet_to_json(sheet);
+
+        const usersData =
+          rows.map((row) => ({
+            region: row["Region"] || "",
+            city: row["City"] || "",
+            organization_code:
+              row["Organization Code"] || "",
+            user_code:
+              row["User Code"] || "",
+            organization_name:
+              row["Organization Name"] || "",
+            van_sub_inventory:
+              row["Van Sub Inventory"] || "",
+            contact:
+              row["Contact"] || "",
+          }));
+
+        await fetch("/api/users", {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            users: usersData,
+          }),
+        });
+
+        const currentUser =
+          await localStorage.getItem(
+            "currentUser"
+          );
+
+        let fullName = "";
+
+        if (currentUser) {
+
+          const { data: user } =
+            await supabase
+              .from("app_users")
+              .select("full_name")
+              .eq(
+                "username",
+                currentUser
+              )
+              .single();
+
+          fullName =
+            user?.full_name || "";
+        }
+
+        await addLog(
+          currentUser || "",
+          fullName,
+          "IMPORT_USERS",
+          `${usersData.length} users`
+        );
+
+        setShowImportModal(false);
+
+        window.location.reload();
+
+      } finally {
+
+        setIsImportingUsers(false);
+
+      }
+
+    };
+
+    reader.readAsBinaryString(file);
+
+  } catch {
+
+    setIsImportingUsers(false);
+
+  }
+
+};
+
   const [isSendingWhatsApp, setIsSendingWhatsApp] =
   useState(false);
   const [deletingExceptionId, setDeletingExceptionId] =
@@ -1093,13 +1219,15 @@ return (
     <span>Dashboard</span>
   </Link>
 
-  <Link
-    href="/import"
-    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
-  >
-    <Upload size={18} />
-    <span>Import File</span>
-  </Link>
+<div
+  onClick={() =>
+    setShowImportModal(true)
+  }
+  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+>
+  <Upload size={18} />
+  <span>Import File</span>
+</div>
 
   <Link
     href="/logs"
@@ -2516,5 +2644,160 @@ setShowLoginModal(false);
        )}
 
   </>
+  {showImportModal && (
+  <div
+    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center"
+    onClick={() => {
+
+      if (isBusy) return;
+
+      setShowImportModal(false);
+
+    }}
+  >
+    <div
+      className="bg-white w-[540px] rounded-3xl shadow-2xl overflow-hidden"
+      onClick={(e) => e.stopPropagation()}
+    >
+
+      <div className="bg-[#071d5c] text-white px-6 py-5 flex items-center justify-between">
+
+  <div>
+
+    <h2 className="text-2xl font-bold">
+      Import Files
+    </h2>
+
+    <p className="text-blue-100 text-sm mt-1">
+      Upload and process system files
+    </p>
+
+  </div>
+
+  <button
+    disabled={isBusy}
+    onClick={() => {
+
+      if (isBusy) return;
+
+      setShowImportModal(false);
+
+    }}
+    className={`w-10 h-10 rounded-full flex items-center justify-center transition ${
+      isBusy
+        ? "opacity-40 cursor-not-allowed"
+        : "hover:bg-white/20"
+    }`}
+  >
+    ✕
+  </button>
+
+</div>
+
+      
+
+      <div className="p-6 space-y-4">
+
+  {/* Import Collection */}
+  <label
+    className={`block rounded-2xl transition-all duration-200 ${
+      isUploadingCollection
+        ? "bg-slate-300 cursor-not-allowed"
+        : "bg-green-600 hover:bg-green-700 hover:scale-[1.02] cursor-pointer"
+    }`}
+  >
+    <div className="p-5 text-white text-center">
+
+      <div className="text-lg font-bold">
+        {isUploadingCollection
+          ? "Uploading Collection..."
+          : "Import Collection"}
+      </div>
+
+      <div className="text-sm text-green-100 mt-1">
+        Collected Invoices File
+      </div>
+
+    </div>
+
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleCollectionImport}
+      disabled={isUploadingCollection}
+    />
+  </label>
+
+  {/* Import Users */}
+  <label
+    className={`block rounded-2xl transition-all duration-200 ${
+      isImportingUsers
+        ? "bg-slate-300 cursor-not-allowed"
+        : "bg-purple-600 hover:bg-purple-700 hover:scale-[1.02] cursor-pointer"
+    }`}
+  >
+    <div className="p-5 text-white text-center">
+
+      <div className="text-lg font-bold">
+        {isImportingUsers
+          ? "Importing Users..."
+          : "Import Users"}
+      </div>
+
+      <div className="text-sm text-purple-100 mt-1">
+        Users &amp; Van Mapping File
+      </div>
+
+    </div>
+
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleImport}
+      disabled={isImportingUsers}
+    />
+  </label>
+
+  {/* Import Credit */}
+  <label
+    className={`block rounded-2xl transition-all duration-200 ${
+      isUploadingCredit
+        ? "bg-slate-300 cursor-not-allowed"
+        : "bg-blue-600 hover:bg-blue-700 hover:scale-[1.02] cursor-pointer"
+    }`}
+  >
+    <div className="p-5 text-white text-center">
+
+      <div className="text-lg font-bold">
+        {isUploadingCredit
+          ? "Uploading Credit..."
+          : "Import Credit"}
+      </div>
+
+      <div className="text-sm text-blue-100 mt-1">
+        Credit Block File
+      </div>
+
+    </div>
+
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleCreditImport}
+      disabled={isUploadingCredit}
+    />
+  </label>
+
+
+      </div>
+
+    </div>
+
+  </div>
+)}
+
 );
 }
