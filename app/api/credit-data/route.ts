@@ -7,13 +7,19 @@ const supabase = createClient(
 );
 
 export async function GET() {
-  const { data, error } = await supabase
+const { data, error } = await supabase
   .from("credit_data_full")
   .select("*")
   .order("created_at", { ascending: false })
   .range(0, 10000000);
+
 console.log("Rows from Supabase:", data?.length);
 console.log("Error:", error);
+
+if (data?.length) {
+  console.log("First Invoice:", data[0].invoice);
+  console.log("Last Invoice:", data[data.length - 1].invoice);
+}
   if (error) {
     return NextResponse.json({
       data: [],
