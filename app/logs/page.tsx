@@ -22,6 +22,7 @@ import {
 
 
 export default function LogsPage() {
+  const [selectedDate, setSelectedDate] = useState("");
 const [isImportingUsers, setIsImportingUsers] =
   useState(false);
 
@@ -431,27 +432,33 @@ useEffect(() => {
   }, []);
 
   const filteredLogs = useMemo(() => {
+  return logs.filter((log) => {
+    const userMatch =
+      !selectedUser ||
+      log.full_name === selectedUser;
 
-    return logs.filter(log => {
+    const actionMatch =
+      !selectedAction ||
+      log.action === selectedAction;
 
-      const userMatch =
-        !selectedUser ||
-        log.full_name === selectedUser;
+    const dateMatch =
+      !selectedDate ||
+      new Date(log.created_at)
+        .toISOString()
+        .split("T")[0] === selectedDate;
 
-      const actionMatch =
-        !selectedAction ||
-        log.action === selectedAction;
-
-      return userMatch && actionMatch;
-
-    });
-
-  }, [
-    logs,
-    selectedUser,
-    selectedAction,
-  ]);
-
+    return (
+      userMatch &&
+      actionMatch &&
+      dateMatch
+    );
+  });
+}, [
+  logs,
+  selectedUser,
+  selectedAction,
+  selectedDate,
+]);
   const todayActivities =
     logs.filter(log => {
 
@@ -756,63 +763,84 @@ return (
 
       <div className="bg-white rounded-xl border p-5 mb-6">
 
-        <div className="flex gap-3">
+  <div className="flex gap-3 flex-wrap">
 
-          <select
-            value={selectedUser}
-            onChange={(e) =>
-              setSelectedUser(
-                e.target.value
-              )
-            }
-            className="border rounded-lg px-4 py-2"
-          >
+    <select
+      value={selectedUser}
+      onChange={(e) =>
+        setSelectedUser(
+          e.target.value
+        )
+      }
+      className="border rounded-lg px-4 py-2"
+    >
+      <option value="">
+        All Users
+      </option>
 
-            <option value="">
-              All Users
-            </option>
+      {users.map(user => (
 
-            {users.map(user => (
+        <option
+          key={user}
+          value={user}
+        >
+          {user}
+        </option>
 
-              <option
-                key={user}
-                value={user}
-              >
-                {user}
-              </option>
+      ))}
 
-            ))}
+    </select>
 
-          </select>
+    <select
+      value={selectedAction}
+      onChange={(e) =>
+        setSelectedAction(
+          e.target.value
+        )
+      }
+      className="border rounded-lg px-4 py-2"
+    >
+      <option value="">
+        All Actions
+      </option>
 
-          <select
-            value={selectedAction}
-            onChange={(e) =>
-              setSelectedAction(
-                e.target.value
-              )
-            }
-            className="border rounded-lg px-4 py-2"
-          >
+      {actions.map(action => (
 
-            <option value="">
-              All Actions
-            </option>
+        <option
+          key={action}
+          value={action}
+        >
+          {action}
+        </option>
 
-            {actions.map(action => (
+      ))}
 
-              <option
-                key={action}
-                value={action}
-              >
-                {action}
-              </option>
+    </select>
 
-            ))}
+    <input
+      type="date"
+      value={selectedDate}
+      onChange={(e) =>
+        setSelectedDate(
+          e.target.value
+        )
+      }
+      className="border rounded-lg px-4 py-2"
+    />
 
-          </select>
+    <button
+      onClick={() => {
+        setSelectedUser("");
+        setSelectedAction("");
+        setSelectedDate("");
+      }}
+      className="px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300"
+    >
+      Reset
+    </button>
 
-        </div>
+  </div>
+
 
       </div>
 
