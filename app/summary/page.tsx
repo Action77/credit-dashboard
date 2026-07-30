@@ -1120,33 +1120,24 @@ const regionSummary = Object.entries(
       <div className="space-y-4">
 
         <label className="block bg-blue-600 text-white text-center p-4 rounded-xl cursor-pointer">
-  Import Credit
-  <input
-    type="file"
-    accept=".xlsx,.xls"
-    className="hidden"
-    onChange={handleCreditImport}
-  />
-</label>
+          Import Credit
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            className="hidden"
+            onChange={handleCreditImport}
+          />
+        </label>
 
         <label className="block bg-green-600 text-white text-center p-4 rounded-xl cursor-pointer">
-  Import Collection
-  <input
-    type="file"
-    accept=".xlsx,.xls"
-    className="hidden"
-    onChange={handleCollectionImport}
-  />
-</label>
-
-        <label className="block bg-purple-600 text-white text-center p-4 rounded-xl cursor-pointer">
-  Import Users
-  <input
-    type="file"
-    accept=".xlsx,.xls"
-    className="hidden"
-      />
-</label>
+          Import Collection
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            className="hidden"
+            onChange={handleCollectionImport}
+          />
+        </label>
 
       </div>
 
