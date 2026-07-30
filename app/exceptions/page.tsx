@@ -1,6 +1,5 @@
 
 "use client";
-import { useSearchParams } from "next/navigation";
 import { addLog } from "@/lib/activityLog";
 import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
@@ -47,18 +46,21 @@ const [currentUser, setCurrentUser] =
 const [tillDate, setTillDate] = useState("");
 const [isPermanent, setIsPermanent] =
   useState(false);
-const searchParams = useSearchParams();
-
 useEffect(() => {
 
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
   const invoice =
-    searchParams.get("invoice");
+    params.get("invoice");
 
   if (invoice) {
     setSearchTerm(invoice);
   }
 
-}, [searchParams]);
+}, []);
 
 
 const addedCount =
