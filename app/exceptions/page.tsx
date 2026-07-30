@@ -1,6 +1,6 @@
 
-import { useSearchParams } from "next/navigation";
 "use client";
+import { useSearchParams } from "next/navigation";
 import { addLog } from "@/lib/activityLog";
 import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
