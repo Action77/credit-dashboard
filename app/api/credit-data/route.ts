@@ -12,7 +12,8 @@ export async function GET() {
   .select("*")
   .order("created_at", { ascending: false })
   .range(0, 10000000);
-
+console.log("Rows from Supabase:", data?.length);
+console.log("Error:", error);
   if (error) {
     return NextResponse.json({
       data: [],
