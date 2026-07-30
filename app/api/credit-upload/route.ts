@@ -164,9 +164,20 @@ const allRecords = jsonData.map((row) => ({
     if (records.length > 0) {
       console.log("Sample Record:", records[0]);
     }
-await supabase
+const { error: fullInsertError } = await supabase
   .from("credit_data_full")
   .insert(allRecords);
+
+console.log("Full Insert Error:", fullInsertError);
+
+const { count } = await supabase
+  .from("credit_data_full")
+  .select("*", {
+    count: "exact",
+    head: true,
+  });
+
+console.log("Rows After Insert:", count);
     const { data, error } = await supabase
       .from("credit_data")
       .insert(records)
