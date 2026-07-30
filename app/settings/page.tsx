@@ -64,14 +64,27 @@ const isBusy =
             type: "binary",
           }
         );
+const sheet =
+  workbook.Sheets[
+    workbook.SheetNames[0]
+  ];
 
-        const sheet =
-          workbook.Sheets[
-            workbook.SheetNames[0]
-          ];
+// Validate Users File
+const a1 = String(
+  sheet["A1"]?.v || ""
+).trim();
 
-        const rows: any[] =
-          XLSX.utils.sheet_to_json(sheet);
+if (a1 !== "User Account") {
+
+  toast.error(
+    "Invalid Users File"
+  );
+
+  return;
+}
+
+const rows: any[] =
+  XLSX.utils.sheet_to_json(sheet);
 
         const usersData =
           rows.map((row) => ({
