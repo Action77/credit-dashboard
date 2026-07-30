@@ -6,15 +6,12 @@ import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 import WhatsAppReport from "@/components/WhatsAppReport";
 import html2canvas from "html2canvas";
-import { openWhatsApp } from "@/utils/whatsapp";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Upload,
-  FileText,
   AlertCircle,
   BarChart3,
   Settings,
@@ -151,7 +148,6 @@ window.location.reload();
   useState<number | null>(null);
   const [currentUser, setCurrentUser] = useState("");
   const [currentFullName, setCurrentFullName] = useState("");
-  const pathname = usePathname();
 const [whatsAppVan, setWhatsAppVan] =
   useState("");
   const [data, setData] =
@@ -784,9 +780,7 @@ const reader =
     reader.readAsBinaryString(file);
 
 };
-const isBlockedInvoice = (
-  row: any
-) => {
+const isBlockedInvoice = (row: any) => {
 
   const paymentTerm = String(
     row["Payment Term"] || ""
@@ -797,14 +791,23 @@ const isBlockedInvoice = (
 
   const invoiceStatus = String(
     row["Invoice status (Due/ Overdue)"] || ""
-  )
-    .toLowerCase();
+  ).toLowerCase();
 
   const rule = creditRules.find(
     r => r.payment_term === paymentTerm
   );
 
+  // إذا ما فيه Rule لهذا الـ Payment Term
+  // اعتبره Block مثل النظام القديم
   if (!rule) {
+    return (
+      creditDays >= 1 &&
+      !invoiceStatus.includes("legal")
+    );
+  }
+
+  // إذا المستخدم عطّل الـ Payment Term
+  if (!rule.enabled) {
     return false;
   }
 
@@ -813,6 +816,7 @@ const isBlockedInvoice = (
     !invoiceStatus.includes("legal")
   );
 };
+
 const filterBaseData =
   data.filter((row) => {
 
@@ -821,6 +825,16 @@ const filterBaseData =
 
     .trim()
     .toUpperCase() === "NOT CENTRAL";
+    const paymentTerm = String(
+  row["Payment Term"] || ""
+).trim();
+
+const rule = creditRules.find(
+  r => r.payment_term === paymentTerm
+);
+
+const isPaymentTermEnabled =
+  !rule || rule.enabled;
     const matchesFilters =
       (
         selectedRegions.length === 0 ||
@@ -863,9 +877,11 @@ const filterBaseData =
         .includes(search);
 return (
   isNotCentral &&
+  isPaymentTermEnabled &&
   matchesFilters &&
   matchesSearch
 );
+
   });
   const whatsappVanCodes = [
   ...new Set(
@@ -911,6 +927,7 @@ return (
   )
 
 ].sort();
+  
 const filteredData = filterBaseData
   .filter((row) => {
 
@@ -927,29 +944,54 @@ const filteredData = filterBaseData
             .toUpperCase() === invoice
       );
 
+    const isCollected =
+      collectedInvoices.some(
+        (i) =>
+          String(i)
+            .replace(/\s/g, "")
+            .toUpperCase() === invoice
+      );
+
     const matchesWhatsappVan =
       !whatsAppVan ||
       row["Van Code."] === whatsAppVan;
 
-return matchesWhatsappVan;
+    const paymentTerm = String(
+      row["Payment Term"] || ""
+    ).trim();
 
+    const rule = creditRules.find(
+      (r) => r.payment_term === paymentTerm
+    );
+
+    let showInvoice = true;
+
+    if (rule) {
+      const creditDays =
+        Number(row["Credit_Days"]) || 0;
+
+      showInvoice =
+        creditDays >= rule.block_at_day;
+    }
+
+    return (
+      !isException &&
+      !isCollected &&
+      matchesWhatsappVan &&
+      showInvoice
+    );
   })
   .sort((a, b) =>
     String(a["Van Code."] || "").localeCompare(
       String(b["Van Code."] || "")
     )
   );
-const blockedCount =
+
+const blockedInvoicesData =
   filteredData.filter((row) => {
 
-    if (!isBlockedInvoice(row)) {
-      return false;
-    }
-
     const invoice =
-      String(
-        row["Invoice #"]
-      )
+      String(row["Invoice #"])
         .replace(/\s/g, "")
         .toUpperCase();
 
@@ -958,8 +1000,7 @@ const blockedCount =
         (e) =>
           String(e.invoice)
             .replace(/\s/g, "")
-            .toUpperCase() ===
-          invoice
+            .toUpperCase() === invoice
       );
 
     const isCollected =
@@ -967,17 +1008,18 @@ const blockedCount =
         (i) =>
           String(i)
             .replace(/\s/g, "")
-            .toUpperCase() ===
-          invoice
+            .toUpperCase() === invoice
       );
 
     return (
+      isBlockedInvoice(row) &&
       !isException &&
       !isCollected
     );
-
-  }).length;
-    const employeeCount =
+  });
+const blockedCount =
+  blockedInvoicesData.length;
+      const employeeCount =
   new Set(
     filteredData.map(
       (row) => row["Employee Name."]
@@ -994,8 +1036,7 @@ const exceptionCount =
   ).length;
   const activeEmployees =
   Object.entries(
-
-    filteredData.reduce(
+    blockedInvoicesData.reduce(
       (acc: any, row) => {
 
         const employee =
@@ -1012,45 +1053,11 @@ const exceptionCount =
       },
       {}
     )
-
-  ).filter(([_, rows]: any) =>
-
-    rows.some((row: any) => {
-
-      const invoice =
-        String(
-          row["Invoice #"]
-        )
-          .replace(/\s/g, "")
-          .toUpperCase();
-
-      const isException =
-        exceptions.some(
-          (e) =>
-            String(e.invoice)
-              .replace(/\s/g, "")
-              .toUpperCase() ===
-            invoice
-        );
-
-      const isCollected =
-        collectedInvoices.some(
-          (i) =>
-            String(i)
-              .replace(/\s/g, "")
-              .toUpperCase() ===
-            invoice
-        );
-
-      return (
-        !isException &&
-        !isCollected
-      );
-
-    })
-
+  ).filter(
+    ([_, rows]: any) =>
+      rows.length > 0
   ).length;
-    const toggleRegion = (
+      const toggleRegion = (
   region: string
 ) => {
 
@@ -2506,7 +2513,7 @@ item.created_by === currentUser && (
 
     {Object.entries(
 
-      filteredData.reduce(
+      blockedInvoicesData.reduce(
         (acc: any, row) => {
 
           const van =
