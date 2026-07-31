@@ -685,11 +685,58 @@ const filteredData = data.filter((row) => {
   return "All Collected";
 
 };
-const summaryBaseData = filteredData;
+const regionSummaryData = data.filter((row) => {
+
+  const isNotCentral =
+    String(
+      row["Central Invoice"] || ""
+    )
+      .trim()
+      .toUpperCase() ===
+    "NOT CENTRAL";
+
+  const invoiceStatus = String(
+    row["Invoice status (Due/ Overdue)"] || ""
+  ).toLowerCase();
+
+  const paymentTerm = String(
+    row["Payment Term"] || ""
+  ).trim();
+
+  const normalize = (
+    value: string
+  ) =>
+    String(value || "")
+      .replace(/^ATS\s+/i, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toUpperCase();
+
+  const rule = creditRules.find(
+    r =>
+      normalize(r.payment_term) ===
+      normalize(paymentTerm)
+  );
+
+  const creditDays =
+    Number(row["Credit_Days"]) || 0;
+
+  const showInvoice =
+    rule
+      ? creditDays >= rule.block_at_day
+      : false;
+
+  return (
+    isNotCentral &&
+    !invoiceStatus.includes("legal") &&
+    showInvoice
+  );
+
+});
 const regionSummary = Object.entries(
 
-  summaryBaseData.reduce(
-    (acc: any, row) => {
+  regionSummaryData.reduce(
+        (acc: any, row) => {
 
       const region =
         row["Region"] || "Unknown";
