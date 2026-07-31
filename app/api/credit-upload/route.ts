@@ -6,6 +6,13 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
+const webpush = require("web-push");
+
+webpush.setVapidDetails(
+  process.env.VAPID_EMAIL!,
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+  process.env.VAPID_PRIVATE_KEY!
+);
 
 export async function POST(req: Request) {
   try {
@@ -204,6 +211,41 @@ const notificationResult = await supabase
     message: `Credit file uploaded successfully by ${user?.full_name || uploadedBy}.`,
   })
   .select();
+const { data: subscriptions } =
+  await supabase
+    .from("push_subscriptions")
+    .select("*");
+
+for (const row of subscriptions || []) {
+
+  const subscription =
+    typeof row.subscription === "string"
+      ? JSON.parse(row.subscription)
+      : row.subscription;
+
+  try {
+
+    await webpush.sendNotification(
+      subscription,
+      JSON.stringify({
+        title:
+          "✅ New Credit File Imported",
+        body:
+          "A new credit file has been uploaded. Please review your blocked invoices to see the latest updates affecting your route.",
+        url: "/",
+      })
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Credit push failed:",
+      error
+    );
+
+  }
+
+}
 const vanCounts: Record<string, number> = {};
 
 records.forEach((row) => {
