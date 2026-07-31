@@ -1,4 +1,6 @@
 "use client";
+
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { storage as localStorage } from "@/utils/storage";
@@ -425,24 +427,26 @@ info.exceptions
 </td>
 
 
-
-<td className="
-p-3
-text-center
-font-bold
-">
-
-{van}
-
+<td
+  className="
+  p-3
+  text-center
+  font-bold
+  "
+>
+  <Link
+    href={`/van/${encodeURIComponent(String(van))}`}
+    className="text-blue-600 underline"
+  >
+    {van}
+  </Link>
 </td>
-
 
 
 </tr>
 
 
 ))
-
 
 }
 
@@ -460,6 +464,7 @@ font-bold
 
 
 </div>
+
 
 );
 
