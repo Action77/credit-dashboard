@@ -223,6 +223,10 @@ const handleCreditImport = async (
         body: formData,
       }
     );
+await supabase
+  .from("van_permissions")
+  .delete()
+  .neq("van_code", "");
 
     const currentUser =
       await localStorage.getItem(

@@ -524,6 +524,10 @@ formData.append(
           body: formData,
         }
       );
+await supabase
+  .from("van_permissions")
+  .delete()
+  .neq("van_code", "");
 
     const uploadResult =
       await uploadResponse.json();
