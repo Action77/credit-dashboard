@@ -1403,40 +1403,58 @@ collection_disabled_at:
         <div className="mt-6 flex gap-3">
 
           <button
-            className="bg-blue-600 text-white px-5 py-2 rounded-lg"
-            onClick={async () => {
+  disabled={isSavingRules || isResettingRules}
+  className={`px-5 py-2 rounded-lg text-white ${
+    isSavingRules || isResettingRules
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-blue-600"
+  }`}
+  onClick={async () => {
 
-              for (const rule of creditRules) {
+    if (isSavingRules || isResettingRules)
+      return;
 
-                await supabase
-                  .from("credit_block_rules")
-                  .update({
-                    block_at_day:
-                      rule.block_at_day,
-                  })
-                  .eq("id", rule.id);
+    setIsSavingRules(true);
 
-              }
+    try {
 
-              alert(
-                "Rules Saved Successfully"
-              );
+      for (const rule of creditRules) {
 
-            }}
-          >
-            Save Changes
-          </button>
+        await supabase
+          .from("credit_block_rules")
+          .update({
+            block_at_day: rule.block_at_day,
+          })
+          .eq("id", rule.id);
+
+      }
+
+      alert("Rules Saved Successfully");
+
+    } finally {
+
+      setIsSavingRules(false);
+
+    }
+
+  }}
+>
+  {isSavingRules
+    ? "Saving..."
+    : "Save Changes"}
+</button>
 
 <button
-  disabled={isResettingRules}
-  className={`px-5 py-2 rounded-lg text-white ${
+disabled={isSavingRules || isResettingRules}
+    className={`px-5 py-2 rounded-lg text-white ${
     isResettingRules
       ? "bg-gray-400 cursor-not-allowed"
       : "bg-red-600"
   }`}
   onClick={async () => {
-
-    if (isResettingRules) return;
+if (isSavingRules || isResettingRules)
+  return;
+    
 
     setIsResettingRules(true);
 
