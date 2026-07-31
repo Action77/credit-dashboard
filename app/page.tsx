@@ -1007,8 +1007,6 @@ const showInvoice =
     ? creditDays >= rule.block_at_day
     : false;
     return (
-      !isException &&
-      !isCollected &&
       matchesWhatsappVan &&
       showInvoice
     );
