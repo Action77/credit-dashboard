@@ -740,16 +740,7 @@ useEffect(() => {
         <div className="flex gap-6">
           {/* Left Menu */}
           <div className="w-64 border rounded-lg p-3 bg-white">
-<button
-  onClick={() => setActiveTab("dashboardFilters")}
-  className={`w-full text-left px-4 py-3 rounded-lg mb-2 ${
-    activeTab === "dashboardFilters"
-      ? "bg-blue-100 text-blue-600"
-      : "hover:bg-gray-100"
-  }`}
->
-  🚫 Dashboard Filters
-</button>
+
 
 <button
   onClick={() => setActiveTab("notifications")}
