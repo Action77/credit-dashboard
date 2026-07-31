@@ -142,7 +142,6 @@ const { data: rules } =
   .select("is_unblocked")
   .eq("van_code", vanCode)
   .single();
-
 setIsRouteUnblocked(
   vanPermission?.is_unblocked || false
 );

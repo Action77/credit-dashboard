@@ -1386,7 +1386,7 @@ const sendWhatsApp = async (
 
   setPermissions((prev: any) => ({
     ...prev,
-    [van]: isChecked,
+    isChecked,
   }));
 
   await supabase
@@ -1400,6 +1400,20 @@ const sendWhatsApp = async (
         onConflict: "van_code",
       }
     );
+
+  if (isChecked) {
+
+    await fetch("/api/send-push", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        van_code: van,
+      }),
+    });
+
+  }
 
 }}
   />
