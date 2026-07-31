@@ -33,17 +33,25 @@ export async function POST(
 
     for (const row of data || []) {
 
-      await webpush.sendNotification(
-        row.subscription,
-        JSON.stringify({
-          title:
-            "✅ Route Unblocked",
-          body:
-            `Van ${van_code} is now unblocked`,
-        })
-      );
+  const subscription =
+    typeof row.subscription === "string"
+      ? JSON.parse(row.subscription)
+      : row.subscription;
 
-    }
+  console.log(
+    "Subscription endpoint:",
+    subscription.endpoint
+  );
+
+  await webpush.sendNotification(
+    subscription,
+    JSON.stringify({
+      title: "✅ Route Unblocked",
+      body: `Van ${van_code} is now unblocked`,
+    })
+  );
+
+}
 
     return NextResponse.json({
       success: true,
