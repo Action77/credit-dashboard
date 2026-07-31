@@ -1240,12 +1240,10 @@ await supabase
     setDeletingId(item.id);
 
     try {
-      await fetch(
-        `/api/exceptions/${item.id}`,
-        {
-          method: "DELETE",
-        }
-      );
+await supabase
+  .from("exceptions")
+  .delete()
+  .eq("invoice", item.invoice);
 const { data: userInfo } = await supabase
   .from("app_users")
   .select("full_name")
@@ -1259,11 +1257,10 @@ await addLog(
   item.invoice
 );
       setExceptions(prev =>
-        prev.filter(
-          exception =>
-            exception.id !== item.id
-        )
-      );
+  prev.filter(
+    exception => exception.invoice !== item.invoice
+  )
+);
       const { data: settings } = await supabase
   .from("user_settings")
   .select("exception_delete_alert")
