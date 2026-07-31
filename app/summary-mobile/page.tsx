@@ -1,5 +1,5 @@
 "use client";
-
+import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { storage as localStorage } from "@/utils/storage";
 
@@ -58,13 +58,19 @@ await localStorage.getItem(
 
 if(user){
 
-const {data} =
-await fetch(
-`/api/credit-rules?username=${user}`
-).then(r=>r.json());
+const { data } =
+await supabase
+.from("credit_block_rules")
+.select("*")
+.eq(
+"username",
+user
+);
 
 
-setCreditRules(data || []);
+setCreditRules(
+data || []
+);
 
 }
 
