@@ -14,14 +14,17 @@ export async function POST(
     await request.json();
 
   const { error } =
-    await supabase
-      .from("push_subscriptions")
-      .insert({
-        van_code:
-          body.van_code,
-        subscription:
-          body.subscription,
-      });
+  await supabase
+    .from("push_subscriptions")
+    .upsert(
+      {
+        van_code: body.van_code,
+        subscription: body.subscription,
+      },
+      {
+        onConflict: "van_code",
+      }
+    );
 
   if (error) {
     return NextResponse.json(
