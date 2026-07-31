@@ -6,7 +6,8 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 export default function VanReportPage() {
-
+  const [isSubscribed,setIsSubscribed] =
+  useState(false);
   const params = useParams();
 
   const vanCode = decodeURIComponent(
@@ -22,7 +23,90 @@ export default function VanReportPage() {
 
 const [isRouteUnblocked, setIsRouteUnblocked] =
   useState(false);
+  function urlBase64ToUint8Array(
+  base64String: string
+) {
+  const padding =
+    "=".repeat(
+      (4 - (base64String.length % 4)) % 4
+    );
 
+  const base64 =
+    (base64String + padding)
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+  const rawData =
+    window.atob(base64);
+
+  return Uint8Array.from(
+    [...rawData].map(
+      (char) => char.charCodeAt(0)
+    )
+  );
+}
+const subscribeToPush =
+async () => {
+
+  try {
+if (!("serviceWorker" in navigator)) {
+  alert("Service Worker not supported");
+  return;
+}
+    const permission =
+      await Notification.requestPermission();
+
+    if (
+      permission !== "granted"
+    ) {
+      return;
+    }
+
+    const registration =
+      await navigator.serviceWorker.register(
+        "/sw.js"
+      );
+
+    const subscription =
+      await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        
+        applicationServerKey:
+  urlBase64ToUint8Array(
+    process.env
+      .NEXT_PUBLIC_VAPID_PUBLIC_KEY!
+  ),
+
+      });
+
+    await fetch(
+      "/api/push-subscribe",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          van_code: vanCode,
+          subscription,
+        }),
+      }
+    );
+
+    setIsSubscribed(true);
+
+    alert(
+      "Notifications Enabled"
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+
+};
   useEffect(() => {
 
     const load = async () => {
@@ -372,6 +456,24 @@ setIsRouteUnblocked(
             Oldest Credit Days:{" "}
             {oldestDays}
           </div>
+{!isSubscribed && (
+
+  <button
+    onClick={subscribeToPush}
+    className="
+      mt-4
+      bg-yellow-500
+      text-black
+      px-4
+      py-2
+      rounded-lg
+      font-semibold
+    "
+  >
+    🔔 Enable Notifications
+  </button>
+
+)}
 
         </div>
 
