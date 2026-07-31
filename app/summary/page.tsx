@@ -1382,12 +1382,11 @@ const sendWhatsApp = async (
     }
     onChange={async (e) => {
 
-  const isChecked =
-    e.target.checked;
+  const isChecked = e.target.checked;
 
-  setPermissions((prev:any) => ({
+  setPermissions((prev: any) => ({
     ...prev,
-    isChecked,
+    [van]: isChecked,
   }));
 
   await supabase
@@ -1403,7 +1402,6 @@ const sendWhatsApp = async (
     );
 
 }}
-
   />
 </td>
           </tr>
