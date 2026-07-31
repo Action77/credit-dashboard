@@ -48,7 +48,7 @@ await webpush.sendNotification(
   JSON.stringify({
     title: "✅ Route Unblocked",
     body: `Van ${van_code} is now unblocked.`,
-    url: `/van-report?van=${van_code}`,
+    url: `/van/${vanCode}`,
   })
 );
 
