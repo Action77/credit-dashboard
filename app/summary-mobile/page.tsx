@@ -32,9 +32,33 @@ setData(
 const ex =
 await fetch("/api/exceptions");
 
-setExceptions(
- await ex.json()
+const exceptionsData =
+await ex.json();
+
+
+const today = new Date();
+
+today.setHours(0,0,0,0);
+
+
+const validExceptions =
+exceptionsData.filter((item:any)=>{
+
+const tillDate =
+new Date(item.till_date);
+
+tillDate.setHours(0,0,0,0);
+
+
+return (
+item.permanent ||
+tillDate >= today
 );
+
+});
+
+
+setExceptions(validExceptions);
 
 
 
@@ -110,14 +134,19 @@ String(v||"")
 
 
 
+const paymentTerm =
+String(
+row["Payment Term"] || ""
+).trim();
+
+
 const rule =
 creditRules.find(
-r=>
+r =>
 normalize(r.payment_term)
 ===
-normalize(row["Payment Term"])
+normalize(paymentTerm)
 );
-
 
 
 const creditDays =
@@ -137,12 +166,12 @@ row["Central Invoice"]
 
 &&
 
+
 !String(
-row["Invoice status (Due/Overdue)"]
+row["Invoice status (Due/ Overdue)"] || ""
 )
 .toLowerCase()
 .includes("legal")
-
 &&
 
 rule
