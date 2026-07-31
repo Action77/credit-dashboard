@@ -799,15 +799,21 @@ const isBlockedInvoice = (row: any) => {
     row["Invoice status (Due/ Overdue)"] || ""
   ).toLowerCase();
 
-  const rule = creditRules.find(
-  r =>
-    String(r.payment_term || "")
-      .trim()
-      .toUpperCase() ===
-    String(paymentTerm || "")
-      .trim()
-      .toUpperCase()
-);
+  const rule = creditRules.find(r => {
+
+  const dbTerm = String(r.payment_term || "")
+    .trim()
+    .toUpperCase();
+
+  const fileTerm = String(paymentTerm || "")
+    .trim()
+    .toUpperCase();
+
+  return (
+    dbTerm === fileTerm ||
+    fileTerm.includes(dbTerm)
+  );
+});
   // إذا ما فيه Rule لهذا الـ Payment Term
   // اعتبره Block مثل النظام القديم
   if (!rule) {
@@ -838,15 +844,21 @@ const paymentTerm = String(
   .replace(/^ATS\s+/i, "")
   .trim();
 
-const rule = creditRules.find(
-  (r) =>
-    String(r.payment_term || "")
-      .trim()
-      .toUpperCase() ===
-    String(paymentTerm || "")
-      .trim()
-      .toUpperCase()
-);
+const rule = creditRules.find(r => {
+
+  const dbTerm = String(r.payment_term || "")
+    .trim()
+    .toUpperCase();
+
+  const fileTerm = String(paymentTerm || "")
+    .trim()
+    .toUpperCase();
+
+  return (
+    dbTerm === fileTerm ||
+    fileTerm.includes(dbTerm)
+  );
+});
 const isPaymentTermEnabled = true;
     const matchesFilters =
       (
@@ -988,11 +1000,21 @@ if (invoiceStatus.includes("legal")) {
     .trim()
     .toUpperCase();
 
-const rule = creditRules.find(
-  r =>
-    normalize(r.payment_term) ===
-    normalize(paymentTerm)
-);
+const rule = creditRules.find(r => {
+
+  const dbTerm = String(r.payment_term || "")
+    .trim()
+    .toUpperCase();
+
+  const fileTerm = String(paymentTerm || "")
+    .trim()
+    .toUpperCase();
+
+  return (
+    dbTerm === fileTerm ||
+    fileTerm.includes(dbTerm)
+  );
+});
 if (!rule) {
   console.log(
     "R*LE NOT FOUND:",
