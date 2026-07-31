@@ -1385,10 +1385,9 @@ const sendWhatsApp = async (
   const isChecked = e.target.checked;
 
   setPermissions((prev: any) => ({
-    ...prev,
-    isChecked,
-  }));
-
+  ...prev,
+  isChecked,
+}));
   await supabase
     .from("van_permissions")
     .upsert(
