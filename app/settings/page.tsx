@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
+  const [isSavingRules, setIsSavingRules] = useState(false);
+const [isResettingRules, setIsResettingRules] = useState(false);
   const [userSettings, setUserSettings] = useState<any>(null);
   const [creditRules, setCreditRules] = useState<any[]>([]);
 const [loadingRules, setLoadingRules] = useState(false);
@@ -908,36 +910,45 @@ useEffect(() => {
         </div>
       </div>
 
-      <button
-        className="bg-blue-600 text-white px-5 py-2 rounded-lg"
-        onClick={async () => {
+<button
+  disabled={isSavingRules}
+  className={`px-5 py-2 rounded-lg text-white ${
+    isSavingRules
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-blue-600"
+  }`}
+  onClick={async () => {
 
-          const currentUser =
-            localStorage.getItem("currentUser");
+    if (isSavingRules) return;
 
-          await supabase
-            .from("user_settings")
-            .update({
-              show_overdue: showOverdue,
-              show_due: showDue,
-              show_legal: showLegal,
-              show_normal_invoices:
-                showNormalInvoices,
-              show_exception_invoices:
-                showExceptionInvoices,
-              hide_collected:
-                hideCollectedInvoices,
-              hide_user_block:
-                hideUserBlock,
-            })
-            .eq("username", currentUser);
+    setIsSavingRules(true);
 
-          alert("Settings Saved Successfully");
+    try {
 
-        }}
-      >
-        Save Changes
-      </button>
+      for (const rule of creditRules) {
+
+        await supabase
+          .from("credit_block_rules")
+          .update({
+            block_at_day: rule.block_at_day,
+          })
+          .eq("id", rule.id);
+
+      }
+
+
+    } finally {
+
+      setIsSavingRules(false);
+
+    }
+
+  }}
+>
+  {isSavingRules
+    ? "Saving..."
+    : "Save Changes"}
+</button>
 
     </div>
   </>
@@ -1416,34 +1427,50 @@ collection_disabled_at:
             Save Changes
           </button>
 
-          <button
-            className="bg-red-600 text-white px-5 py-2 rounded-lg"
-            onClick={async () => {
+<button
+  disabled={isResettingRules}
+  className={`px-5 py-2 rounded-lg text-white ${
+    isResettingRules
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-red-600"
+  }`}
+  onClick={async () => {
 
-              for (const rule of creditRules) {
+    if (isResettingRules) return;
 
-                await supabase
-                  .from("credit_block_rules")
-                  .update({
-                    block_at_day:
-                      getDefaultBlockDay(
-                        rule.payment_term
-                      ),
-                  })
-                  .eq("id", rule.id);
+    setIsResettingRules(true);
 
-              }
+    try {
 
-              await loadCreditRules();
+      for (const rule of creditRules) {
 
-              alert(
-                "Rules Reset Successfully"
-              );
+        await supabase
+          .from("credit_block_rules")
+          .update({
+            block_at_day:
+              getDefaultBlockDay(
+                rule.payment_term
+              ),
+          })
+          .eq("id", rule.id);
 
-            }}
-          >
-            Reset To Default
-          </button>
+      }
+
+      await loadCreditRules();
+
+
+    } finally {
+
+      setIsResettingRules(false);
+
+    }
+
+  }}
+>
+  {isResettingRules
+    ? "Resetting..."
+    : "Reset To Default"}
+</button>
 
         </div>
 
