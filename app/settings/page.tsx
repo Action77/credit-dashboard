@@ -1429,7 +1429,7 @@ collection_disabled_at:
 
       }
 
-      alert("Rules Saved Successfully");
+    
 
     } finally {
 
