@@ -63,12 +63,19 @@ if (!("serviceWorker" in navigator)) {
     }
 
     const registration =
-      await navigator.serviceWorker.register(
-        "/sw.js"
-      );
+  await navigator.serviceWorker.register(
+    "/sw.js"
+  );
 
-    const subscription =
-      await registration.pushManager.subscribe({
+await navigator.serviceWorker.ready;
+const existingSubscription =
+  await registration.pushManager.getSubscription();
+
+if (existingSubscription) {
+  await existingSubscription.unsubscribe();
+}
+const subscription =
+  await registration.pushManager.subscribe({
         userVisibleOnly: true,
         
         applicationServerKey:
