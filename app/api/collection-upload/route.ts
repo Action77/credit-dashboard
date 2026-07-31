@@ -210,14 +210,13 @@ for (const vanCode in currentCounts) {
       try {
 
         await webpush.sendNotification(
-          subscription,
-          JSON.stringify({
-            title:
-              "✅ Collection Updated",
-            body:
-              `${reducedBy} invoice(s) have been collected from your route.`,
-          })
-        );
+  subscription,
+  JSON.stringify({
+    title: "✅ Collection Updated",
+    body: `${reducedBy} invoice(s) have been collected from your route.`,
+    url: `/van/${vanCode}`,
+  })
+);
 
       } catch (error) {
 

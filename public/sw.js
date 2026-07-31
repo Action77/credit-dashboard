@@ -8,19 +8,24 @@ self.addEventListener("push", (event) => {
         body: data.body,
         icon: "/icon.png",
         badge: "/icon.png",
+        data: {
+          url: data.url || "/",
+        },
       }
     )
   );
 });
-
 self.addEventListener(
   "notificationclick",
   (event) => {
 
     event.notification.close();
 
+    const url =
+      event.notification.data?.url || "/";
+
     event.waitUntil(
-      clients.openWindow("/")
+      clients.openWindow(url)
     );
 
   }
