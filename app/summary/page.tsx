@@ -25,7 +25,9 @@ import {
 import { useEffect, useState } from "react";
 
 export default function SummaryPage() {
-  
+  const [creditRules, setCreditRules] =
+  useState<any[]>([]);
+
   
 const [isImportingUsers,
   setIsImportingUsers] =
@@ -473,6 +475,29 @@ setCollectedInvoices(
   loadData();
 
 }, []);
+useEffect(() => {
+
+  const loadRules = async () => {
+
+    const currentUser =
+      await localStorage.getItem(
+        "currentUser"
+      );
+
+    if (!currentUser) return;
+
+    const { data } = await supabase
+      .from("credit_block_rules")
+      .select("*")
+      .eq("username", currentUser);
+
+    setCreditRules(data || []);
+
+  };
+
+  loadRules();
+
+}, []);
   const getStatusStyle = (
 remaining: number,
 ex: number,
@@ -533,9 +558,37 @@ const filteredData = data.filter((row) => {
     row["Invoice status (Due/ Overdue)"] || ""
   ).toLowerCase();
 
+  const paymentTerm = String(
+    row["Payment Term"] || ""
+  ).trim();
+
+  const normalize = (
+    value: string
+  ) =>
+    String(value || "")
+      .replace(/^ATS\s+/i, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toUpperCase();
+
+  const rule = creditRules.find(
+    r =>
+      normalize(r.payment_term) ===
+      normalize(paymentTerm)
+  );
+
+  const creditDays =
+    Number(row["Credit_Days"]) || 0;
+
+  const showInvoice =
+    rule
+      ? creditDays >= rule.block_at_day
+      : false;
+
   return (
     isNotCentral &&
     !invoiceStatus.includes("legal") &&
+    showInvoice &&
     regionMatch &&
     cityMatch &&
     vanMatch
