@@ -116,11 +116,17 @@ const { data: creditRows } =
   await supabase
     .from("credit_data")
     .select("invoice, van_code");
+const { data: allCollected } =
+  await supabase
+    .from("collection_invoices")
+    .select("invoice");
+
 const collectedSet = new Set(
-  invoices.map(i =>
-    String(i)
-      .trim()
-      .toUpperCase()
+  (allCollected || []).map(
+    (row: any) =>
+      String(row.invoice)
+        .trim()
+        .toUpperCase()
   )
 );
 
