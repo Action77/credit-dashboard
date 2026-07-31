@@ -287,7 +287,7 @@ export default function VanReportPage() {
       <div className="mb-4">
 
         <Link
-          href="/summary-mobile"
+          href="/van"
           className="text-blue-600 text-sm"
         >
           ← Back
