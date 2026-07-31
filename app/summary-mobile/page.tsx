@@ -74,30 +74,15 @@ setCollectedInvoices(
 
 
 
-const user =
-await localStorage.getItem(
-"currentUser"
-);
-
-
-if(user){
-
-const { data } =
+const { data: rules } =
 await supabase
 .from("credit_block_rules")
-.select("*")
-.eq(
-"username",
-user
-);
+.select("*");
 
 
 setCreditRules(
-data || []
+rules || []
 );
-
-}
-
 
 
 const saved =
