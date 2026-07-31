@@ -1422,7 +1422,7 @@ const sendWhatsApp = async (
 
   } catch (error) {
 
-    alert("Push Failed");
+    
 
   }
 
