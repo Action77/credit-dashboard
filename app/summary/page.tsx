@@ -520,19 +520,26 @@ const filteredData = data.filter((row) => {
     filters.vans.includes(
       row["Van Code."]
     );
-const isNotCentral =
-  String(
-    row["Central Invoice"] || ""
-  )
-    .trim()
-    .toUpperCase() ===
-  "NOT CENTRAL";
-return (
-  isNotCentral &&
-  regionMatch &&
-  cityMatch &&
-  vanMatch
-);
+
+  const isNotCentral =
+    String(
+      row["Central Invoice"] || ""
+    )
+      .trim()
+      .toUpperCase() ===
+    "NOT CENTRAL";
+
+  const invoiceStatus = String(
+    row["Invoice status (Due/ Overdue)"] || ""
+  ).toLowerCase();
+
+  return (
+    isNotCentral &&
+    !invoiceStatus.includes("legal") &&
+    regionMatch &&
+    cityMatch &&
+    vanMatch
+  );
 
 });
   const vans = Object.entries(
@@ -625,15 +632,7 @@ return (
   return "All Collected";
 
 };
-const summaryBaseData =
-  data.filter((row) =>
-    String(
-      row["Central Invoice"] || ""
-    )
-      .trim()
-      .toUpperCase() ===
-    "NOT CENTRAL"
-  );
+const summaryBaseData = filteredData;
 const regionSummary = Object.entries(
 
   summaryBaseData.reduce(
