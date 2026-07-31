@@ -1,4 +1,7 @@
 "use client";
+import WhatsAppReport from "@/components/WhatsAppReport";
+import html2canvas from "html2canvas";
+import { FaWhatsapp } from "react-icons/fa";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -25,6 +28,12 @@ import {
 import { useEffect, useState } from "react";
 
 export default function SummaryPage() {
+  const [whatsAppVan, setWhatsAppVan] =
+  useState("");
+
+const [isSendingWhatsApp,
+  setIsSendingWhatsApp] =
+  useState(false);
   const [creditRules, setCreditRules] =
   useState<any[]>([]);
 
@@ -790,7 +799,174 @@ const regionSummary = Object.entries(
     {}
   )
 );
+const whatsappData =
+  filteredData.filter(
+    (row) => {
+
+      if (
+        row["Van Code."] !==
+        whatsAppVan
+      ) {
+        return false;
+      }
+
+      const invoice =
+        String(
+          row["Invoice #"]
+        )
+          .replace(/\s/g, "")
+          .toUpperCase();
+
+      const isException =
+        exceptions.some(
+          (e) =>
+            String(e.invoice)
+              .replace(/\s/g, "")
+              .toUpperCase() ===
+            invoice
+        );
+
+      const isCollected =
+        collectedInvoices.some(
+          (i) =>
+            String(i)
+              .replace(/\s/g, "")
+              .toUpperCase() ===
+            invoice
+        );
+
+      return (
+        !isException &&
+        !isCollected
+      );
+
+    }
+  );
+const sendWhatsApp = async (
+  vanCode: string
+) => {
+
+  if (isSendingWhatsApp)
+    return;
+
+  setIsSendingWhatsApp(true);
+
+  try {
+
+    setWhatsAppVan(vanCode);
+
+    await new Promise(
+      resolve =>
+        setTimeout(resolve, 200)
+    );
+
+    const report =
+      document.getElementById(
+        "whatsapp-report"
+      );
+
+    if (!report) {
+
+      alert(
+        "Report Not Found"
+      );
+
+      return;
+
+    }
+
+    const canvas =
+      await html2canvas(
+        report,
+        {
+          scale: 2,
+          backgroundColor:
+            "#ffffff",
+        }
+      );
+
+    const blob =
+      await new Promise<
+        Blob | null
+      >(
+        resolve =>
+          canvas.toBlob(
+            blob =>
+              resolve(blob),
+            "image/png"
+          )
+      );
+
+    if (!blob) return;
+
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        "image/png": blob,
+      }),
+    ]);
+
+    const response =
+      await fetch("/api/users");
+
+    const users =
+      await response.json();
+
+    const selectedUser =
+      users.find(
+        (user: any) =>
+          user.van_sub_inventory ===
+          vanCode
+      );
+
+    if (!selectedUser) {
+
+      alert(
+        `Van ${vanCode} not found`
+      );
+
+      return;
+
+    }
+
+    const phoneNumber =
+      String(
+        selectedUser.contact
+      ).replace(/\s/g, "");
+
+    const whatsappNumber =
+      phoneNumber.startsWith(
+        "05"
+      )
+        ? `966${phoneNumber.slice(1)}`
+        : phoneNumber;
+
+    window.open(
+      `https://wa.me/${whatsappNumber}`,
+      "_blank"
+    );
+
+  } finally {
+
+    setIsSendingWhatsApp(false);
+
+  }
+
+};
   return (
+  <>
+    <div
+      style={{
+        position: "absolute",
+        left: "-99999px",
+        top: 0,
+      }}
+    >
+      <WhatsAppReport
+        vanCode={whatsAppVan}
+        data={whatsappData}
+      />
+    </div>
+
     <div className="min-h-screen bg-[#f4f7fc] flex">
 
       <aside className="w-52 bg-[#071d5c] text-white flex flex-col">
@@ -1128,30 +1304,50 @@ const regionSummary = Object.entries(
 
             <td className="px-4 py-3 text-center border-r border-b border-slate-300">
 
-  <span
-  className={`
-      inline-flex
-      items-center
-      justify-center
-      min-w-[130px]
-      px-3
-      py-1
-      rounded-full
-      text-xs
-      font-semibold
-            ${getStatusStyle(
-        info.remaining,
-        info.exceptions,
-        lastUpdatedVans.some(
-          (v) =>
-            String(v).trim() ===
-            String(van).trim()
-        )
-      )}
-    `}
-  >
-    {status}
-  </span>
+  <div className="flex items-center justify-center gap-2">
+
+    {info.remaining > 0 && (
+
+      <button
+        onClick={() => sendWhatsApp(van)}
+        className="
+          text-green-600
+          hover:text-green-700
+          transition
+        "
+        title="Send WhatsApp Report"
+      >
+        <FaWhatsapp size={22} />
+      </button>
+
+    )}
+
+    <span
+      className={`
+        inline-flex
+        items-center
+        justify-center
+        min-w-[130px]
+        px-3
+        py-1
+        rounded-full
+        text-xs
+        font-semibold
+        ${getStatusStyle(
+          info.remaining,
+          info.exceptions,
+          lastUpdatedVans.some(
+            (v) =>
+              String(v).trim() ===
+              String(van).trim()
+          )
+        )}
+      `}
+    >
+      {status}
+    </span>
+
+  </div>
 
 </td>
             <td className="px-3 py-2 border-r border-b border-slate-300 text-center">
@@ -1530,6 +1726,7 @@ const regionSummary = Object.entries(
   </div>
 )}
 
-</div>
+    </div>
+  </>
 );
 }
