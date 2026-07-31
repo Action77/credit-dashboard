@@ -13,51 +13,45 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export async function POST(
-  request: Request
-) {
+export async function POST(request: Request) {
   try {
+    const { van_code } = await request.json();
 
-    const { van_code } =
-      await request.json();
-
-    const { data, error } =
-      await supabase
-        .from("push_subscriptions")
-        .select("*")
-        .eq("van_code", van_code);
+    const { data, error } = await supabase
+      .from("push_subscriptions")
+      .select("*")
+      .eq("van_code", van_code);
 
     if (error) {
       throw error;
     }
 
     for (const row of data || []) {
+      const subscription =
+        typeof row.subscription === "string"
+          ? JSON.parse(row.subscription)
+          : row.subscription;
 
-  const subscription =
-    typeof row.subscription === "string"
-      ? JSON.parse(row.subscription)
-      : row.subscription;
+      console.log(
+        "Subscription endpoint:",
+        subscription.endpoint
+      );
 
-  console.log(
-    "Subscription endpoint:",
-    subscription.endpoint
-  );
-
-await webpush.sendNotification(
-  subscription,
-  JSON.stringify({
-    title: "✅ Route Unblocked",
-    body: `Van ${van_code} is now unblocked.`,
-    url: `/van/${vanCode}`,
-  })
-);
+      await webpush.sendNotification(
+        subscription,
+        JSON.stringify({
+          title: "✅ Route Unblocked",
+          body: `Van ${van_code} is now unblocked.`,
+          url: `/van/${van_code}`,
+        })
+      );
+    }
 
     return NextResponse.json({
       success: true,
     });
 
   } catch (error: any) {
-
     return NextResponse.json(
       {
         success: false,
@@ -65,6 +59,5 @@ await webpush.sendNotification(
       },
       { status: 500 }
     );
-
   }
 }
