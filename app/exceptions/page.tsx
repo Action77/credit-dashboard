@@ -525,12 +525,17 @@ useEffect(() => {
     });
 
     if (duplicatesToDelete.length) {
-      await supabase
-        .from("exceptions")
-        .delete()
-        .in("id", duplicatesToDelete);
-    }
-  };
+  await supabase
+    .from("exceptions")
+    .delete()
+    .in("id", duplicatesToDelete);
+
+  setExceptions(prev =>
+    prev.filter(
+      item => !duplicatesToDelete.includes(item.id)
+    )
+  );
+}  };
 
   if (exceptions.length) {
     removeDuplicates();
