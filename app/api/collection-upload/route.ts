@@ -112,143 +112,128 @@ await supabase
     title: "📦 Collection File Imported",
     message: `Collection ${uploadRecord.id} uploaded successfully by ${user?.full_name || uploadedBy}.`,
   });
-const previousUploadId =
-  uploadRecord.id - 1;
+const { data: creditRows } =
+  await supabase
+    .from("credit_data_full")
+    .select("invoice, van_code");
 
-if (previousUploadId > 0) {
+const collectedSet = new Set(
+  invoices.map(i =>
+    String(i)
+      .trim()
+      .toUpperCase()
+  )
+);
 
-  const { data: previousInvoices } =
-    await supabase
-      .from("collection_invoices")
-      .select("invoice")
-      .eq(
-        "upload_id",
-        previousUploadId
-      );
+const currentCounts: Record<string, number> = {};
 
-  const currentSet = new Set(
-    invoices.map(i =>
-      String(i)
-        .trim()
-        .toUpperCase()
-    )
-  );
+(creditRows || []).forEach(
+  (row: any) => {
 
-  const disappearedInvoices =
-    (previousInvoices || [])
-      .map((x: any) =>
-        String(x.invoice)
-          .trim()
-          .toUpperCase()
+    const vanCode =
+      String(
+        row.van_code || ""
+      ).trim();
+
+    if (!vanCode) return;
+
+    const invoice =
+      String(
+        row.invoice || ""
       )
-      .filter(
-        invoice =>
-          !currentSet.has(invoice)
-      );
+        .trim()
+        .toUpperCase();
 
-  if (
-    disappearedInvoices.length > 0
-  ) {
+    if (collectedSet.has(invoice))
+      return;
 
-    const { data: invoiceInfo } =
-      await supabase
-        .from("credit_data_full")
-        .select(
-          "invoice, van_code"
-        )
-        .in(
-          "invoice",
-          disappearedInvoices
-        );
-
-    const vanGroups: any = {};
-
-    (invoiceInfo || []).forEach(
-      (row: any) => {
-
-        const van =
-          row.van_code ||
-          "Unknown";
-
-        vanGroups[van] =
-          (vanGroups[van] || 0) + 1;
-
-      }
-    );
-
-    const { data: userFilters } =
-      await supabase
-        .from("user_filters")
-        .select("*");
-
-    for (const vanCode in vanGroups) {
-
-  const count =
-    vanGroups[vanCode];
-
-  const matchedUsers =
-    (userFilters || [])
-      .filter(
-        (user: any) =>
-          user.vans?.includes(
-            vanCode
-          )
-      );
-
-  for (const user of matchedUsers) {
-
-    await supabase
-      .from("notifications")
-      .insert({
-        username: user.username,
-        title: "🚨 Disappeared Invoices",
-        message:
-          `${count} invoices disappeared in ${vanCode}.`,
-      });
+    currentCounts[vanCode] =
+      (currentCounts[vanCode] || 0) + 1;
 
   }
+);
 
-  const { data: subscriptions } =
+for (const vanCode in currentCounts) {
+
+  const newCount =
+    currentCounts[vanCode];
+
+  const { data: savedCount } =
     await supabase
-      .from("push_subscriptions")
-      .select("*")
-      .eq("van_code", vanCode);
+      .from("van_invoice_counts")
+      .select("invoice_count")
+      .eq(
+        "van_code",
+        vanCode
+      )
+      .single();
 
-  for (const row of subscriptions || []) {
+  const oldCount =
+    savedCount?.invoice_count;
 
-    const subscription =
-      typeof row.subscription === "string"
-        ? JSON.parse(
-            row.subscription
-          )
-        : row.subscription;
+  if (
+    oldCount !== null &&
+    oldCount !== undefined &&
+    newCount < oldCount
+  ) {
 
-    try {
+    const reducedBy =
+      oldCount - newCount;
 
-      await webpush.sendNotification(
-        subscription,
-        JSON.stringify({
-          title:
-            "✅ Collection Updated",
-          body:
-            `${count} invoice(s) collected from your route`,
-        })
-      );
+    const { data: subscriptions } =
+      await supabase
+        .from("push_subscriptions")
+        .select("*")
+        .eq(
+          "van_code",
+          vanCode
+        );
 
-    } catch (error) {
+    for (
+      const row of
+      subscriptions || []
+    ) {
 
-      console.error(
-        "Push notification failed:",
-        error
-      );
+      const subscription =
+        typeof row.subscription ===
+        "string"
+          ? JSON.parse(
+              row.subscription
+            )
+          : row.subscription;
+
+      try {
+
+        await webpush.sendNotification(
+          subscription,
+          JSON.stringify({
+            title:
+              "✅ Collection Updated",
+            body:
+              `${reducedBy} invoice(s) have been collected from your route.`,
+          })
+        );
+
+      } catch (error) {
+
+        console.error(
+          error
+        );
+
+      }
 
     }
 
   }
 
-}
-
-  }
+  await supabase
+    .from("van_invoice_counts")
+    .upsert({
+      van_code: vanCode,
+      invoice_count: newCount,
+      updated_at:
+        new Date().toISOString(),
+    });
 
 }
     return NextResponse.json({
