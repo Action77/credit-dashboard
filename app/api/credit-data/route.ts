@@ -38,7 +38,56 @@ while (true) {
 }
 
 const data = allData;
+/* Auto Clear Daily - Saudi Time */
 
+if (data.length > 0) {
+
+  const now = new Date();
+
+  const saudiToday = new Date(
+    now.toLocaleString("en-US", {
+      timeZone: "Asia/Riyadh",
+    })
+  );
+
+  const todayString =
+    saudiToday.toISOString().split("T")[0];
+
+  const fileCreatedDate = new Date(
+    data[0].created_at
+  );
+
+  const fileSaudiDate =
+    new Date(
+      fileCreatedDate.toLocaleString(
+        "en-US",
+        {
+          timeZone: "Asia/Riyadh",
+        }
+      )
+    )
+      .toISOString()
+      .split("T")[0];
+
+  if (todayString !== fileSaudiDate) {
+
+    await supabase
+      .from("credit_data")
+      .delete()
+      .neq("invoice", "");
+
+    await supabase
+      .from("credit_data_full")
+      .delete()
+      .neq("invoice", "");
+
+    return NextResponse.json({
+      data: [],
+      fileInfo: "",
+    });
+
+  }
+}
 console.log("Rows from Supabase:", data.length);
 console.log("Rows from Supabase:", data?.length);
 console.log("Error:", error);
