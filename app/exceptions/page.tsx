@@ -494,6 +494,48 @@ useEffect(() => {
   loadUser();
 
 }, []);
+useEffect(() => {
+  const removeDuplicates = async () => {
+    const duplicatesToDelete: number[] = [];
+
+    const grouped = exceptions.reduce((acc: any, item: any) => {
+      const key = item.invoice;
+
+      if (!acc[key]) {
+        acc[key] = [item];
+      } else {
+        acc[key].push(item);
+      }
+
+      return acc;
+    }, {});
+
+    Object.values(grouped).forEach((items: any) => {
+      if (items.length > 1) {
+        items.sort(
+          (a: any, b: any) =>
+            calculateBusinessDays(b.till_date) -
+            calculateBusinessDays(a.till_date)
+        );
+
+        items.slice(1).forEach((x: any) => {
+          duplicatesToDelete.push(x.id);
+        });
+      }
+    });
+
+    if (duplicatesToDelete.length) {
+      await supabase
+        .from("exceptions")
+        .delete()
+        .in("id", duplicatesToDelete);
+    }
+  };
+
+  if (exceptions.length) {
+    removeDuplicates();
+  }
+}, [exceptions]);
 const handleDateChange = (
   value: string
 ) => {
@@ -564,6 +606,29 @@ const calculateBusinessDays = (
   return count;
 
 };
+const uniqueExceptions: any[] = Object.values(
+  exceptions.reduce((acc: any, item: any) => {
+    const key = item.invoice;
+
+    const currentDays = item.permanent
+      ? Number.MAX_SAFE_INTEGER
+      : calculateBusinessDays(item.till_date);
+
+    if (!acc[key]) {
+      acc[key] = item;
+    } else {
+      const existingDays = acc[key].permanent
+        ? Number.MAX_SAFE_INTEGER
+        : calculateBusinessDays(acc[key].till_date);
+
+      if (currentDays > existingDays) {
+        acc[key] = item;
+      }
+    }
+
+    return acc;
+  }, {})
+);
 return (
   <div className="min-h-screen bg-[#f4f7fc] flex">
 
@@ -1096,36 +1161,33 @@ await supabase
 
 <tbody>
 
-  {exceptions
+  {uniqueExceptions
   .filter(item => {
-
-    const search =
-      searchTerm.toLowerCase();
+    const search = searchTerm.toLowerCase();
 
     return Object.values(item)
       .join(" ")
       .toLowerCase()
       .includes(search);
-
   })
-  .map(
-        (item, index) => {
+  .map((item, index) => {
 
-      const daysLeft =
-  calculateBusinessDays(
-    item.till_date
-  );
-      return (
+  const daysLeft =
+    calculateBusinessDays(
+      item.till_date
+    );
 
-<tr
-  key={index}
-  className={`border-b ${
-    item.permanent
-      ? "bg-red-50"
-      : "hover:bg-slate-50"
-  }`}
->
+  return (
+    <tr
+      key={index}
+      className={`border-b ${
+        item.permanent
+          ? "bg-red-50"
+          : "hover:bg-slate-50"
+      }`}
+    >
 
+          
           <td className="p-3">{item.van_code}</td>
 
           <td className="p-3">
@@ -1239,12 +1301,10 @@ await supabase
 </button>
     )}
 </td>
-        </tr>
+</tr>
+);
+})}
 
-      );
-
-    }
-  )}
 
 </tbody>
         </table>
