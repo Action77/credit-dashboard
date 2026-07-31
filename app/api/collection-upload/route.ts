@@ -114,9 +114,8 @@ await supabase
   });
 const { data: creditRows } =
   await supabase
-    .from("credit_data_full")
+    .from("credit_data")
     .select("invoice, van_code");
-
 const collectedSet = new Set(
   invoices.map(i =>
     String(i)

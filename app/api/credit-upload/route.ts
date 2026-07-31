@@ -204,7 +204,31 @@ const notificationResult = await supabase
     message: `Credit file uploaded successfully by ${user?.full_name || uploadedBy}.`,
   })
   .select();
+const vanCounts: Record<string, number> = {};
 
+records.forEach((row) => {
+
+  const van =
+    String(row.van_code || "").trim();
+
+  if (!van) return;
+
+  vanCounts[van] =
+    (vanCounts[van] || 0) + 1;
+
+});
+
+for (const vanCode in vanCounts) {
+
+  await supabase
+    .from("van_invoice_counts")
+    .upsert({
+      van_code: vanCode,
+      invoice_count: vanCounts[vanCode],
+      updated_at: new Date().toISOString(),
+    });
+
+}
 console.log(
   "NOTIFICATION RESULT:",
   notificationResult
@@ -218,7 +242,6 @@ return NextResponse.json({
 
   } catch (err) {
     console.error("UPLOAD ERROR:", err);
-
     return NextResponse.json({
       success: false,
       error: String(err),
