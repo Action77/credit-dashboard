@@ -1377,20 +1377,28 @@ const sendWhatsApp = async (
     }
     onChange={async (e) => {
 
+  const isChecked =
+    e.target.checked;
+
+  setPermissions((prev:any) => ({
+    ...prev,
+    isChecked,
+  }));
+
   await supabase
     .from("van_permissions")
-    .upsert({
-      van_code: van,
-      is_unblocked: e.target.checked,
-    });
-
-  const updated = {
-  ...permissions,
-  [van]: e.target.checked,
-};
-  setPermissions(updated);
+    .upsert(
+      {
+        van_code: van,
+        is_unblocked: isChecked,
+      },
+      {
+        onConflict: "van_code",
+      }
+    );
 
 }}
+
   />
 </td>
           </tr>

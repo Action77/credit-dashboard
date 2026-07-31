@@ -314,9 +314,10 @@ setIsRouteUnblocked(
         <h1 className="text-2xl font-bold">
           {vanCode}
         </h1>
-{isRouteUnblocked && (
+<div className="mt-3">
 
-  <div className="mt-3">
+  {isRouteUnblocked ? (
+
     <span
       className="
         inline-flex
@@ -330,12 +331,30 @@ setIsRouteUnblocked(
         font-semibold
       "
     >
-      Route Unblocked
+      ✅ Route Unblocked
     </span>
-  </div>
 
-)}
+  ) : (
 
+    <span
+      className="
+        inline-flex
+        items-center
+        px-4
+        py-2
+        rounded-full
+        bg-red-600
+        text-white
+        text-sm
+        font-semibold
+      "
+    >
+      ⛔ Route Blocked
+    </span>
+
+  )}
+
+</div>
         <div className="mt-3 space-y-1 text-sm">
 
           <div>
