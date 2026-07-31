@@ -789,9 +789,7 @@ const isBlockedInvoice = (row: any) => {
 
   const paymentTerm = String(
   row["Payment Term"] || ""
-)
-  .replace(/^ATS\s+/i, "")
-  .trim();
+).trim();
   const creditDays =
     Number(row["Credit_Days"]) || 0;
 
@@ -799,22 +797,18 @@ const isBlockedInvoice = (row: any) => {
     row["Invoice status (Due/ Overdue)"] || ""
   ).toLowerCase();
 
-  const rule = creditRules.find(r => {
-
-  const dbTerm = String(r.payment_term || "")
+  const normalize = (value: string) =>
+  String(value || "")
+    .replace(/^ATS\s+/i, "")
+    .replace(/\s+/g, " ")
     .trim()
     .toUpperCase();
 
-  const fileTerm = String(paymentTerm || "")
-    .trim()
-    .toUpperCase();
-
-  return (
-    dbTerm === fileTerm ||
-    fileTerm.includes(dbTerm)
-  );
-});
-  // إذا ما فيه Rule لهذا الـ Payment Term
+const rule = creditRules.find(
+  r =>
+    normalize(r.payment_term) ===
+    normalize(paymentTerm)
+);  // إذا ما فيه Rule لهذا الـ Payment Term
   // اعتبره Block مثل النظام القديم
   if (!rule) {
     return (
@@ -840,25 +834,19 @@ const filterBaseData =
     .toUpperCase() === "NOT CENTRAL";
 const paymentTerm = String(
   row["Payment Term"] || ""
-)
-  .replace(/^ATS\s+/i, "")
-  .trim();
-
-const rule = creditRules.find(r => {
-
-  const dbTerm = String(r.payment_term || "")
+).trim();
+const normalize = (value: string) =>
+  String(value || "")
+    .replace(/^ATS\s+/i, "")
+    .replace(/\s+/g, " ")
     .trim()
     .toUpperCase();
 
-  const fileTerm = String(paymentTerm || "")
-    .trim()
-    .toUpperCase();
-
-  return (
-    dbTerm === fileTerm ||
-    fileTerm.includes(dbTerm)
-  );
-});
+const rule = creditRules.find(
+  r =>
+    normalize(r.payment_term) ===
+    normalize(paymentTerm)
+);
 const isPaymentTermEnabled = true;
     const matchesFilters =
       (
@@ -983,9 +971,7 @@ const filteredData = filterBaseData
 
     const paymentTerm = String(
   row["Payment Term"] || ""
-)
-  .replace(/^ATS\s+/i, "")
-  .trim();
+).trim();
       const invoiceStatus = String(
   row["Invoice status (Due/ Overdue)"] || ""
 ).toLowerCase();
@@ -994,27 +980,19 @@ if (invoiceStatus.includes("legal")) {
   return false;
 }
 
-    const normalize = (value: string) =>
+    
+const normalize = (value: string) =>
   String(value || "")
+    .replace(/^ATS\s+/i, "")
     .replace(/\s+/g, " ")
     .trim()
     .toUpperCase();
 
-const rule = creditRules.find(r => {
-
-  const dbTerm = String(r.payment_term || "")
-    .trim()
-    .toUpperCase();
-
-  const fileTerm = String(paymentTerm || "")
-    .trim()
-    .toUpperCase();
-
-  return (
-    dbTerm === fileTerm ||
-    fileTerm.includes(dbTerm)
-  );
-});
+const rule = creditRules.find(
+  r =>
+    normalize(r.payment_term) ===
+    normalize(paymentTerm)
+);
 if (!rule) {
   console.log(
     "R*LE NOT FOUND:",
