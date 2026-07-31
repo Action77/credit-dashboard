@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { createClient } from "@supabase/supabase-js";
 
+const webpush = require("web-push");
+
+webpush.setVapidDetails(
+  process.env.VAPID_EMAIL!,
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+  process.env.VAPID_PRIVATE_KEY!
+);
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -175,34 +183,70 @@ if (previousUploadId > 0) {
 
     for (const vanCode in vanGroups) {
 
-      const count =
-        vanGroups[vanCode];
+  const count =
+    vanGroups[vanCode];
 
-      const matchedUsers =
-        (userFilters || [])
-          .filter(
-            (user: any) =>
-              user.vans?.includes(
-                vanCode
-              )
-          );
+  const matchedUsers =
+    (userFilters || [])
+      .filter(
+        (user: any) =>
+          user.vans?.includes(
+            vanCode
+          )
+      );
 
-      for (const user of matchedUsers) {
+  for (const user of matchedUsers) {
 
-        await supabase
-          .from("notifications")
-          .insert({
-            username:
-              user.username,
-            title:
-              "🚨 Disappeared Invoices",
-            message:
-              `${count} invoices disappeared in ${vanCode}.`,
-          });
+    await supabase
+      .from("notifications")
+      .insert({
+        username: user.username,
+        title: "🚨 Disappeared Invoices",
+        message:
+          `${count} invoices disappeared in ${vanCode}.`,
+      });
 
-      }
+  }
+
+  const { data: subscriptions } =
+    await supabase
+      .from("push_subscriptions")
+      .select("*")
+      .eq("van_code", vanCode);
+
+  for (const row of subscriptions || []) {
+
+    const subscription =
+      typeof row.subscription === "string"
+        ? JSON.parse(
+            row.subscription
+          )
+        : row.subscription;
+
+    try {
+
+      await webpush.sendNotification(
+        subscription,
+        JSON.stringify({
+          title:
+            "✅ Collection Updated",
+          body:
+            `${count} invoice(s) collected from your route`,
+        })
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Push notification failed:",
+        error
+      );
 
     }
+
+  }
+
+}
 
   }
 
