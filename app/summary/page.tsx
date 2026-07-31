@@ -1403,7 +1403,7 @@ const sendWhatsApp = async (
 
   if (isChecked) {
 
-  alert("send-push start");
+
 
   try {
 
@@ -1419,12 +1419,6 @@ const sendWhatsApp = async (
         }),
       });
 
-    const result =
-      await response.json();
-
-    alert(
-      JSON.stringify(result)
-    );
 
   } catch (error) {
 
