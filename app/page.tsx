@@ -24,6 +24,47 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  const handleDateChange = (value: string) => {
+  const selectedDate = new Date(value);
+
+  if (selectedDate.getDay() === 5) {
+    selectedDate.setDate(selectedDate.getDate() + 1);
+
+    setTillDate(
+      selectedDate.toISOString().split("T")[0]
+    );
+
+    return;
+  }
+
+  setTillDate(value);
+};
+
+const calculateBusinessDays = (
+  dateString: string
+) => {
+  if (!dateString) return 0;
+
+  const today = new Date();
+
+  today.setHours(0, 0, 0, 0);
+
+  const endDate = new Date(dateString);
+
+  let count = 0;
+
+  const current = new Date(today);
+
+  while (current <= endDate) {
+    if (current.getDay() !== 5) {
+      count++;
+    }
+
+    current.setDate(current.getDate() + 1);
+  }
+
+  return count;
+};
   const [creditRules, setCreditRules] =
   useState<any[]>([]);
   const [isImportingUsers, setIsImportingUsers] = useState(false);
@@ -2148,14 +2189,26 @@ await localStorage.setItem(
       className="w-full border rounded-lg p-3 mb-3"
     />
 
-    <input
-      type="date"
-      value={tillDate}
-      onChange={(e) =>
-        setTillDate(e.target.value)
-      }
-      className="w-full border rounded-lg p-3 mb-3"
-    />
+<input
+  type="date"
+  value={tillDate}
+  min={new Date().toISOString().split("T")[0]}
+  onChange={(e) =>
+    handleDateChange(e.target.value)
+  }
+  className="w-full border rounded-lg p-3 mb-3"
+/>
+
+{tillDate && (
+  <div className="mb-3 text-sm text-green-600 font-semibold">
+    Exception Duration:
+    <span className="ml-2">
+      {calculateBusinessDays(tillDate)}
+      {" "}
+      Working Days
+    </span>
+  </div>
+)}
   </>
 )}
 
@@ -2324,16 +2377,11 @@ await addLog(
             new Date(item.till_date);
 
           const daysLeft =
-            isNaN(tillDate.getTime())
-              ? "-"
-              : Math.ceil(
-                  (
-                    tillDate.getTime() -
-                    new Date().getTime()
-                  ) /
-                    (1000 * 60 * 60 * 24)
-                );
-
+  item.till_date
+    ? calculateBusinessDays(
+        item.till_date
+      )
+    : "-";
           return (
 
 
