@@ -969,6 +969,13 @@ const filteredData = filterBaseData
     const paymentTerm = String(
       row["Payment Term"] || ""
     ).trim();
+    const invoiceStatus = String(
+  row["Invoice status (Due/ Overdue)"] || ""
+).toLowerCase();
+
+if (invoiceStatus.includes("legal")) {
+  return false;
+}
 
     const normalize = (value: string) =>
   String(value || "")
