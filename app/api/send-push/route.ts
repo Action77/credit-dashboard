@@ -43,15 +43,14 @@ export async function POST(
     subscription.endpoint
   );
 
-  await webpush.sendNotification(
-    subscription,
-    JSON.stringify({
-      title: "✅ Route Unblocked",
-      body: `Van ${van_code} is now unblocked`,
-    })
-  );
-
-}
+await webpush.sendNotification(
+  subscription,
+  JSON.stringify({
+    title: "✅ Route Unblocked",
+    body: `Van ${van_code} is now unblocked.`,
+    url: `/van-report?van=${van_code}`,
+  })
+);
 
     return NextResponse.json({
       success: true,
