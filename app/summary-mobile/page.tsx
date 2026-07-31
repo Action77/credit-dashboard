@@ -1,362 +1,467 @@
-// app/summary-mobile/page.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 
-export default function SummaryMobile() {
-  const [data, setData] = useState<any[]>([]);
-  const [exceptions, setExceptions] = useState<any[]>([]);
-  const [collectedInvoices, setCollectedInvoices] = useState<string[]>([]);
-  const [permissions, setPermissions] = useState<any>({});
-  const [creditRules, setCreditRules] = useState<any[]>([]);
+export default function MobileSummaryPage() {
 
-  const [filters] = useState<any>({
-    regions: [],
-    cities: [],
-    vans: [],
-  });
+  const [data,setData] = useState<any[]>([]);
+  const [exceptions,setExceptions] = useState<any[]>([]);
+  const [collectedInvoices,setCollectedInvoices] = useState<string[]>([]);
+  const [creditRules,setCreditRules] = useState<any[]>([]);
+  const [permissions,setPermissions] = useState<any>({});
 
-  useEffect(() => {
-    const loadData = async () => {
-      const response =
-        await fetch("/api/credit-data");
 
-      const result =
-        await response.json();
+useEffect(()=>{
 
-      setData(result.data || []);
+const load = async()=>{
 
-      const exceptionsResponse =
-        await fetch("/api/exceptions");
 
-      const exceptionsData =
-        await exceptionsResponse.json();
+const credit =
+await fetch("/api/credit-data");
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+const creditData =
+await credit.json();
 
-      const validExceptions =
-        exceptionsData.filter((item: any) => {
-          const tillDate =
-            new Date(item.till_date);
+setData(
+ creditData.data || []
+);
 
-          tillDate.setHours(
-            0,
-            0,
-            0,
-            0
-          );
 
-          return (
-            item.permanent ||
-            tillDate >= today
-          );
-        });
 
-      setExceptions(validExceptions);
+const ex =
+await fetch("/api/exceptions");
 
-      const collectionResponse =
-        await fetch(
-          "/api/collection-data"
-        );
+setExceptions(
+ await ex.json()
+);
 
-      const collectionData =
-        await collectionResponse.json();
 
-      setCollectedInvoices(
-        collectionData.invoices || []
-      );
 
-      const savedPermissions =
-        await localStorage.getItem(
-          "vanPermissions"
-        );
+const col =
+await fetch("/api/collection-data");
 
-      if (savedPermissions) {
-        setPermissions(
-          JSON.parse(savedPermissions)
-        );
-      }
-    };
+const colData =
+await col.json();
 
-    loadData();
-  }, []);
+setCollectedInvoices(
+ colData.invoices || []
+);
 
-  useEffect(() => {
-    const loadRules = async () => {
-      const currentUser =
-        await localStorage.getItem(
-          "currentUser"
-        );
 
-      if (!currentUser) return;
 
-      const { data } =
-        await supabase
-          .from("credit_block_rules")
-          .select("*")
-          .eq(
-            "username",
-            currentUser
-          );
+const user =
+await localStorage.getItem(
+"currentUser"
+);
 
-      setCreditRules(data || []);
-    };
 
-    loadRules();
-  }, []);
+if(user){
 
-  const getStatusStyle = (
-    remaining: number,
-    ex: number
-  ) => {
-    if (
-      remaining === 0 &&
-      ex === 0
-    ) {
-      return "bg-green-100 text-green-700";
-    }
+const {data} =
+await fetch(
+`/api/credit-rules?username=${user}`
+).then(r=>r.json());
 
-    if (
-      remaining > 0 &&
-      ex === 0
-    ) {
-      return "bg-pink-100 text-pink-700";
-    }
 
-    if (
-      remaining === 0 &&
-      ex > 0
-    ) {
-      return "bg-orange-100 text-orange-700";
-    }
+setCreditRules(data || []);
 
-    return "bg-orange-200 text-orange-900";
-  };
+}
 
-  const getStatus = (
-    remaining: number,
-    ex: number
-  ) => {
-    if (
-      remaining > 0 &&
-      ex > 0
-    ) {
-      return `${remaining} Remaining , Ex`;
-    }
 
-    if (remaining > 0) {
-      return `${remaining} Remaining`;
-    }
 
-    if (
-      remaining === 0 &&
-      ex > 0
-    ) {
-      return "Ex & All Collected";
-    }
+const saved =
+await localStorage.getItem(
+"vanPermissions"
+);
 
-    return "All Collected";
-  };
+if(saved)
+setPermissions(
+JSON.parse(saved)
+);
 
-  const filteredData = data.filter(
-    (row) => {
-      const isNotCentral =
-        String(
-          row["Central Invoice"] || ""
-        )
-          .trim()
-          .toUpperCase() ===
-        "NOT CENTRAL";
 
-      const invoiceStatus = String(
-        row[
-          "Invoice status (Due/ Overdue)"
-        ] || ""
-      ).toLowerCase();
+};
 
-      const paymentTerm = String(
-        row["Payment Term"] || ""
-      ).trim();
 
-      const normalize = (
-        value: string
-      ) =>
-        String(value || "")
-          .replace(/^ATS\s+/i, "")
-          .replace(/\s+/g, " ")
-          .trim()
-          .toUpperCase();
+load();
 
-      const rule =
-        creditRules.find(
-          (r) =>
-            normalize(
-              r.payment_term
-            ) ===
-            normalize(
-              paymentTerm
-            )
-        );
 
-      const creditDays =
-        Number(
-          row["Credit_Days"]
-        ) || 0;
+},[]);
 
-      const showInvoice =
-        rule
-          ? creditDays >=
-            rule.block_at_day
-          : false;
 
-      return (
-        isNotCentral &&
-        !invoiceStatus.includes(
-          "legal"
-        ) &&
-        showInvoice
-      );
-    }
-  );
 
-  const vans = Object.entries(
-    filteredData.reduce(
-      (acc: any, row) => {
-        const van =
-          row["Van Code."];
+const filteredData =
+data.filter((row)=>{
 
-        if (!acc[van]) {
-          acc[van] = {
-            ids: new Set(),
-            remaining: 0,
-            exceptions: 0,
-          };
-        }
 
-        acc[van].ids.add(
-          row["Employee ATS Code."]
-        );
+const normalize=(v:string)=>
+String(v||"")
+.replace(/^ATS\s+/i,"")
+.replace(/\s+/g," ")
+.trim()
+.toUpperCase();
 
-        const invoice = String(
-          row["Invoice #"]
-        )
-          .replace(/\s/g, "")
-          .toUpperCase();
 
-        const isException =
-          exceptions.some(
-            (e: any) =>
-              String(e.invoice)
-                .replace(/\s/g, "")
-                .toUpperCase() ===
-              invoice
-          );
 
-        const isCollected =
-          collectedInvoices.some(
-            (i) =>
-              String(i)
-                .replace(/\s/g, "")
-                .toUpperCase() ===
-              invoice
-          );
+const rule =
+creditRules.find(
+r=>
+normalize(r.payment_term)
+===
+normalize(row["Payment Term"])
+);
 
-        if (isException) {
-          acc[van]
-            .exceptions++;
-        } else if (
-          !isCollected
-        ) {
-          acc[van]
-            .remaining++;
-        }
 
-        return acc;
-      },
-      {}
-    )
-  ).sort((a: any, b: any) =>
-    String(a[0]).localeCompare(
-      String(b[0]),
-      undefined,
-      { numeric: true }
-    )
-  );
 
-  return (
-    <div className="min-h-screen bg-slate-100 p-4">
+const creditDays =
+Number(row["Credit_Days"])||0;
 
-      <h1 className="text-2xl font-bold mb-4">
-        Van Performance
-      </h1>
 
-      <div className="space-y-3">
 
-        {vans.map(
-          ([van, info]: any) => (
-            <div
-              key={van}
-              className="bg-white rounded-xl border shadow-sm p-4"
-            >
-              <div className="flex justify-between items-start gap-3">
+return (
 
-                <div>
-                  <div className="font-bold text-lg">
-                    Van {van}
-                  </div>
+String(
+row["Central Invoice"]
+)
+.trim()
+.toUpperCase()
+===
+"NOT CENTRAL"
 
-                  <div className="text-sm text-slate-500 mt-1">
-                    {[...info.ids].join(
-                      " or "
-                    )}
-                  </div>
-                </div>
+&&
 
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold text-center ${getStatusStyle(
-                    info.remaining,
-                    info.exceptions
-                  )}`}
-                >
-                  {getStatus(
-                    info.remaining,
-                    info.exceptions
-                  )}
-                </span>
-              </div>
+!String(
+row["Invoice status (Due/Overdue)"]
+)
+.toLowerCase()
+.includes("legal")
 
-              <div className="mt-4 flex justify-between">
+&&
 
-                <span className="text-slate-500">
-                  Permission
-                </span>
+rule
 
-                <span
-                  className={
-                    permissions[
-                      van
-                    ]
-                      ? "text-green-600 font-semibold"
-                      : "text-red-600 font-semibold"
-                  }
-                >
-                  {permissions[
-                    van
-                  ]
-                    ? "Enabled"
-                    : "Disabled"}
-                </span>
-              </div>
-            </div>
-          )
-        )}
+&&
 
-      </div>
+creditDays >=
+rule.block_at_day
 
-    </div>
-  );
+);
+
+
+});
+
+
+
+const vans =
+Object.entries(
+
+filteredData.reduce(
+(acc:any,row)=>{
+
+
+const van =
+row["Van Code."];
+
+
+if(!acc[van]){
+
+acc[van]={
+ids:new Set(),
+remaining:0,
+exceptions:0
+};
+
+}
+
+
+acc[van].ids.add(
+row["Employee ATS Code."]
+);
+
+
+
+const invoice =
+String(row["Invoice #"])
+.replace(/\s/g,"")
+.toUpperCase();
+
+
+
+const ex =
+exceptions.some(
+(e:any)=>
+String(e.invoice)
+.replace(/\s/g,"")
+.toUpperCase()
+===
+invoice
+);
+
+
+
+const collected =
+collectedInvoices.some(
+(i)=>
+String(i)
+.replace(/\s/g,"")
+.toUpperCase()
+===
+invoice
+);
+
+
+
+if(ex){
+
+acc[van].exceptions++;
+
+}
+else if(!collected){
+
+acc[van].remaining++;
+
+}
+
+
+
+return acc;
+
+
+},{}
+
+)
+
+);
+
+
+
+const getStatus=(r:number,e:number)=>{
+
+
+if(r>0 && e>0)
+return `${r} Remaining , Ex`;
+
+
+if(r>0)
+return `${r} Remaining`;
+
+
+if(e>0)
+return "Ex & All Collected";
+
+
+return "All Collected";
+
+
+};
+
+
+
+return (
+
+<div className="min-h-screen bg-slate-100 p-3">
+
+
+<h1 className="
+text-2xl
+font-bold
+mb-4
+text-slate-800
+">
+
+Van Performance
+
+</h1>
+
+
+<div className="
+bg-white
+rounded-xl
+shadow
+overflow-hidden
+">
+
+
+<div className="
+overflow-x-auto
+">
+
+
+<table className="
+w-full
+text-sm
+">
+
+
+<thead className="
+bg-[#071d5c]
+text-white
+">
+
+
+<tr>
+
+
+<th className="p-3">
+Status
+</th>
+
+
+<th className="p-3">
+ID
+</th>
+
+
+<th className="p-3">
+Van Code
+</th>
+
+
+<th className="p-3">
+Permission
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+<tbody>
+
+
+{
+vans
+.sort((a:any,b:any)=>
+String(a[0])
+.localeCompare(
+String(b[0]),
+undefined,
+{
+numeric:true
+}
+)
+)
+.map(([van,info]:any)=>(
+
+
+<tr
+key={van}
+className="
+border-b
+"
+>
+
+
+<td className="p-3 text-center">
+
+
+<span className={`
+px-3
+py-1
+rounded-full
+text-xs
+font-bold
+
+${
+info.remaining===0
+&&
+info.exceptions===0
+?
+"bg-green-100 text-green-700"
+
+:
+
+info.remaining>0
+?
+"bg-pink-100 text-pink-700"
+
+:
+
+"bg-orange-100 text-orange-700"
+
+}
+
+`}>
+
+{getStatus(
+info.remaining,
+info.exceptions
+)}
+
+</span>
+
+
+</td>
+
+
+
+<td className="p-3 text-center">
+
+{[...info.ids].join(" / ")}
+
+</td>
+
+
+
+<td className="
+p-3
+text-center
+font-bold
+">
+
+{van}
+
+</td>
+
+
+
+<td className="p-3 text-center">
+
+
+<input
+
+type="checkbox"
+
+disabled
+
+checked={
+permissions[van] ?? false
+}
+
+/>
+
+
+</td>
+
+
+</tr>
+
+
+))
+
+
+}
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+);
+
+
 }
