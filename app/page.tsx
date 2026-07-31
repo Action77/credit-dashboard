@@ -788,9 +788,10 @@ const reader =
 const isBlockedInvoice = (row: any) => {
 
   const paymentTerm = String(
-    row["Payment Term"] || ""
-  ).trim();
-
+  row["Payment Term"] || ""
+)
+  .replace(/^ATS\s+/i, "")
+  .trim();
   const creditDays =
     Number(row["Credit_Days"]) || 0;
 
@@ -831,9 +832,11 @@ const filterBaseData =
 
     .trim()
     .toUpperCase() === "NOT CENTRAL";
-    const paymentTerm = String(
+const paymentTerm = String(
   row["Payment Term"] || ""
-).trim();
+)
+  .replace(/^ATS\s+/i, "")
+  .trim();
 
 const rule = creditRules.find(
   (r) =>
@@ -967,9 +970,11 @@ const filteredData = filterBaseData
       row["Van Code."] === whatsAppVan;
 
     const paymentTerm = String(
-      row["Payment Term"] || ""
-    ).trim();
-    const invoiceStatus = String(
+  row["Payment Term"] || ""
+)
+  .replace(/^ATS\s+/i, "")
+  .trim();
+      const invoiceStatus = String(
   row["Invoice status (Due/ Overdue)"] || ""
 ).toLowerCase();
 
