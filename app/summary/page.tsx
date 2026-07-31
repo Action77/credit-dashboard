@@ -430,12 +430,6 @@ setExceptions(validExceptions);
     const currentUser =
       await localStorage.getItem("currentUser");
 
-
-    const savedPermissions =
-      await localStorage.getItem(
-        "vanPermissions"
-      );
-
     const savedUpdatedVans =
       await localStorage.getItem(
         "lastUpdatedVans"
@@ -465,12 +459,27 @@ setCollectedInvoices(
   collectionData.invoices || []
 );
 
-    if (savedPermissions) {
-      setPermissions(
-        JSON.parse(savedPermissions)
-      );
-    }
+const { data: permissionData } =
+  await supabase
+    .from("van_permissions")
+    .select("*");
 
+const mappedPermissions:any = {};
+
+(permissionData || []).forEach(
+  (item:any) => {
+
+    mappedPermissions[
+      item.van_code
+    ] = item.is_unblocked;
+
+  }
+);
+
+setPermissions(
+  mappedPermissions
+);
+    
     if (savedUpdatedVans) {
       setLastUpdatedVans(
         JSON.parse(savedUpdatedVans)
@@ -1366,24 +1375,22 @@ const sendWhatsApp = async (
     checked={
       permissions[van] ?? false
     }
-    onChange={(e) => {
+    onChange={async (e) => {
 
-      const updated = {
+  await supabase
+    .from("van_permissions")
+    .upsert({
+      van_code: van,
+      is_unblocked: e.target.checked,
+    });
+
+  const updated = {
   ...permissions,
   [van]: e.target.checked,
 };
-      setPermissions(
-        updated
-      );
+  setPermissions(updated);
 
-      localStorage.setItem(
-        "vanPermissions",
-        JSON.stringify(
-          updated
-        )
-      );
-
-    }}
+}}
   />
 </td>
           </tr>

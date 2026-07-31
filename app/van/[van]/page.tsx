@@ -17,8 +17,11 @@ export default function VanReportPage() {
   const [data, setData] = useState<any[]>([]);
   const [exceptions, setExceptions] = useState<any[]>([]);
   const [collectedInvoices, setCollectedInvoices] = useState<string[]>([]);
-  const [creditRules, setCreditRules] = useState<any[]>([]);
+  const [creditRules, setCreditRules] =
+  useState<any[]>([]);
 
+const [isRouteUnblocked, setIsRouteUnblocked] =
+  useState(false);
 
   useEffect(() => {
 
@@ -44,12 +47,21 @@ export default function VanReportPage() {
       const colData =
         await col.json();
 
+const { data: rules } =
+  await supabase
+    .from("credit_block_rules")
+    .select("*");
+      const {
+  data: vanPermission
+} = await supabase
+  .from("van_permissions")
+  .select("is_unblocked")
+  .eq("van_code", vanCode)
+  .single();
 
-      const { data: rules } =
-        await supabase
-          .from("credit_block_rules")
-          .select("*");
-
+setIsRouteUnblocked(
+  vanPermission?.is_unblocked || false
+);
 
 
       const today =
@@ -302,7 +314,27 @@ export default function VanReportPage() {
         <h1 className="text-2xl font-bold">
           {vanCode}
         </h1>
+{isRouteUnblocked && (
 
+  <div className="mt-3">
+    <span
+      className="
+        inline-flex
+        items-center
+        px-4
+        py-2
+        rounded-full
+        bg-green-600
+        text-white
+        text-sm
+        font-semibold
+      "
+    >
+      Route Unblocked
+    </span>
+  </div>
+
+)}
 
         <div className="mt-3 space-y-1 text-sm">
 
@@ -411,7 +443,7 @@ export default function VanReportPage() {
 
         <div className="bg-white p-6 rounded-xl text-center text-slate-500">
 
-          No active invoices found
+          No Block invoices found
 
         </div>
 
