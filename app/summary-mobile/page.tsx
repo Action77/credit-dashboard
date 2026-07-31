@@ -10,8 +10,7 @@ const [searchTerm, setSearchTerm] = useState("");
   const [exceptions,setExceptions] = useState<any[]>([]);
   const [collectedInvoices,setCollectedInvoices] = useState<string[]>([]);
   const [creditRules,setCreditRules] = useState<any[]>([]);
-  const [permissions,setPermissions] = useState<any>({});
-
+  
 
 useEffect(()=>{
 
@@ -85,16 +84,6 @@ setCreditRules(
 rules || []
 );
 
-
-const saved =
-await localStorage.getItem(
-"vanPermissions"
-);
-
-if(saved)
-setPermissions(
-JSON.parse(saved)
-);
 
 
 };
@@ -254,15 +243,11 @@ return acc;
 
 );
 
-const filteredVans = vans.filter(([van, info]: any) => {
-  const search = searchTerm.toLowerCase().trim();
-
-  return (
-    String(van).toLowerCase().includes(search) ||
-    [...info.ids].join(" ").toLowerCase().includes(search)
-  );
+const filteredVans = vans.filter(([van]) => {
+  return String(van)
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase().trim());
 });
-
 const getStatus=(r:number,e:number)=>{
 
 
@@ -297,7 +282,7 @@ return (
 
   <input
     type="text"
-    placeholder="Search Van / ID..."
+    placeholder="Search Van Code..."
     value={searchTerm}
     onChange={(e) => setSearchTerm(e.target.value)}
     className="
@@ -357,11 +342,6 @@ ID
 
 <th className="p-3">
 Van Code
-</th>
-
-
-<th className="p-3">
-Permission
 </th>
 
 
@@ -456,25 +436,6 @@ font-bold
 
 </td>
 
-
-
-<td className="p-3 text-center">
-
-
-<input
-
-type="checkbox"
-
-disabled
-
-checked={
-permissions[van] ?? false
-}
-
-/>
-
-
-</td>
 
 
 </tr>
