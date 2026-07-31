@@ -232,7 +232,7 @@ await webpush.sendNotification(
       "✅ New Credit File Imported",
     body:
       "A new credit file has been uploaded. Please review your blocked invoices to see the latest updates affecting your route.",
-    url: `/van/${vanCode}`,
+    url: `/van/${row.van_code}`,
   })
 );
 
