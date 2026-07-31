@@ -462,7 +462,7 @@ setIsRouteUnblocked(
 
         <div className="bg-white p-6 rounded-xl text-center text-slate-500">
 
-          No Block invoices found
+          No block invoices found
 
         </div>
 
