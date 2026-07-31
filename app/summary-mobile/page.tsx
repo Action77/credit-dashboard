@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { storage as localStorage } from "@/utils/storage";
 
 export default function MobileSummaryPage() {
+const [searchTerm, setSearchTerm] = useState("");
 
   const [data,setData] = useState<any[]>([]);
   const [exceptions,setExceptions] = useState<any[]>([]);
@@ -191,7 +192,6 @@ ids:new Set(),
 remaining:0,
 exceptions:0
 };
-
 }
 
 
@@ -254,7 +254,14 @@ return acc;
 
 );
 
+const filteredVans = vans.filter(([van, info]: any) => {
+  const search = searchTerm.toLowerCase().trim();
 
+  return (
+    String(van).toLowerCase().includes(search) ||
+    [...info.ids].join(" ").toLowerCase().includes(search)
+  );
+});
 
 const getStatus=(r:number,e:number)=>{
 
@@ -283,17 +290,32 @@ return (
 <div className="min-h-screen bg-slate-100 p-3">
 
 
-<h1 className="
-text-2xl
-font-bold
-mb-4
-text-slate-800
-">
+<div className="flex items-center gap-2 mb-4">
+  <h1 className="text-xl sm:text-2xl font-bold text-slate-800 whitespace-nowrap">
+    Van Performance
+  </h1>
 
-Van Performance
-
-</h1>
-
+  <input
+    type="text"
+    placeholder="Search Van / ID..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="
+      flex-1
+      min-w-0
+      h-10
+      px-3
+      text-sm
+      border
+      border-slate-300
+      rounded-lg
+      focus:outline-none
+      focus:ring-2
+      focus:ring-blue-500
+      bg-white
+    "
+  />
+</div>
 
 <div className="
 bg-white
@@ -354,16 +376,13 @@ Permission
 
 
 {
-vans
+filteredVans
 .sort((a:any,b:any)=>
-String(a[0])
-.localeCompare(
-String(b[0]),
-undefined,
-{
-numeric:true
-}
-)
+  String(a[0]).localeCompare(
+    String(b[0]),
+    undefined,
+    { numeric:true }
+  )
 )
 .map(([van,info]:any)=>(
 
