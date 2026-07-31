@@ -1403,16 +1403,45 @@ const sendWhatsApp = async (
 
   if (isChecked) {
 
-    await fetch("/api/send-push", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        van_code: van,
-      }),
-    });
+    if (isChecked) {
 
+  try {
+
+    const response =
+      await fetch("/api/send-push", {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          van_code: van,
+        }),
+      });
+
+    const result =
+      await response.json();
+
+    console.log(
+      "Push Result:",
+      result
+    );
+
+    alert(
+      JSON.stringify(result)
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Push Failed"
+    );
+
+  }
+
+}
   }
 
 }}
