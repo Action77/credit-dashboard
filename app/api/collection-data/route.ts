@@ -8,14 +8,19 @@ const supabase = createClient(
 
 export async function GET() {
   const { data, error } = await supabase
-    .from("collection_invoices")
-    .select(
-      "invoice, uploaded_by, created_at"
-    )
-    .order("created_at", {
-      ascending: false,
-    })
-.range(0, 100000)
+  .from("collection_invoices")
+  .select(
+    "invoice, uploaded_by, created_at"
+  )
+  .order("created_at", {
+    ascending: false,
+  })
+  .range(0, 100000);
+
+console.log(
+  "Collection Data Count:",
+  data?.length
+);
 
   if (error) {
     return NextResponse.json({
