@@ -1,5 +1,5 @@
 "use client";
-
+import { useMemo } from "react";
 import { addLog } from "@/lib/activityLog";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -254,12 +254,15 @@ const normalize = (value: string) =>
     .trim()
     .toUpperCase();
 
-const rulesMap = new Map(
-  creditRules.map((rule) => [
-    normalize(rule.payment_term),
-    rule,
-  ])
-);
+
+const rulesMap = useMemo(() => {
+  return new Map(
+    creditRules.map((rule) => [
+      normalize(rule.payment_term),
+      rule,
+    ])
+  );
+}, [creditRules]);
 const [lastUpdatedVans,
   setLastUpdatedVans] =
   useState<string[]>([]);
@@ -474,19 +477,19 @@ useEffect(() => {
     const result = await response.json();
 
     const invoices = (result.invoices || [])
-      .map((invoice: any) =>
-        String(invoice)
-          .replace(/\s/g, "")
-          .trim()
-          .toUpperCase()
-      )
-      .filter(Boolean);
+  .map((invoice: any) =>
+    String(invoice)
+      .replace(/\s/g, "")
+      .trim()
+      .toUpperCase()
+  )
+  .filter(Boolean);
 
-    setCollectedInvoices(invoices);
+setCollectedInvoices(invoices);
 
-    setCollectionFileInfo(
-      result.fileInfo || ""
-    );
+setCollectionFileInfo(
+  result.fileInfo || ""
+);
 
   };
 
@@ -803,20 +806,24 @@ const invoices =
     .filter(Boolean);
 
         const previousInvoices =
-          JSON.parse(
-            await localStorage.getItem(
-              "collectedInvoices"
-            ) || "[]"
-          );
+  JSON.parse(
+    await localStorage.getItem(
+      "collectedInvoices"
+    ) || "[]"
+  );
 
-        const newCollected =
-          invoices.filter(
-            (invoice) =>
-              !previousInvoices.includes(
-                invoice
-              )
-          );
+const mergedInvoices = [
+  ...new Set([
+    ...previousInvoices,
+    ...invoices,
+  ]),
+];
 
+const newCollected =
+  mergedInvoices.filter(
+    (invoice) =>
+      !previousInvoices.includes(invoice)
+  );
         const affectedVans = [
           ...new Set(
             data
@@ -849,25 +856,24 @@ const invoices =
         );
 
         setCollectedInvoices(
-          invoices
-        );
+  mergedInvoices
+);
 
-        const now =
-          new Date();
+const now = new Date();
 
-        setCollectionFileInfo(
-          `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
-        );
+setCollectionFileInfo(
+  `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
+);
 
-        await localStorage.setItem(
-          "collectionFileInfo",
-          `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
-        );
+await localStorage.setItem(
+  "collectionFileInfo",
+  `${file.name} | ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
+);
 
-        await localStorage.setItem(
-          "collectedInvoices",
-          JSON.stringify(invoices)
-        );
+await localStorage.setItem(
+  "collectedInvoices",
+  JSON.stringify(mergedInvoices)
+);
 
       } finally {
 
