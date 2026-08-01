@@ -114,13 +114,13 @@ const recordsToInsert =
     uploaded_by: uploadedBy,
     upload_id: uploadRecord.id,
   }));
-
+console.time("UPSERT_COLLECTION");
 const { error } = await supabase
   .from("collection_invoices")
   .upsert(recordsToInsert, {
     onConflict: "invoice",
   });
-
+console.timeEnd("UPSERT_COLLECTION");
 if (error) {
   throw error;
 }
@@ -137,6 +137,7 @@ await supabase
     title: "📦 Collection File Imported",
     message: `Collection ${uploadRecord.id} uploaded successfully by ${user?.full_name || uploadedBy}.`,
   });
+console.time("CALCULATE_VANS");
 const { data: creditRows } =
   await supabase
     .from("credit_data")
@@ -154,7 +155,7 @@ const collectedSet = new Set(
         .toUpperCase()
   )
 );
-
+console.timeEnd("CALCULATE_VANS");
 const currentCounts: Record<string, number> = {};
 
 (creditRows || []).forEach(
