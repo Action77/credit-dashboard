@@ -51,7 +51,11 @@ const uploadedBy =
           header: 1,
         }
       );
-
+console.log("Headers:", rows[0]);
+console.log("First row:", rows[1]);
+console.log("AA:", rows[1][26]);
+console.log("AB:", rows[1][27]);
+console.log("AC:", rows[1][28]);
 const invoices = rows
   .slice(1)
   .filter((row: any) => {
@@ -59,17 +63,15 @@ const invoices = rows
       .trim()
       .toLowerCase();
 
-    return (
-      status === "hold" ||
-      status === "completed"
-    );
+    console.log("Status =", status);
+
+    return status === "hold" || status === "completed";
   })
   .map((row: any) =>
     String(row[1] || "")
       .trim()
       .replace(/\s/g, "")
-  );
-        
+  );  
 
     const { data: uploadRecord, error: uploadError } =
   await supabase
