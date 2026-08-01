@@ -15,7 +15,7 @@ export async function GET() {
     .order("created_at", {
       ascending: false,
     })
-    .range(0, 20000);
+.range(0, 100000)
 
   if (error) {
     return NextResponse.json({
