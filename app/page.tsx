@@ -239,6 +239,27 @@ const [collectedInvoices,
 const collectedSet = new Set(
   collectedInvoices
 );
+const exceptionSet = new Set(
+  exceptions.map((e) =>
+    String(e.invoice)
+      .replace(/\s/g, "")
+      .trim()
+      .toUpperCase()
+  )
+);
+const normalize = (value: string) =>
+  String(value || "")
+    .replace(/^ATS\s+/i, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
+
+const rulesMap = new Map(
+  creditRules.map((rule) => [
+    normalize(rule.payment_term),
+    rule,
+  ])
+);
 const [lastUpdatedVans,
   setLastUpdatedVans] =
   useState<string[]>([]);
@@ -889,18 +910,11 @@ const isBlockedInvoice = (row: any) => {
     row["Invoice status (Due/ Overdue)"] || ""
   ).toLowerCase();
 
-  const normalize = (value: string) =>
-  String(value || "")
-    .replace(/^ATS\s+/i, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toUpperCase();
+  const rule = rulesMap.get(
+  normalize(paymentTerm)
+);
 
-const rule = creditRules.find(
-  r =>
-    normalize(r.payment_term) ===
-    normalize(paymentTerm)
-);  // إذا ما فيه Rule لهذا الـ Payment Term
+// إذا ما فيه Rule لهذا الـ Payment Term
   // اعتبره Block مثل النظام القديم
   if (!rule) {
     return (
@@ -927,18 +941,6 @@ const filterBaseData =
 const paymentTerm = String(
   row["Payment Term"] || ""
 ).trim();
-const normalize = (value: string) =>
-  String(value || "")
-    .replace(/^ATS\s+/i, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toUpperCase();
-
-const rule = creditRules.find(
-  r =>
-    normalize(r.payment_term) ===
-    normalize(paymentTerm)
-);
 const isPaymentTermEnabled = true;
     const matchesFilters =
       (
@@ -1002,14 +1004,7 @@ return (
             .toUpperCase();
 
         const isException =
-          exceptions.some(
-            e =>
-              String(e.invoice)
-                .replace(/\s/g, "")
-                .toUpperCase() ===
-              invoice
-          );
-
+  exceptionSet.has(invoice);
         const isCollected =
   collectedSet.has(invoice);
         return (
@@ -1035,12 +1030,7 @@ const filteredData = filterBaseData
         .toUpperCase();
 
     const isException =
-      exceptions.some(
-        (e) =>
-          String(e.invoice)
-            .replace(/\s/g, "")
-            .toUpperCase() === invoice
-      );
+  exceptionSet.has(invoice);
 
     const isCollected =
   collectedSet.has(
@@ -1065,17 +1055,8 @@ if (invoiceStatus.includes("legal")) {
 }
 
     
-const normalize = (value: string) =>
-  String(value || "")
-    .replace(/^ATS\s+/i, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toUpperCase();
-
-const rule = creditRules.find(
-  r =>
-    normalize(r.payment_term) ===
-    normalize(paymentTerm)
+const rule = rulesMap.get(
+  normalize(paymentTerm)
 );
 if (!rule) {
   }
@@ -1105,13 +1086,8 @@ const blockedInvoicesData =
         .replace(/\s/g, "")
         .toUpperCase();
 
-    const isException =
-      exceptions.some(
-        (e) =>
-          String(e.invoice)
-            .replace(/\s/g, "")
-            .toUpperCase() === invoice
-      );
+const isException =
+  exceptionSet.has(invoice);
 
     const isCollected =
   collectedSet.has(invoice);
@@ -1311,15 +1287,8 @@ const whatsappData =
         )
           .replace(/\s/g, "")
           .toUpperCase();
-
-      const isException =
-        exceptions.some(
-          e =>
-            String(e.invoice)
-              .replace(/\s/g, "")
-              .toUpperCase() ===
-            invoice
-        );
+const isException =
+  exceptionSet.has(invoice);
 
       const isCollected =
   collectedSet.has(invoice);
@@ -2088,8 +2057,10 @@ await localStorage.setItem(
 
                 <tbody>
 
-                 {filteredData.map((row, index) => (
-                  <tr
+                 {filteredData
+  .slice(0, 100)
+  .map((row, index) => (
+                      <tr
   key={index}
   className="border-b"
   style={{
@@ -2103,18 +2074,12 @@ await localStorage.setItem(
 )
       ? "#C6EFCE"
 
-      : exceptions.some(
-          e =>
-            String(e.invoice)
-              .replace(/\s/g, "")
-              .toUpperCase() ===
-            String(
-              row["Invoice #"]
-            )
-              .replace(/\s/g, "")
-              .toUpperCase()
-        )
-
+      : exceptionSet.has(
+    String(row["Invoice #"])
+      .replace(/\s/g, "")
+      .trim()
+      .toUpperCase()
+  )
       ? "#FFCB96"
 
       : ""
@@ -2556,13 +2521,8 @@ item.created_by === currentUser && (
             const employee =
               row["Employee Name."];
 
-            const isException =
-              exceptions.some(
-                (e) =>
-                  String(e.invoice)
-                    .replace(/\s/g, "") ===
-                  invoice
-              );
+const isException =
+  exceptionSet.has(invoice);
 const isCollected =
 collectedSet.has(invoice);
 
