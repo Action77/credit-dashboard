@@ -674,19 +674,32 @@ if (a1 !== "Collection Submit Time") {
 }
 /* إذا التحقق نجح يكمل الرفع */
 
-const formData = new FormData();
+const currentUsername = currentUser;
 
-formData.append("file", file);
-  const currentUsername = currentUser;
+const fileName =
+  `${Date.now()}-${file.name}`;
 
-  formData.append(
-    "uploadedBy",
-    currentUsername
-  );
+const { error: uploadError } =
+  await supabase.storage
+    .from("imports")
+    .upload(fileName, file, {
+      upsert: true,
+    });
+
+if (uploadError) {
+  throw uploadError;
+}
 
 await fetch("/api/collection-upload", {
   method: "POST",
-  body: formData,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    path: fileName,
+    uploadedBy: currentUsername,
+    originalName: file.name,
+  }),
 });
 
 await addLog(

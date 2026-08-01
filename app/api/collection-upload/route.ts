@@ -17,22 +17,33 @@ const supabase = createClient(
 
 export async function POST(req: Request) {
   try {
-    const formData = await req.formData();
+    const body = await req.json();
 
-    const file = formData.get("file") as File;
-const uploadedBy =
-  String(
-    formData.get("uploadedBy") || ""
-  );
-    if (!file) {
-      return NextResponse.json({
-        success: false,
-        error: "No file uploaded",
-      });
-    }
+const path = String(body.path || "");
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+const uploadedBy = String(body.uploadedBy || "");
+
+const originalName = String(body.originalName || "");
+
+if (!path) {
+  return NextResponse.json({
+    success: false,
+    error: "No file uploaded",
+  });
+}
+
+const { data: storageFile, error: storageError } =
+  await supabase.storage
+    .from("imports")
+    .download(path);
+
+if (storageError || !storageFile) {
+  throw storageError;
+}
+
+const buffer = Buffer.from(
+  await storageFile.arrayBuffer()
+);
 
     const workbook = XLSX.read(buffer, {
       type: "buffer",
@@ -77,7 +88,7 @@ const invoices = rows
   await supabase
     .from("collection_uploads")
     .insert({
-      file_name: file.name,
+      file_name: originalName,
       uploaded_by: uploadedBy,
     })
     .select()
@@ -246,7 +257,7 @@ for (const vanCode in currentCounts) {
     return NextResponse.json({
       success: true,
       invoices: invoices.length,
-      file: file.name,
+      file: originalName,
     });
   } catch (error) {
     console.error(error);
