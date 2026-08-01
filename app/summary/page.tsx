@@ -1002,9 +1002,13 @@ const sendWhatsApp = async (
   </Link>
 
   <div
-  onClick={() =>
-    setShowImportModal(true)
-  }
+  onClick={() => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+    setShowImportModal(true);
+  }}
   className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition cursor-pointer"
 >
   <Upload size={18} />
@@ -1012,12 +1016,18 @@ const sendWhatsApp = async (
 </div>
 
   <Link
-    href="/logs"
-    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
-  >
-    <ClipboardList size={18} />
-    <span>Logs</span>
-  </Link>
+  href={isLoggedIn ? "/logs" : "#"}
+  onClick={(e) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      setShowLoginModal(true);
+    }
+  }}
+  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+>
+  <ClipboardList size={18} />
+  <span>Logs</span>
+</Link>
 
   <Link
     href="/exceptions"
@@ -1044,12 +1054,18 @@ const sendWhatsApp = async (
   </Link>
 
   <Link
-    href="/settings"
-    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
-  >
-    <Settings size={18} />
-    <span>Settings</span>
-  </Link>
+  href={isLoggedIn ? "/settings" : "#"}
+  onClick={(e) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      setShowLoginModal(true);
+    }
+  }}
+  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+>
+  <Settings size={18} />
+  <span>Settings</span>
+</Link>
 
   <Link
     href="/users"

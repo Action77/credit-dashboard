@@ -674,23 +674,33 @@ return (
     <span>Dashboard</span>
   </Link>
 
- <div
-  onClick={() =>
-    setShowImportModal(true)
-  }
+<div
+  onClick={() => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+    setShowImportModal(true);
+  }}
   className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition cursor-pointer"
 >
   <Upload size={18} />
   <span>Import File</span>
 </div>
 
-  <Link
-    href="/logs"
-    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
-  >
-    <ClipboardList size={18} />
-    <span>Logs</span>
-  </Link>
+<Link
+  href={isLoggedIn ? "/logs" : "#"}
+  onClick={(e) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      setShowLoginModal(true);
+    }
+  }}
+  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+>
+  <ClipboardList size={18} />
+  <span>Logs</span>
+</Link>
 
   <Link
     href="/exceptions"
@@ -716,13 +726,19 @@ return (
     <span>Reports</span>
   </Link>
 
-  <Link
-    href="/settings"
-    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
-  >
-    <Settings size={18} />
-    <span>Settings</span>
-  </Link>
+<Link
+  href={isLoggedIn ? "/settings" : "#"}
+  onClick={(e) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      setShowLoginModal(true);
+    }
+  }}
+  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+>
+  <Settings size={18} />
+  <span>Settings</span>
+</Link>
 
   <Link
     href="/users"
