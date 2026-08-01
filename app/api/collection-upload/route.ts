@@ -34,7 +34,7 @@ if (!path) {
 
 const { data: storageFile, error: storageError } =
   await supabase.storage
-    .from("imports")
+    .from("IMPORTS")
     .download(path);
 
 if (storageError || !storageFile) {
