@@ -615,7 +615,6 @@ await fetch(
   }
 );
 setShowImportModal(false);
-window.location.reload();
   } finally {
 
     setIsUploadingCredit(false);
@@ -690,17 +689,28 @@ if (uploadError) {
   throw uploadError;
 }
 
-await fetch("/api/collection-upload", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    path: fileName,
-    uploadedBy: currentUsername,
-    originalName: file.name,
-  }),
-});
+const uploadResult = await fetch(
+  "/api/collection-upload",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      path: fileName,
+      uploadedBy: currentUsername,
+      originalName: file.name,
+    }),
+  }
+);
+
+const result = await uploadResult.json();
+
+if (!result.success) {
+  alert(result.error);
+  setIsUploadingCollection(false);
+  return;
+}
 
 await addLog(
   currentUser,
@@ -831,11 +841,21 @@ return (
 
       } finally {
 
-        setIsUploadingCollection(false);
-        setShowImportModal(false);
-        window.location.reload();
+  const response =
+    await fetch(
+      "/api/collection-data"
+    );
 
-      }
+  const refreshed =
+    await response.json();
+
+  setCollectedInvoices(
+    refreshed.invoices || []
+  );
+
+  setIsUploadingCollection(false);
+  setShowImportModal(false);
+}
 
     };
 
