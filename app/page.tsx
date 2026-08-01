@@ -236,6 +236,9 @@ const [collectedInvoices,
   setCollectedInvoices] =
   useState<string[]>([]);
 
+const collectedSet = new Set(
+  collectedInvoices
+);
 const [lastUpdatedVans,
   setLastUpdatedVans] =
   useState<string[]>([]);
@@ -280,11 +283,6 @@ const [isAddingException,
   .eq("username", currentUser);
 
 setCreditRules(data || []);
-
-console.log(
-  "Rules Count:",
-  data?.length || 0
-);
 
   };
 
@@ -455,44 +453,26 @@ useEffect(() => {
     const result = await response.json();
 
     const invoices = (result.invoices || [])
-  .map((invoice: any) =>
-    String(invoice)
-      .replace(/\s/g, "")
-      .trim()
-      .toUpperCase()
-  )
-  .filter(Boolean);
+      .map((invoice: any) =>
+        String(invoice)
+          .replace(/\s/g, "")
+          .trim()
+          .toUpperCase()
+      )
+      .filter(Boolean);
 
-console.log("Collected Count:", invoices.length);
+    setCollectedInvoices(invoices);
 
-console.log(
-  "HAS TEST INVOICE:",
-  invoices.includes("P1316600015296")
-);
+    setCollectionFileInfo(
+      result.fileInfo || ""
+    );
 
-console.log(
-  "TEST INVOICE VALUE:",
-  invoices.find(
-    (i: string) =>
-      i.includes("15296")
-  )
-);
-
-setCollectedInvoices(invoices);
   };
 
   loadCollection();
 
 }, []);
 useEffect(() => {
-
-  fetch("/api/collection-data")
-    .then(res => res.json())
-    .then(data => {
-      setCollectionFileInfo(data.fileInfo || "");
-    });
-
-}, []);useEffect(() => {
 
   const loadCreditData = async () => {
 
@@ -501,14 +481,6 @@ useEffect(() => {
     const result = await response.json();
 
     setData(result.data || []);
-console.log("Total API Rows:", result.data.length);
-
-console.log(
-  result.data.filter(
-    (r: any) =>
-      r["Invoice #"] === "V2076000003195"
-  )
-);
     setCreditFileInfo(result.fileInfo || "");
 
   };
@@ -589,8 +561,7 @@ await supabase
     const uploadResult =
       await uploadResponse.json();
 
-    console.log(uploadResult);
-
+    
     if (!uploadResult.success) {
   alert(uploadResult.error);
   return;
@@ -873,9 +844,15 @@ const invoices =
     await response.json();
 
   setCollectedInvoices(
-    refreshed.invoices || []
-  );
-
+  (refreshed.invoices || [])
+    .map((invoice: any) =>
+      String(invoice)
+        .replace(/\s/g, "")
+        .trim()
+        .toUpperCase()
+    )
+    .filter(Boolean)
+);
   setIsUploadingCollection(false);
   setShowImportModal(false);
 }
@@ -1019,14 +996,7 @@ return (
           );
 
         const isCollected =
-          collectedInvoices.some(
-            i =>
-              String(i)
-                .replace(/\s/g, "")
-                .toUpperCase() ===
-              invoice
-          );
-
+  collectedSet.has(invoice);
         return (
           !isException &&
           !isCollected
@@ -1058,13 +1028,12 @@ const filteredData = filterBaseData
       );
 
     const isCollected =
-      collectedInvoices.some(
-        (i) =>
-          String(i)
-            .replace(/\s/g, "")
-            .toUpperCase() === invoice
-      );
-
+  collectedSet.has(
+    String(row["Invoice #"])
+      .replace(/\s/g, "")
+      .trim()
+      .toUpperCase()
+  );
     const matchesWhatsappVan =
       !whatsAppVan ||
       row["Van Code."] === whatsAppVan;
@@ -1094,11 +1063,7 @@ const rule = creditRules.find(
     normalize(paymentTerm)
 );
 if (!rule) {
-  console.log(
-    "R*LE NOT FOUND:",
-    JSON.stringify(paymentTerm)
-  );
-}
+  }
     const creditDays =
   Number(row["Credit_Days"]) || 0;
 
@@ -1134,13 +1099,7 @@ const blockedInvoicesData =
       );
 
     const isCollected =
-      collectedInvoices.some(
-        (i) =>
-          String(i)
-            .replace(/\s/g, "")
-            .toUpperCase() === invoice
-      );
-
+  collectedSet.has(invoice);
     return (
       isBlockedInvoice(row) &&
       !isException &&
@@ -1348,14 +1307,7 @@ const whatsappData =
         );
 
       const isCollected =
-        collectedInvoices.some(
-          i =>
-            String(i)
-              .replace(/\s/g, "")
-              .toUpperCase() ===
-            invoice
-        );
-
+  collectedSet.has(invoice);
       return (
         !isException &&
         !isCollected
@@ -2128,13 +2080,12 @@ await localStorage.setItem(
   style={{
   backgroundColor:
 
-    collectedInvoices.includes(
+    collectedSet.has(
   String(row["Invoice #"])
     .replace(/\s/g, "")
     .trim()
     .toUpperCase()
 )
-
       ? "#C6EFCE"
 
       : exceptions.some(
@@ -2597,11 +2548,8 @@ item.created_by === currentUser && (
                     .replace(/\s/g, "") ===
                   invoice
               );
-
-            const isCollected =
-              collectedInvoices.some(
-                (i) => i === invoice
-              );
+const isCollected =
+collectedSet.has(invoice);
 
             if (
               isException ||
