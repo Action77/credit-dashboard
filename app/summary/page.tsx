@@ -95,14 +95,10 @@ const a1 = String(
 ).trim();
 
 if (a1 !== "User Account") {
-
-  toast.error(
-    "Invalid Users File"
-  );
-
+  toast.error("Invalid Users File");
+  setIsImportingUsers(false);
   return;
 }
-
 const rows: any[] =
   XLSX.utils.sheet_to_json(sheet);
         const usersData =
@@ -221,14 +217,10 @@ const handleCreditImport = async (
     ).trim();
 
     if (b6 !== "Region") {
-
-      toast.error(
-        "Invalid Credit File"
-      );
-
-      return;
-    }
-
+  toast.error("Invalid Credit File");
+  setIsUploadingCredit(false);
+  return;
+}
     const formData =
       new FormData();
 
@@ -319,17 +311,11 @@ const handleCollectionImport = async (
       worksheet["A1"]?.v || ""
     ).trim();
 
-    if (
-      a1 !==
-      "Collection Submit Time"
-    ) {
-
-      toast.error(
-        "Invalid Collection File"
-      );
-
-      return;
-    }
+if (a1 !== "Collection Submit Time") {
+  toast.error("Invalid Collection File");
+  setIsUploadingCollection(false);
+  return;
+}
 
     const formData =
       new FormData();
@@ -395,7 +381,7 @@ const [showLoginModal, setShowLoginModal] = useState(false);
 const [username, setUsername] = useState("");
 
 const [password, setPassword] = useState("");
-
+const [currentUser, setCurrentUser] = useState("");
 
   useEffect(() => {
 
@@ -491,7 +477,13 @@ setPermissions(
       );
     }
 
-    setIsLoggedIn(!!currentUser);
+    if (currentUser) {
+  setCurrentUser(currentUser);
+  setIsLoggedIn(true);
+} else {
+  setCurrentUser("");
+  setIsLoggedIn(false);
+}
 
   };
 
@@ -1082,10 +1074,28 @@ const sendWhatsApp = async (
 
     <div
       className="flex items-center gap-3 bg-red-600 p-3 rounded-lg cursor-pointer"
-      onClick={() => {
-        localStorage.removeItem("currentUser");
-        setIsLoggedIn(false);
-      }}
+onClick={async () => {
+
+  const { data: user } = await supabase
+    .from("app_users")
+    .select("full_name")
+    .eq("username", currentUser)
+    .single();
+
+  await addLog(
+    currentUser,
+    user?.full_name || currentUser,
+    "LOGOUT",
+    "User logged out"
+  );
+
+  await localStorage.removeItem("currentUser");
+
+  setCurrentUser("");
+
+  setIsLoggedIn(false);
+
+}}
     >
       <LogOut size={18} />
       Logout
@@ -1549,75 +1559,68 @@ const sendWhatsApp = async (
 
 </main>
 {showLoginModal && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center">
 
-    <div className="bg-white rounded-xl p-6 w-80">
+  <div className="bg-white w-[420px] rounded-2xl shadow-2xl p-8">
 
-      <h2 className="text-xl font-bold mb-4">
-        Login
-      </h2>
-
+      <h2 className="text-3xl font-bold text-slate-800 mb-6">
+  Welcome Back
+</h2>
       <input
-        className="border w-full p-2 mb-3 rounded"
-        placeholder="Username"
+        className="w-full border p-3 rounded-xl mb-4"
+                placeholder="Username"
         value={username}
         onChange={(e) =>
           setUsername(e.target.value)
         }
       />
 
-      <input
-        type="password"
-        className="border w-full p-2 mb-4 rounded"
-        placeholder="Password"
-        value={password}
-        onChange={(e) =>
-          setPassword(e.target.value)
-        }
-      />
-
-      <div className="flex justify-end gap-2">
-
+<input
+  type="password"
+  placeholder="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  className="w-full border p-3 rounded-xl mb-4"
+/>
+      
         <button
-          className="px-4 py-2 border rounded"
-          onClick={() =>
-            setShowLoginModal(false)
-          }
-        >
-          Cancel
-        </button>
+          className="w-full bg-blue-600 text-white py-3 rounded-xl"
+                    onClick={async () => {
 
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-          onClick={async () => {
+  const { data, error } = await supabase
+  .from("app_users")
+  .select("*")
+  .eq("username", username)
+  .eq("password", password)
+  .single();
 
-  const { data: user } = await supabase
-    .from("app_users")
-    .select("*")
-    .eq("username", username)
-    .single();
+if (error || !data) {
+  alert("Invalid Username or Password");
+  return;
+}
 
-  if (!user) {
-    alert("Invalid Username");
-    return;
-  }
 
-  if (user.password !== password) {
-    alert("Invalid Password");
-    return;
-  }
 
-  localStorage.setItem(
-    "currentUser",
-    user.username
-  );
+  await localStorage.setItem(
+  "currentUser",
+  data.username
+);
 
-  setIsLoggedIn(true);
-  setShowLoginModal(false);
+setCurrentUser(data.username);
 
-  setUsername("");
-  setPassword("");
+setIsLoggedIn(true);
 
+await addLog(
+  data.username,
+  data.full_name,
+  "LOGIN",
+  "User logged in"
+);
+
+setShowLoginModal(false);
+
+setUsername("");
+setPassword("");
 }}
         >
           Login
@@ -1627,7 +1630,6 @@ const sendWhatsApp = async (
 
     </div>
 
-  </div>
 )}
 
 {showImportModal && (
