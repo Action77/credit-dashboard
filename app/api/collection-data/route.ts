@@ -8,18 +8,14 @@ const supabase = createClient(
 
 export async function GET() {
   const { data, error } = await supabase
-  .from("collection_invoices")
-  .select(
-    "invoice, uploaded_by, created_at"
-  )
-  .order("created_at", {
-    ascending: false,
-  })
-  .range(0, 20000);
-
+    .from("collection_invoices")
+    .select(
+      "invoice, uploaded_by, created_at"
+    )
     .order("created_at", {
       ascending: false,
-    });
+    })
+    .range(0, 20000);
 
   if (error) {
     return NextResponse.json({
