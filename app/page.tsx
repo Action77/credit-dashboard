@@ -747,15 +747,14 @@ const reader =
             .filter((row) => {
 
               const status =
-                String(
-                  row[26] || ""
-                ).trim();
+  String(row[26] || "")
+    .trim()
+    .toLowerCase();
 
-              return (
-                status === "Hold" ||
-                status === "Completed"
-              );
-
+return (
+  status === "hold" ||
+  status === "completed"
+);
             })
             .map((row) =>
               String(row[1] || "")

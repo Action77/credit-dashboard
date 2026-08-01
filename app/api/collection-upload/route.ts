@@ -101,9 +101,22 @@ const records = invoices.map(
   })
 );
 
+const uniqueInvoices = [
+  ...new Set(records.map(r => r.invoice))
+];
+
+const recordsToInsert =
+  uniqueInvoices.map(invoice => ({
+    invoice,
+    uploaded_by: uploadedBy,
+    upload_id: uploadRecord.id,
+  }));
+
 const { error } = await supabase
   .from("collection_invoices")
-  .insert(records);
+  .upsert(recordsToInsert, {
+    onConflict: "invoice",
+  });
 
 if (error) {
   throw error;
