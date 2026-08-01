@@ -1625,7 +1625,14 @@ setPassword("");
         >
           Login
         </button>
-
+        <button
+          className="w-full mt-3 border py-3 rounded-xl"
+          onClick={() =>
+            setShowLoginModal(false)
+          }
+        >
+          Cancel
+        </button>
       </div>
 
     </div>
