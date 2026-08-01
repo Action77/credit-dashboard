@@ -45,39 +45,7 @@ export async function POST(req: Request) {
       defval: "",
     });
 
-        const { data: creditRules } = await supabase
-  .from("credit_block_rules")
-  .select("*")
-  .eq("username", uploadedBy);
-
-const blockedRows = jsonData.filter((row) => {
-  const paymentTerm = String(
-    row["Payment Term"] || ""
-  ).trim();
-
-  const creditDays =
-    Number(row["Credit_Days"]) || 0;
-
-  const invoiceStatus = String(
-    row["Invoice status (Due/ Overdue)"] || ""
-  )
-    .trim()
-    .toLowerCase();
-
-  const rule = creditRules?.find(
-    (r) => r.payment_term === paymentTerm
-  );
-
-  if (!rule) {
-    return false;
-  }
-
-  return (
-    creditDays >= rule.block_at_day &&
-    !invoiceStatus.includes("legal")
-  );
-});
-
+        
 const [
   collectionInvoicesDelete,
   collectionUploadsDelete,
@@ -95,10 +63,6 @@ const [
     .delete()
     .neq("id", 0),
 
-  supabase
-    .from("credit_data")
-    .delete()
-    .neq("invoice", ""),
 
   supabase
     .from("credit_data_full")
@@ -153,50 +117,9 @@ const allRecords = jsonData.map((row) => ({
   file_name: file.name,
   file_date: creditFileDate,
 }));
-    const records = blockedRows.map((row) => ({
-      invoice: String(row["Invoice #"])
-  .replace(/\s/g, "")
-  .trim()
-  .toUpperCase(),
-      van_code: row["Van Code."],
-      employee_name: row["Employee Name."],
-      employee_ats_code: row["Employee ATS Code."],
-      customer_code: row["Customer Code"],
-      customer_name: row["Customer Name"],
-      central_invoice: row["Central Invoice"],
-      payment_term: row["Payment Term"],
-      trx_date: String(row["Trx Date"]),
-      credit_invoice_amount: Number(row["Credit Invoice Amount"]) || 0,
-      pending_cim: Number(row["Pending CIM"]) || 0,
-      credit_days: Number(row["Credit_Days"]) || 0,
-      total_rejected_count: Number(row["Total Rejected Count"]) || 0,
-      region: row["Region"],
-      city: row["City"],
-      uploaded_by: uploadedBy,
-      file_name: file.name,
-      file_date: creditFileDate,
-    }));
-
+    
 
     
-for (
-  let i = 0;
-  i < allRecords.length;
-  i += 5000
-) {
-  const batch = allRecords.slice(
-    i,
-    i + 5000
-  );
-
-  const { error } = await supabase
-    .from("credit_data_full")
-    .insert(batch);
-
-  if (error) {
-    throw error;
-  }
-}
 
 
 
@@ -277,7 +200,7 @@ await Promise.all(
 );
 const vanCounts: Record<string, number> = {};
 
-records.forEach((row) => {
+allRecords.forEach((row) => {
 
   const van =
     String(row.van_code || "").trim();
@@ -288,7 +211,6 @@ records.forEach((row) => {
     (vanCounts[van] || 0) + 1;
 
 });
-
 await Promise.all(
 
   Object.keys(vanCounts).map(
@@ -306,10 +228,9 @@ await Promise.all(
   )
 
 );
-
 return NextResponse.json({
   success: true,
-  rows: records.length,
+  rows: allRecords.length,
 });
 
   } catch (err) {
