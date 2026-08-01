@@ -7,15 +7,31 @@ const supabase = createClient(
 );
 
 export async function GET() {
-  const { data, error } = await supabase
+  const { data: latestUpload } = await supabase
+  .from("collection_uploads")
+  .select("id")
+  .order("id", { ascending: false })
+  .limit(1)
+  .single();
+
+if (!latestUpload) {
+  return NextResponse.json({
+    invoices: [],
+    fileInfo: "",
+  });
+}
+
+const { data, error } = await supabase
   .from("collection_invoices")
   .select(
     "invoice, uploaded_by, created_at"
   )
-  .order("created_at", {
-    ascending: false,
-  })
-  .range(0, 100000);
+  .eq("upload_id", latestUpload.id);
+
+console.log(
+  "Collection Data Count:",
+  data?.length
+);
 
 console.log(
   "Collection Data Count:",
