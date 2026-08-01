@@ -52,23 +52,24 @@ const uploadedBy =
         }
       );
 
-    const invoices = rows
-      .slice(1)
-      .filter((row: any) => {
-        const status = String(
-          row[26] || ""
-        ).trim();
+const invoices = rows
+  .slice(1)
+  .filter((row: any) => {
+    const status = String(row[26] || "")
+      .trim()
+      .toLowerCase();
 
-        return (
-          status === "Hold" ||
-          status === "Completed"
-        );
-      })
-      .map((row: any) =>
-        String(row[1] || "")
-          .trim()
-          .replace(/\s/g, "")
-      );
+    return (
+      status === "hold" ||
+      status === "completed"
+    );
+  })
+  .map((row: any) =>
+    String(row[1] || "")
+      .trim()
+      .replace(/\s/g, "")
+  );
+        
 
     const { data: uploadRecord, error: uploadError } =
   await supabase
