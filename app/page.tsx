@@ -681,7 +681,7 @@ const fileName =
 
 const { error: uploadError } =
   await supabase.storage
-    .from("IMPORTS")
+    .from("imports")
     .upload(fileName, file, {
       upsert: true,
     });
