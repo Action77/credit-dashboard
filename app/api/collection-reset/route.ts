@@ -7,7 +7,18 @@ const supabase = createClient(
 );
 
 export async function POST() {
+const { data: files } =
+  await supabase.storage
+    .from("imports")
+    .list();
 
+if (files?.length) {
+  await supabase.storage
+    .from("imports")
+    .remove(
+      files.map(file => file.name)
+    );
+}
   const { error: invoicesError } =
     await supabase
       .from("collection_invoices")

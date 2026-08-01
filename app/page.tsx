@@ -601,6 +601,21 @@ await fetch(
     method: "POST",
   }
 );
+setCollectedInvoices([]);
+
+setCollectionFileInfo("");
+
+await localStorage.removeItem(
+  "collectedInvoices"
+);
+
+await localStorage.removeItem(
+  "collectionFileInfo"
+);
+
+await localStorage.removeItem(
+  "lastUpdatedVans"
+);
 setShowImportModal(false);
   } finally {
 
