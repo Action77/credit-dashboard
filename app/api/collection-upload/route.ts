@@ -63,10 +63,6 @@ const buffer = Buffer.from(
     }
   );
 
-console.log(
-  "Rows Loaded:",
-  rows.length
-);
 
 const invoices = rows
   .slice(1)
@@ -87,20 +83,6 @@ const invoices = rows
       .toUpperCase()
   )
   .filter(Boolean);
-console.log(
-  "Invoices Found:",
-  invoices.length
-);
-
-console.log(
-  "First Invoice:",
-  invoices[0]
-);
-
-console.log(
-  "Last Invoice:",
-  invoices[invoices.length - 1]
-);
     const { data: uploadRecord, error: uploadError } =
   await supabase
     .from("collection_uploads")
@@ -133,15 +115,25 @@ const recordsToInsert =
     uploaded_by: uploadedBy,
     upload_id: uploadRecord.id,
   }));
-console.time("UPSERT_COLLECTION");
-const { error } = await supabase
-  .from("collection_invoices")
-  .upsert(recordsToInsert, {
-    onConflict: "invoice",
-  });
-console.timeEnd("UPSERT_COLLECTION");
-if (error) {
-  throw error;
+for (
+  let i = 0;
+  i < recordsToInsert.length;
+  i += 5000
+) {
+  const batch = recordsToInsert.slice(
+    i,
+    i + 5000
+  );
+
+  const { error } = await supabase
+    .from("collection_invoices")
+    .upsert(batch, {
+      onConflict: "invoice",
+    });
+
+  if (error) {
+    throw error;
+  }
 }
 const { data: user } = await supabase
   .from("app_users")
@@ -156,25 +148,19 @@ await supabase
     title: "📦 Collection File Imported",
     message: `Collection ${uploadRecord.id} uploaded successfully by ${user?.full_name || uploadedBy}.`,
   });
-console.time("CALCULATE_VANS");
+
 const { data: creditRows } =
   await supabase
     .from("credit_data")
     .select("invoice, van_code");
-const { data: allCollected } =
-  await supabase
-    .from("collection_invoices")
-    .select("invoice");
-
 const collectedSet = new Set(
-  (allCollected || []).map(
-    (row: any) =>
-      String(row.invoice)
-        .trim()
-        .toUpperCase()
+  invoices.map(invoice =>
+    String(invoice)
+      .trim()
+      .toUpperCase()
   )
 );
-console.timeEnd("CALCULATE_VANS");
+
 const currentCounts: Record<string, number> = {};
 
 (creditRows || []).forEach(

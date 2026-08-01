@@ -45,12 +45,7 @@ export async function POST(req: Request) {
       defval: "",
     });
 
-    console.log("========== CREDIT FILE ==========");
-    console.log("Total Rows:", jsonData.length);
-    console.log("First Row:", jsonData[0]);
-    console.log("Second Row:", jsonData[1]);
-
-    const { data: creditRules } = await supabase
+        const { data: creditRules } = await supabase
   .from("credit_block_rules")
   .select("*")
   .eq("username", uploadedBy);
@@ -83,7 +78,6 @@ const blockedRows = jsonData.filter((row) => {
   );
 });
 
-    console.log("Blocked Rows:", blockedRows.length);
 const [
   collectionInvoicesDelete,
   collectionUploadsDelete,
@@ -183,35 +177,47 @@ const allRecords = jsonData.map((row) => ({
       file_date: creditFileDate,
     }));
 
-    console.log("Records To Insert:", records.length);
 
-    if (records.length > 0) {
-      console.log("Sample Record:", records[0]);
-    }
-const { error: fullInsertError } = await supabase
-  .from("credit_data_full")
-  .insert(allRecords);
+    
+for (
+  let i = 0;
+  i < allRecords.length;
+  i += 5000
+) {
+  const batch = allRecords.slice(
+    i,
+    i + 5000
+  );
 
-console.log("Full Insert Error:", fullInsertError);
+  const { error } = await supabase
+    .from("credit_data_full")
+    .insert(batch);
 
-const { count } = await supabase
-  .from("credit_data_full")
-  .select("*", {
-    count: "exact",
-    head: true,
-  });
+  if (error) {
+    throw error;
+  }
+}
 
-console.log("Rows After Insert:", count);
-    const { data, error } = await supabase
-      .from("credit_data")
-      .insert(records)
-      .select();
 
-    console.log("Inserted Rows:", data?.length);
-    console.log("Insert Error:", error);
 
-    if (error) {
-  throw error;
+
+    for (
+  let i = 0;
+  i < records.length;
+  i += 5000
+) {
+  const batch = records.slice(
+    i,
+    i + 5000
+  );
+
+  const { error } = await supabase
+    .from("credit_data")
+    .insert(batch);
+
+  if (error) {
+    throw error;
+  }
 }
 
 const { data: user } = await supabase
