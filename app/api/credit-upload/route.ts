@@ -15,6 +15,9 @@ webpush.setVapidDetails(
 );
 
 export async function POST(req: Request) {
+
+  console.time("TOTAL_IMPORT");
+
   try {
     const formData = await req.formData();
 
@@ -27,7 +30,7 @@ export async function POST(req: Request) {
         error: "No file uploaded",
       });
     }
-
+console.time("READ_EXCEL");
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -44,8 +47,8 @@ export async function POST(req: Request) {
       range: 5,
       defval: "",
     });
-
-        
+console.timeEnd("READ_EXCEL");
+ console.time("DELETE_OLD_DATA");       
 const [
   collectionInvoicesDelete,
   collectionUploadsDelete,
@@ -73,6 +76,7 @@ const [
 if (creditFullDelete.error) {
   throw creditFullDelete.error;
 }
+console.timeEnd("DELETE_OLD_DATA");
 const allRecords = jsonData.map((row) => ({
   invoice: String(row["Invoice #"])
   .replace(/\s/g, "")
@@ -122,7 +126,7 @@ const allRecords = jsonData.map((row) => ({
 
 
 
-
+console.time("INSERT_CREDIT_DATA");
     for (
   let i = 0;
   i < allRecords.length;
@@ -142,7 +146,7 @@ const allRecords = jsonData.map((row) => ({
   }
 }
 
-
+console.timeEnd("INSERT_CREDIT_DATA");
 const { data: user } = await supabase
   .from("app_users")
   .select("full_name")
@@ -170,6 +174,7 @@ const { data: subscriptions } =
     .from("push_subscriptions")
     .select("*")
     .in("van_code", vansInFile);
+console.time("PUSH_NOTIFICATIONS");
 await Promise.all(
 
   (subscriptions || []).map(
@@ -192,7 +197,6 @@ await Promise.all(
             url: `/van/${row.van_code}`,
           })
         );
-
       } catch (error) {
 
         console.error(
@@ -206,6 +210,7 @@ await Promise.all(
   )
 
 );
+console.timeEnd("PUSH_NOTIFICATIONS");
 const vanCounts: Record<string, number> = {};
 
 allRecords.forEach((row) => {
@@ -225,17 +230,26 @@ const vanRows = Object.keys(vanCounts).map(
     updated_at: new Date().toISOString(),
   })
 );
+console.time("UPSERT_COUNTS");
 
 await supabase
   .from("van_invoice_counts")
   .upsert(vanRows);
+
+console.timeEnd("UPSERT_COUNTS");
+
+console.timeEnd("TOTAL_IMPORT");
+
 return NextResponse.json({
   success: true,
   rows: allRecords.length,
 });
-
   } catch (err) {
-    console.error("UPLOAD ERROR:", err);
+
+  console.timeEnd("TOTAL_IMPORT");
+
+  console.error("UPLOAD ERROR:", err);
+
     return NextResponse.json({
       success: false,
       error: String(err),
