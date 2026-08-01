@@ -744,33 +744,40 @@ const reader =
           ];
 
         const rows: any[] =
-          XLSX.utils.sheet_to_json(
-            worksheet,
-            {
-              header: 1,
-            }
-          );
+  XLSX.utils.sheet_to_json(
+    worksheet
+  );
 
-        const invoices =
-          rows
-            .slice(1)
-            .filter((row) => {
+const invoices =
+  rows
+    .filter((row: any) => {
 
-              const status =
-  String(row[26] || "")
-    .trim()
-    .toLowerCase();
+      const status =
+        String(
+          row["Status"] ||
+          row["Collection Status"] ||
+          ""
+        )
+        .trim()
+        .toLowerCase();
 
-return (
-  status === "hold" ||
-  status === "completed"
-);
-            })
-            .map((row) =>
-              String(row[1] || "")
-                .trim()
-                .replace(/\s/g, "")
-            );
+      return (
+        status === "hold" ||
+        status === "completed"
+      );
+
+    })
+    .map((row: any) =>
+      String(
+        row["Invoice #"] ||
+        row["Invoice"] ||
+        ""
+      )
+      .trim()
+      .replace(/\s/g, "")
+      .toUpperCase()
+    )
+    .filter(Boolean);
 
         const previousInvoices =
           JSON.parse(
