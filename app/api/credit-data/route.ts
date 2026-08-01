@@ -72,7 +72,7 @@ if (data.length > 0) {
   if (todayString !== fileSaudiDate) {
 
     await supabase
-      .from("credit_data")
+      .from("credit_data_full")
       .delete()
       .neq("invoice", "");
 

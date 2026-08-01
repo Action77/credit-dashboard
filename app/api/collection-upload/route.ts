@@ -150,7 +150,7 @@ await supabase
 
 const { data: creditRows } =
   await supabase
-    .from("credit_data")
+    .from("credit_data_full")
     .select("invoice, van_code");
 
 const { data: allCollected } = await supabase

@@ -49,7 +49,6 @@ export async function POST(req: Request) {
 const [
   collectionInvoicesDelete,
   collectionUploadsDelete,
-  creditDelete,
   creditFullDelete
 ] = await Promise.all([
 
@@ -71,8 +70,8 @@ const [
 
 ]);
 
-if (creditDelete.error) {
-  throw creditDelete.error;
+if (creditFullDelete.error) {
+  throw creditFullDelete.error;
 }
 const allRecords = jsonData.map((row) => ({
   invoice: String(row["Invoice #"])
@@ -126,22 +125,23 @@ const allRecords = jsonData.map((row) => ({
 
     for (
   let i = 0;
-  i < records.length;
+  i < allRecords.length;
   i += 5000
 ) {
-  const batch = records.slice(
+  const batch = allRecords.slice(
     i,
     i + 5000
   );
 
   const { error } = await supabase
-    .from("credit_data")
+    .from("credit_data_full")
     .insert(batch);
 
   if (error) {
     throw error;
   }
 }
+
 
 const { data: user } = await supabase
   .from("app_users")
@@ -201,7 +201,6 @@ await Promise.all(
 const vanCounts: Record<string, number> = {};
 
 allRecords.forEach((row) => {
-
   const van =
     String(row.van_code || "").trim();
 
