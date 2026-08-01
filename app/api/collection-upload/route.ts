@@ -70,15 +70,18 @@ const invoices = rows
       .trim()
       .toLowerCase();
 
-
-    return status === "hold" || status === "completed";
+    return (
+      status === "hold" ||
+      status === "completed"
+    );
   })
   .map((row: any) =>
     String(row[1] || "")
       .trim()
       .replace(/\s/g, "")
-  );  
-
+      .toUpperCase()
+  )
+  .filter(Boolean);
     const { data: uploadRecord, error: uploadError } =
   await supabase
     .from("collection_uploads")

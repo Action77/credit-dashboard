@@ -106,7 +106,10 @@ await supabase
       throw deleteError;
     }
 const allRecords = jsonData.map((row) => ({
-  invoice: String(row["Invoice #"]).replace(/\s/g, ""),
+  invoice: String(row["Invoice #"])
+  .replace(/\s/g, "")
+  .trim()
+  .toUpperCase(),
 
   van_code: row["Van Code."],
   employee_name: row["Employee Name."],
@@ -146,7 +149,10 @@ const allRecords = jsonData.map((row) => ({
   file_date: creditFileDate,
 }));
     const records = blockedRows.map((row) => ({
-      invoice: String(row["Invoice #"]).replace(/\s/g, ""),
+      invoice: String(row["Invoice #"])
+  .replace(/\s/g, "")
+  .trim()
+  .toUpperCase(),
       van_code: row["Van Code."],
       employee_name: row["Employee Name."],
       employee_ats_code: row["Employee ATS Code."],
