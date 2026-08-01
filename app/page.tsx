@@ -455,21 +455,30 @@ useEffect(() => {
     const result = await response.json();
 
     const invoices = (result.invoices || [])
-      .map((invoice: any) =>
-        String(invoice)
-          .replace(/\s/g, "")
-          .trim()
-          .toUpperCase()
-      )
-      .filter(Boolean);
+  .map((invoice: any) =>
+    String(invoice)
+      .replace(/\s/g, "")
+      .trim()
+      .toUpperCase()
+  )
+  .filter(Boolean);
 
+console.log("Collected Count:", invoices.length);
 
 console.log(
   "HAS TEST INVOICE:",
   invoices.includes("P1316600015296")
 );
-    setCollectedInvoices(invoices);
 
+console.log(
+  "TEST INVOICE VALUE:",
+  invoices.find(
+    (i: string) =>
+      i.includes("15296")
+  )
+);
+
+setCollectedInvoices(invoices);
   };
 
   loadCollection();
