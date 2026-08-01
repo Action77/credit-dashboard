@@ -191,21 +191,31 @@ const handleCreditImport = async (
       return;
     }
 
-    const formData =
-      new FormData();
+    const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
 
-    formData.append(
-      "file",
-      file
-    );
+const formData =
+  new FormData();
 
-    await fetch(
-      "/api/credit-upload",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+formData.append(
+  "file",
+  file
+);
+
+formData.append(
+  "uploadedBy",
+  currentUser || ""
+);
+
+await fetch(
+  "/api/credit-upload",
+  {
+    method: "POST",
+    body: formData,
+  }
+);
 await supabase
   .from("van_permissions")
   .delete()

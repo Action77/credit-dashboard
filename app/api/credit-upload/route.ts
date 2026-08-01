@@ -157,11 +157,19 @@ const notificationResult = await supabase
     message: `Credit file uploaded successfully by ${user?.full_name || uploadedBy}.`,
   })
   .select();
+const vansInFile = [
+  ...new Set(
+    allRecords
+      .map((x) => x.van_code)
+      .filter(Boolean)
+  ),
+];
+
 const { data: subscriptions } =
   await supabase
     .from("push_subscriptions")
-    .select("*");
-
+    .select("*")
+    .in("van_code", vansInFile);
 await Promise.all(
 
   (subscriptions || []).map(
@@ -210,23 +218,17 @@ allRecords.forEach((row) => {
     (vanCounts[van] || 0) + 1;
 
 });
-await Promise.all(
-
-  Object.keys(vanCounts).map(
-    async (vanCode) => {
-
-      await supabase
-        .from("van_invoice_counts")
-        .upsert({
-          van_code: vanCode,
-          invoice_count: vanCounts[vanCode],
-          updated_at: new Date().toISOString(),
-        });
-
-    }
-  )
-
+const vanRows = Object.keys(vanCounts).map(
+  (vanCode) => ({
+    van_code: vanCode,
+    invoice_count: vanCounts[vanCode],
+    updated_at: new Date().toISOString(),
+  })
 );
+
+await supabase
+  .from("van_invoice_counts")
+  .upsert(vanRows);
 return NextResponse.json({
   success: true,
   rows: allRecords.length,
