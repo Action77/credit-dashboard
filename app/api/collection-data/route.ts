@@ -27,7 +27,9 @@ const { data, error } = await supabase
     "invoice, uploaded_by, created_at"
   )
   .eq("upload_id", latestUpload.id);
-
+console.log("Latest Upload:", latestUpload.id);
+console.log("Rows Returned:", data?.length);
+console.log("Error:", error);
 console.log(
   "Collection Data Count:",
   data?.length
