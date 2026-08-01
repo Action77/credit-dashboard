@@ -936,44 +936,30 @@ const isBlockedInvoice = (row: any) => {
   );
 };
 
-const filterBaseData =
-  data.filter((row) => {
+const filterBaseData = useMemo(() => {
+  return data.filter((row) => {
 
     const isNotCentral =
       String(row["Central Invoice"] || "")
+        .trim()
+        .toUpperCase() === "NOT CENTRAL";
 
-    .trim()
-    .toUpperCase() === "NOT CENTRAL";
-const paymentTerm = String(
-  row["Payment Term"] || ""
-).trim();
-const isPaymentTermEnabled = true;
     const matchesFilters =
       (
         selectedRegions.length === 0 ||
-        selectedRegions.includes(
-          row["Region"]
-        )
-      )
-      &&
+        selectedRegions.includes(row["Region"])
+      ) &&
       (
         selectedCities.length === 0 ||
-        selectedCities.includes(
-          row["City"]
-        )
-      )
-      &&
+        selectedCities.includes(row["City"])
+      ) &&
       (
         selectedVans.length === 0 ||
-        selectedVans.includes(
-          row["Van Code."]
-        )
+        selectedVans.includes(row["Van Code."])
       );
 
     const search =
-      searchText
-        .toLowerCase()
-        .trim();
+      searchText.toLowerCase().trim();
 
     const matchesSearch =
       !search ||
@@ -988,121 +974,112 @@ const isPaymentTermEnabled = true;
         .join(" ")
         .toLowerCase()
         .includes(search);
-return (
-  isNotCentral &&
-  isPaymentTermEnabled &&
-  matchesFilters &&
-  matchesSearch
-);
 
+    return (
+      isNotCentral &&
+      matchesFilters &&
+      matchesSearch
+    );
   });
-  const whatsappVanCodes = [
-  ...new Set(
+}, [
+  data,
+  selectedRegions,
+  selectedCities,
+  selectedVans,
+  searchText,
+]);
 
-    filterBaseData
-      .filter((row) => {
-
-        const invoice =
-          String(
-            row["Invoice #"]
-          )
+  const whatsappVanCodes = useMemo(() => {
+  return [
+    ...new Set(
+      filterBaseData
+        .filter((row) => {
+          const invoice = String(row["Invoice #"])
             .replace(/\s/g, "")
             .toUpperCase();
 
-        const isException =
-  exceptionSet.has(invoice);
-        const isCollected =
-  collectedSet.has(invoice);
-        return (
-          !isException &&
-          !isCollected
-        );
-
-      })
-      .map(
-        row => row["Van Code."]
-      )
-
-  )
-
-].sort();
+          return (
+            !exceptionSet.has(invoice) &&
+            !collectedSet.has(invoice)
+          );
+        })
+        .map((row) => row["Van Code."])
+    ),
+  ].sort();
+}, [
+  filterBaseData,
+  exceptions,
+  collectedInvoices,
+]);
   
-const filteredData = filterBaseData
-  .filter((row) => {
+const filteredData = useMemo(() => {
+  return filterBaseData
+    .filter((row) => {
 
-    const invoice =
-      String(row["Invoice #"])
-        .replace(/\s/g, "")
-        .toUpperCase();
+      const invoice =
+        String(row["Invoice #"])
+          .replace(/\s/g, "")
+          .toUpperCase();
 
-    const isException =
-  exceptionSet.has(invoice);
+      const matchesWhatsappVan =
+        !whatsAppVan ||
+        row["Van Code."] === whatsAppVan;
 
-    const isCollected =
-  collectedSet.has(
-    String(row["Invoice #"])
-      .replace(/\s/g, "")
-      .trim()
-      .toUpperCase()
-  );
-    const matchesWhatsappVan =
-      !whatsAppVan ||
-      row["Van Code."] === whatsAppVan;
+      const paymentTerm = String(
+        row["Payment Term"] || ""
+      ).trim();
 
-    const paymentTerm = String(
-  row["Payment Term"] || ""
-).trim();
       const invoiceStatus = String(
-  row["Invoice status (Due/ Overdue)"] || ""
-).toLowerCase();
+        row["Invoice status (Due/ Overdue)"] || ""
+      ).toLowerCase();
 
-if (invoiceStatus.includes("legal")) {
-  return false;
-}
+      if (invoiceStatus.includes("legal")) {
+        return false;
+      }
 
-    
-const rule = rulesMap.get(
-  normalize(paymentTerm)
-);
-if (!rule) {
-  }
-    const creditDays =
-  Number(row["Credit_Days"]) || 0;
+      const rule =
+        rulesMap.get(normalize(paymentTerm));
 
-const showInvoice =
-  rule
-    ? creditDays >= rule.block_at_day
-    : false;
-    return (
-      matchesWhatsappVan &&
-      showInvoice
+      const creditDays =
+        Number(row["Credit_Days"]) || 0;
+
+      const showInvoice =
+        rule
+          ? creditDays >= rule.block_at_day
+          : false;
+
+      return matchesWhatsappVan && showInvoice;
+    })
+    .sort((a, b) =>
+      String(a["Van Code."] || "").localeCompare(
+        String(b["Van Code."] || "")
+      )
     );
-  })
-  .sort((a, b) =>
-    String(a["Van Code."] || "").localeCompare(
-      String(b["Van Code."] || "")
-    )
-  );
+}, [
+  filterBaseData,
+  whatsAppVan,
+  rulesMap,
+]);
 
-const blockedInvoicesData =
-  filteredData.filter((row) => {
+const blockedInvoicesData = useMemo(() => {
+  return filteredData.filter((row) => {
 
-    const invoice =
-      String(row["Invoice #"])
-        .replace(/\s/g, "")
-        .toUpperCase();
+    const invoice = String(row["Invoice #"])
+      .replace(/\s/g, "")
+      .toUpperCase();
 
-const isException =
-  exceptionSet.has(invoice);
-
-    const isCollected =
-  collectedSet.has(invoice);
     return (
       isBlockedInvoice(row) &&
-      !isException &&
-      !isCollected
+      !exceptionSet.has(invoice) &&
+      !collectedSet.has(invoice)
     );
   });
+}, [
+  filteredData,
+  rulesMap,
+  exceptions,
+  collectedInvoices,
+]);
 const blockedCount =
   blockedInvoicesData.length;
       const employeeCount =
