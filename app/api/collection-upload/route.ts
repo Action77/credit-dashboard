@@ -56,12 +56,17 @@ const buffer = Buffer.from(
       workbook.Sheets[sheetName];
 
     const rows: any[] =
-      XLSX.utils.sheet_to_json(
-        worksheet,
-        {
-          header: 1,
-        }
-      );
+  XLSX.utils.sheet_to_json(
+    worksheet,
+    {
+      header: 1,
+    }
+  );
+
+console.log(
+  "Rows Loaded:",
+  rows.length
+);
 
 const invoices = rows
   .slice(1)
@@ -82,6 +87,20 @@ const invoices = rows
       .toUpperCase()
   )
   .filter(Boolean);
+console.log(
+  "Invoices Found:",
+  invoices.length
+);
+
+console.log(
+  "First Invoice:",
+  invoices[0]
+);
+
+console.log(
+  "Last Invoice:",
+  invoices[invoices.length - 1]
+);
     const { data: uploadRecord, error: uploadError } =
   await supabase
     .from("collection_uploads")
