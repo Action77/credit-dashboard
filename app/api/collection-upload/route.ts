@@ -108,13 +108,33 @@ const records = invoices.map(
 const uniqueInvoices = [
   ...new Set(records.map(r => r.invoice))
 ];
+const { data: existingInvoices } =
+  await supabase
+    .from("collection_invoices")
+    .select("invoice");
 
+const existingSet = new Set(
+  (existingInvoices || []).map(
+    (row: any) =>
+      String(row.invoice)
+        .trim()
+        .toUpperCase()
+  )
+);
+
+const newlyCollectedInvoices =
+  uniqueInvoices.filter(
+    invoice => !existingSet.has(invoice)
+  );
 const recordsToInsert =
   uniqueInvoices.map(invoice => ({
     invoice,
     uploaded_by: uploadedBy,
     upload_id: uploadRecord.id,
   }));
+
+const newlyCollectedSet =
+  new Set(newlyCollectedInvoices);
 for (
   let i = 0;
   i < recordsToInsert.length;
@@ -153,6 +173,36 @@ const { data: creditRows } =
   await supabase
     .from("credit_data")
     .select("invoice, van_code");
+
+const vanCollectedCounts:
+  Record<string, number> = {};
+
+(creditRows || []).forEach(
+  (row: any) => {
+
+    const invoice =
+      String(row.invoice || "")
+        .trim()
+        .toUpperCase();
+
+    if (
+      newlyCollectedSet.has(invoice)
+    ) {
+
+      const vanCode =
+        String(
+          row.van_code || ""
+        ).trim();
+
+      if (!vanCode) return;
+
+      vanCollectedCounts[vanCode] =
+        (vanCollectedCounts[vanCode] || 0) + 1;
+    }
+
+  }
+);
+
 const { data: allCollected } = await supabase
   .from("collection_invoices")
   .select("invoice");
@@ -208,61 +258,63 @@ for (const vanCode in currentCounts) {
       )
       .single();
 
-  const oldCount =
-    savedCount?.invoice_count;
+ 
+const oldCount =
+  savedCount?.invoice_count;
 
-  if (
-    oldCount !== null &&
-    oldCount !== undefined &&
-    newCount < oldCount
-  ) {
+const reducedBy =
+  vanCollectedCounts[
+    vanCode
+  ] || 0;
 
-    const reducedBy =
-      oldCount - newCount;
+if (
+  oldCount !== null &&
+  oldCount !== undefined &&
+  reducedBy > 0
+) {
 
-    const { data: subscriptions } =
-      await supabase
-        .from("push_subscriptions")
-        .select("*")
-        .eq(
-          "van_code",
-          vanCode
-        );
+  const { data: subscriptions } =
+    await supabase
+      .from("push_subscriptions")
+      .select("*")
+      .eq(
+        "van_code",
+        vanCode
+      );
 
-    await Promise.all(
-  (subscriptions || []).map(
-    async (row) => {
+  await Promise.all(
+    (subscriptions || []).map(
+      async (row) => {
 
-      const subscription =
-        typeof row.subscription === "string"
-          ? JSON.parse(
-              row.subscription
-            )
-          : row.subscription;
+        const subscription =
+          typeof row.subscription === "string"
+            ? JSON.parse(
+                row.subscription
+              )
+            : row.subscription;
 
-      try {
+        try {
 
-        await webpush.sendNotification(
-          subscription,
-          JSON.stringify({
-            title: "✅ Collection Updated",
-            body: `${reducedBy} invoice(s) have been collected from your route.`,
-            url: `/van/${vanCode}`,
-          })
-        );
+          await webpush.sendNotification(
+            subscription,
+            JSON.stringify({
+              title: "✅ Collection Updated",
+              body: `${reducedBy} invoice(s) have been collected from your route.`,
+              url: `/van/${vanCode}`,
+            })
+          );
 
-      } catch (error) {
+        } catch (error) {
 
-        console.error(error);
+          console.error(error);
+
+        }
 
       }
+    )
+  );
 
-    }
-  )
-);
-
-  }
-
+}    
   await supabase
     .from("van_invoice_counts")
     .upsert({
