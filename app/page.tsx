@@ -463,8 +463,11 @@ useEffect(() => {
       )
       .filter(Boolean);
 
-    console.log("Collected Invoices Loaded:", invoices);
 
+console.log(
+  "HAS TEST INVOICE:",
+  invoices.includes("P1316600015296")
+);
     setCollectedInvoices(invoices);
 
   };
