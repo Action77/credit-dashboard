@@ -165,31 +165,6 @@ const handleCreditImport = async (
 
     if (!file) return;
 
-    const buffer =
-      await file.arrayBuffer();
-
-    const workbook =
-      XLSX.read(buffer, {
-        type: "array",
-      });
-
-    const worksheet =
-      workbook.Sheets[
-        workbook.SheetNames[0]
-      ];
-
-    const b6 = String(
-      worksheet["B6"]?.v || ""
-    ).trim();
-
-    if (b6 !== "Region") {
-
-      toast.error(
-        "Invalid Credit File"
-      );
-
-      return;
-    }
 
     const currentUser =
   await localStorage.getItem(
@@ -248,7 +223,7 @@ await supabase
 
     setShowImportModal(false);
 
-    window.location.reload();
+    toast.success("Import Completed");
 
   } finally {
 
@@ -322,7 +297,7 @@ const handleCollectionImport = async (
   await localStorage.getItem(
     "currentUser"
   );
-  
+
     let fullName = "";
 
     if (currentUser) {
