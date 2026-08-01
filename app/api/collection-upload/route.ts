@@ -108,33 +108,12 @@ const records = invoices.map(
 const uniqueInvoices = [
   ...new Set(records.map(r => r.invoice))
 ];
-const { data: existingInvoices } =
-  await supabase
-    .from("collection_invoices")
-    .select("invoice");
-
-const existingSet = new Set(
-  (existingInvoices || []).map(
-    (row: any) =>
-      String(row.invoice)
-        .trim()
-        .toUpperCase()
-  )
-);
-
-const newlyCollectedInvoices =
-  uniqueInvoices.filter(
-    invoice => !existingSet.has(invoice)
-  );
 const recordsToInsert =
   uniqueInvoices.map(invoice => ({
     invoice,
     uploaded_by: uploadedBy,
     upload_id: uploadRecord.id,
   }));
-
-const newlyCollectedSet =
-  new Set(newlyCollectedInvoices);
 for (
   let i = 0;
   i < recordsToInsert.length;
@@ -173,35 +152,6 @@ const { data: creditRows } =
   await supabase
     .from("credit_data")
     .select("invoice, van_code");
-
-const vanCollectedCounts:
-  Record<string, number> = {};
-
-(creditRows || []).forEach(
-  (row: any) => {
-
-    const invoice =
-      String(row.invoice || "")
-        .trim()
-        .toUpperCase();
-
-    if (
-      newlyCollectedSet.has(invoice)
-    ) {
-
-      const vanCode =
-        String(
-          row.van_code || ""
-        ).trim();
-
-      if (!vanCode) return;
-
-      vanCollectedCounts[vanCode] =
-        (vanCollectedCounts[vanCode] || 0) + 1;
-    }
-
-  }
-);
 
 const { data: allCollected } = await supabase
   .from("collection_invoices")
@@ -263,15 +213,13 @@ const oldCount =
   savedCount?.invoice_count;
 
 const reducedBy =
-  vanCollectedCounts[
-    vanCode
-  ] || 0;
+  oldCount - newCount;
 
 if (
   oldCount !== null &&
   oldCount !== undefined &&
-  reducedBy > 0
-) {
+  newCount < oldCount
+){
 
   const { data: subscriptions } =
     await supabase
