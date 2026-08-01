@@ -7,102 +7,119 @@ const supabase = createClient(
 );
 
 export async function GET() {
-let allData: any[] = [];
-let from = 0;
-const batchSize = 1000;
-let error = null;
 
-while (true) {
-  const { data, error: err } = await supabase
+  let error = null;
+
+  // Get latest uploaded row only
+  const { data: latestRow, error: latestError } = await supabase
     .from("credit_data_full")
-    .select("*")
+    .select("created_at")
     .order("created_at", { ascending: false })
-    .range(from, from + batchSize - 1);
+    .limit(1)
+    .maybeSingle();
 
-  if (err) {
-    error = err;
-    break;
-  }
-
-  if (!data || data.length === 0) {
-    break;
-  }
-
-  allData.push(...data);
-
-  if (data.length < batchSize) {
-    break;
-  }
-
-  from += batchSize;
-}
-
-const data = allData;
-/* Auto Clear Daily - Saudi Time */
-
-if (data.length > 0) {
-
-  const now = new Date();
-
-  const saudiToday = new Date(
-    now.toLocaleString("en-US", {
-      timeZone: "Asia/Riyadh",
-    })
-  );
-
-  const todayString =
-    saudiToday.toISOString().split("T")[0];
-
-  const fileCreatedDate = new Date(
-    data[0].created_at
-  );
-
-  const fileSaudiDate =
-    new Date(
-      fileCreatedDate.toLocaleString(
-        "en-US",
-        {
-          timeZone: "Asia/Riyadh",
-        }
-      )
-    )
-      .toISOString()
-      .split("T")[0];
-
-  if (todayString !== fileSaudiDate) {
-
-    await supabase
-      .from("credit_data_full")
-      .delete()
-      .neq("invoice", "");
-
-    await supabase
-      .from("credit_data_full")
-      .delete()
-      .neq("invoice", "");
-
+  if (latestError) {
     return NextResponse.json({
       data: [],
       fileInfo: "",
     });
-
   }
-}
-console.log("Rows from Supabase:", data.length);
-console.log("Rows from Supabase:", data?.length);
-console.log("Error:", error);
 
-if (data?.length) {
-  console.log("First Invoice:", data[0].invoice);
-  console.log("Last Invoice:", data[data.length - 1].invoice);
-}
+  // Auto Clear Daily - Saudi Time
+  if (latestRow) {
+    const now = new Date();
+
+    const saudiToday = new Date(
+      now.toLocaleString("en-US", {
+        timeZone: "Asia/Riyadh",
+      })
+    );
+
+    const todayString = saudiToday
+      .toISOString()
+      .split("T")[0];
+
+    const fileSaudiDate = new Date(
+      new Date(latestRow.created_at).toLocaleString("en-US", {
+        timeZone: "Asia/Riyadh",
+      })
+    )
+      .toISOString()
+      .split("T")[0];
+
+    if (todayString !== fileSaudiDate) {
+      await supabase
+        .from("credit_data_full")
+        .delete()
+        .neq("invoice", "");
+
+      return NextResponse.json({
+        data: [],
+        fileInfo: "",
+      });
+    }
+  }
+
+  // Load all rows only if today's file exists
+  let allData: any[] = [];
+  let from = 0;
+  const batchSize = 1000;
+
+  while (true) {
+    const { data, error: err } = await supabase
+      .from("credit_data_full")
+      .select(`
+  van_code,
+  employee_name,
+  employee_ats_code,
+  customer_code,
+  customer_name,
+  central_invoice,
+  payment_term,
+  invoice,
+  trx_date,
+  credit_invoice_amount,
+  pending_cim,
+  credit_days,
+  total_rejected_count,
+  status_user_block,
+  invoice_status,
+  region,
+  city,
+  created_at,
+  uploaded_by,
+  file_name,
+  file_date
+`)
+      .order("created_at", { ascending: false })
+      .range(from, from + batchSize - 1);
+
+    if (err) {
+      error = err;
+      break;
+    }
+
+    if (!data || data.length === 0) {
+      break;
+    }
+
+    allData.push(...data);
+
+    if (data.length < batchSize) {
+      break;
+    }
+
+    from += batchSize;
+  }
+
+  const data = allData;
+
   if (error) {
     return NextResponse.json({
       data: [],
       fileInfo: "",
     });
   }
-
   const uploadTime =
     data.length > 0
       ? new Date(
