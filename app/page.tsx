@@ -446,28 +446,32 @@ useEffect(() => {
 }, [currentUser]);
 useEffect(() => {
 
-  const loadCollection =
-    async () => {
+  const loadCollection = async () => {
 
-      const response =
-        await fetch(
-          "/api/collection-data"
-        );
+    const response = await fetch(
+      "/api/collection-data"
+    );
 
-      const data =
-        await response.json();
+    const result = await response.json();
 
-      setCollectedInvoices(
-        data.invoices || []
-      );
+    const invoices = (result.invoices || [])
+      .map((invoice: any) =>
+        String(invoice)
+          .replace(/\s/g, "")
+          .trim()
+          .toUpperCase()
+      )
+      .filter(Boolean);
 
-    };
+    console.log("Collected Invoices Loaded:", invoices);
+
+    setCollectedInvoices(invoices);
+
+  };
 
   loadCollection();
 
 }, []);
-
-
 useEffect(() => {
 
   fetch("/api/collection-data")
@@ -2112,17 +2116,12 @@ await localStorage.setItem(
   style={{
   backgroundColor:
 
-    collectedInvoices.some(
-      invoice =>
-        String(invoice)
-          .replace(/\s/g, "")
-          .toUpperCase() ===
-        String(
-          row["Invoice #"]
-        )
-          .replace(/\s/g, "")
-          .toUpperCase()
-    )
+    collectedInvoices.includes(
+  String(row["Invoice #"])
+    .replace(/\s/g, "")
+    .trim()
+    .toUpperCase()
+)
 
       ? "#C6EFCE"
 
