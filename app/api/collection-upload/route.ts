@@ -219,14 +219,12 @@ for (const vanCode in currentCounts) {
           vanCode
         );
 
-    for (
-      const row of
-      subscriptions || []
-    ) {
+    await Promise.all(
+  (subscriptions || []).map(
+    async (row) => {
 
       const subscription =
-        typeof row.subscription ===
-        "string"
+        typeof row.subscription === "string"
           ? JSON.parse(
               row.subscription
             )
@@ -235,23 +233,23 @@ for (const vanCode in currentCounts) {
       try {
 
         await webpush.sendNotification(
-  subscription,
-  JSON.stringify({
-    title: "✅ Collection Updated",
-    body: `${reducedBy} invoice(s) have been collected from your route.`,
-    url: `/van/${vanCode}`,
-  })
-);
+          subscription,
+          JSON.stringify({
+            title: "✅ Collection Updated",
+            body: `${reducedBy} invoice(s) have been collected from your route.`,
+            url: `/van/${vanCode}`,
+          })
+        );
 
       } catch (error) {
 
-        console.error(
-          error
-        );
+        console.error(error);
 
       }
 
     }
+  )
+);
 
   }
 

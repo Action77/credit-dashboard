@@ -84,27 +84,38 @@ const blockedRows = jsonData.filter((row) => {
 });
 
     console.log("Blocked Rows:", blockedRows.length);
-await supabase
-  .from("collection_invoices")
-  .delete()
-  .neq("id", 0);
+const [
+  collectionInvoicesDelete,
+  collectionUploadsDelete,
+  creditDelete,
+  creditFullDelete
+] = await Promise.all([
 
-await supabase
-  .from("collection_uploads")
-  .delete()
-  .neq("id", 0);
-    const { error: deleteError } = await supabase
-      .from("credit_data")
-      .delete()
-      .neq("invoice", "");
-await supabase
-  .from("credit_data_full")
-  .delete()
-  .neq("invoice", "");
-    if (deleteError) {
-      console.error("DELETE ERROR:", deleteError);
-      throw deleteError;
-    }
+  supabase
+    .from("collection_invoices")
+    .delete()
+    .neq("id", 0),
+
+  supabase
+    .from("collection_uploads")
+    .delete()
+    .neq("id", 0),
+
+  supabase
+    .from("credit_data")
+    .delete()
+    .neq("invoice", ""),
+
+  supabase
+    .from("credit_data_full")
+    .delete()
+    .neq("invoice", "")
+
+]);
+
+if (creditDelete.error) {
+  throw creditDelete.error;
+}
 const allRecords = jsonData.map((row) => ({
   invoice: String(row["Invoice #"])
   .replace(/\s/g, "")
@@ -222,36 +233,42 @@ const { data: subscriptions } =
     .from("push_subscriptions")
     .select("*");
 
-for (const row of subscriptions || []) {
+await Promise.all(
 
-  const subscription =
-    typeof row.subscription === "string"
-      ? JSON.parse(row.subscription)
-      : row.subscription;
+  (subscriptions || []).map(
+    async (row) => {
 
-  try {
+      const subscription =
+        typeof row.subscription === "string"
+          ? JSON.parse(row.subscription)
+          : row.subscription;
 
-await webpush.sendNotification(
-  subscription,
-  JSON.stringify({
-    title:
-      "✅ New Credit File Imported",
-    body:
-      "A new credit file has been uploaded. Please review your blocked invoices to see the latest updates affecting your route.",
-    url: `/van/${row.van_code}`,
-  })
+      try {
+
+        await webpush.sendNotification(
+          subscription,
+          JSON.stringify({
+            title:
+              "✅ New Credit File Imported",
+            body:
+              "A new credit file has been uploaded. Please review your blocked invoices to see the latest updates affecting your route.",
+            url: `/van/${row.van_code}`,
+          })
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Credit push failed:",
+          error
+        );
+
+      }
+
+    }
+  )
+
 );
-
-  } catch (error) {
-
-    console.error(
-      "Credit push failed:",
-      error
-    );
-
-  }
-
-}
 const vanCounts: Record<string, number> = {};
 
 records.forEach((row) => {
@@ -266,22 +283,23 @@ records.forEach((row) => {
 
 });
 
-for (const vanCode in vanCounts) {
+await Promise.all(
 
-  await supabase
-    .from("van_invoice_counts")
-    .upsert({
-      van_code: vanCode,
-      invoice_count: vanCounts[vanCode],
-      updated_at: new Date().toISOString(),
-    });
+  Object.keys(vanCounts).map(
+    async (vanCode) => {
 
-}
-console.log(
-  "NOTIFICATION RESULT:",
-  notificationResult
+      await supabase
+        .from("van_invoice_counts")
+        .upsert({
+          van_code: vanCode,
+          invoice_count: vanCounts[vanCode],
+          updated_at: new Date().toISOString(),
+        });
+
+    }
+  )
+
 );
-
 
 return NextResponse.json({
   success: true,
