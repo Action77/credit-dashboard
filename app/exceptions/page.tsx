@@ -221,7 +221,6 @@ await supabase
   .delete()
   .neq("van_code", "");
 
-    
     let fullName = "";
 
     if (currentUser) {
@@ -319,7 +318,11 @@ const handleCollectionImport = async (
       }
     );
 
-    
+    const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
+  
     let fullName = "";
 
     if (currentUser) {
