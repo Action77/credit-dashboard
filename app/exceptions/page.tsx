@@ -323,11 +323,7 @@ const handleCollectionImport = async (
       }
     );
 
-    const currentUser =
-      await localStorage.getItem(
-        "currentUser"
-      );
-
+    
     let fullName = "";
 
     if (currentUser) {
