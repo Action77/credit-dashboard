@@ -130,11 +130,11 @@ console.time("INSERT_CREDIT_DATA");
     for (
   let i = 0;
   i < allRecords.length;
-  i += 5000
+  i += 10000
 ) {
   const batch = allRecords.slice(
     i,
-    i + 5000
+    i + 10000
   );
 
   const { error } = await supabase
