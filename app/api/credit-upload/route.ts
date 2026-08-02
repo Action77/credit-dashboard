@@ -48,11 +48,12 @@ console.time("READ_EXCEL");
       defval: "",
     });
 console.timeEnd("READ_EXCEL");
- console.time("DELETE_OLD_DATA");       
+ console.time("DELETE_OLD_DATA");
+
 const [
   collectionInvoicesDelete,
   collectionUploadsDelete,
-  creditFullDelete
+  clearCreditDataResult
 ] = await Promise.all([
 
   supabase
@@ -65,23 +66,31 @@ const [
     .delete()
     .neq("id", 0),
 
-
-  supabase
-    .from("credit_data_full")
-    .delete()
-    .neq("invoice", "")
+  supabase.rpc(
+    "clear_credit_data"
+  )
 
 ]);
 
-if (creditFullDelete.error) {
-  throw creditFullDelete.error;
+if (collectionInvoicesDelete.error) {
+  throw collectionInvoicesDelete.error;
 }
+
+if (collectionUploadsDelete.error) {
+  throw collectionUploadsDelete.error;
+}
+
+if (clearCreditDataResult.error) {
+  throw clearCreditDataResult.error;
+}
+
 console.timeEnd("DELETE_OLD_DATA");
+console.time("MAP_ROWS");
 const allRecords = jsonData.map((row) => ({
   invoice: String(row["Invoice #"])
-  .replace(/\s/g, "")
-  .trim()
-  .toUpperCase(),
+    .replace(/\s/g, "")
+    .trim()
+    .toUpperCase(),
 
   van_code: row["Van Code."],
   employee_name: row["Employee Name."],
@@ -120,8 +129,12 @@ const allRecords = jsonData.map((row) => ({
   file_name: file.name,
   file_date: creditFileDate,
 }));
-    
 
+console.log(
+  "ROWS_COUNT",
+  allRecords.length
+);    
+console.timeEnd("MAP_ROWS");
     
 
 
