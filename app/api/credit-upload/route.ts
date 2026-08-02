@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { createClient } from "@supabase/supabase-js";
+import crypto from "crypto";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -284,6 +285,20 @@ await supabase
 await supabase
   .from("van_invoice_counts")
   .upsert(vanRows);
+
+const permissionRows = Object.keys(vanCounts).map(
+  (vanCode) => ({
+    van_code: vanCode,
+    is_unblocked: false,
+    public_token: crypto.randomUUID(),
+  })
+);
+
+await supabase
+  .from("van_permissions")
+  .upsert(permissionRows, {
+    onConflict: "van_code",
+  });
 
 console.timeEnd("UPSERT_COUNTS");
 console.timeEnd("TOTAL_IMPORT");
