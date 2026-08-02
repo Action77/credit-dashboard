@@ -23,34 +23,54 @@ export default function VanExceptionsPage() {
         await response.json();
 
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
+
+      today.setHours(
+        0,
+        0,
+        0,
+        0
+      );
 
       const validExceptions =
-        (data || []).filter((item: any) => {
-          if (item.permanent) {
-            return true;
+        (data || []).filter(
+          (item: any) => {
+
+            if (item.permanent) {
+              return true;
+            }
+
+            const tillDate =
+              new Date(
+                item.till_date
+              );
+
+            tillDate.setHours(
+              0,
+              0,
+              0,
+              0
+            );
+
+            return (
+              tillDate >= today
+            );
           }
+        );
 
-          const tillDate =
-            new Date(item.till_date);
-
-          tillDate.setHours(
-            0,
-            0,
-            0,
-            0
-          );
-
-          return tillDate >= today;
-        });
-
-      setExceptions(
+      const filtered =
         validExceptions.filter(
           (item: any) =>
-            String(item.van_code).trim() ===
-            String(vanCode).trim()
-        )
-      );
+            String(
+              item.van_code || ""
+            )
+              .trim()
+              .toUpperCase() ===
+            String(vanCode)
+              .trim()
+              .toUpperCase()
+        );
+
+      setExceptions(filtered);
     };
 
     load();
@@ -62,7 +82,13 @@ export default function VanExceptionsPage() {
     if (!dateString) return 0;
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+
+    today.setHours(
+      0,
+      0,
+      0,
+      0
+    );
 
     const endDate =
       new Date(dateString);
@@ -72,8 +98,12 @@ export default function VanExceptionsPage() {
     const current =
       new Date(today);
 
-    while (current <= endDate) {
-      if (current.getDay() !== 5) {
+    while (
+      current <= endDate
+    ) {
+      if (
+        current.getDay() !== 5
+      ) {
         count++;
       }
 
@@ -85,85 +115,166 @@ export default function VanExceptionsPage() {
     return count;
   };
 
+  const legalCount =
+    exceptions.filter(
+      x => x.permanent
+    ).length;
+
+  const temporaryCount =
+    exceptions.filter(
+      x => !x.permanent
+    ).length;
+
   return (
     <div className="min-h-screen bg-slate-100 p-3">
 
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between items-center">
+
   <Link
     href={`/van/${encodeURIComponent(vanCode)}`}
     className="text-blue-600 text-sm"
   >
     ← Back To Van
   </Link>
+
 </div>
-      <div className="bg-red-600 text-white rounded-xl p-4 mb-4">
+      <div className="bg-[#071d5c] text-white rounded-xl p-4 mb-4">
+
         <h1 className="text-2xl font-bold">
           {vanCode}
         </h1>
 
-        <div className="text-sm mt-2">
-          Exceptions: {exceptions.length}
+        <div className="mt-3">
+          <span
+            className="
+              inline-flex
+              items-center
+              px-4
+              py-2
+              rounded-full
+              bg-red-600
+              text-white
+              text-sm
+              font-semibold
+            "
+          >
+            ⚠️ Exceptions
+          </span>
         </div>
+
+        <div className="mt-3 space-y-1 text-sm">
+
+          <div>
+            Total Exceptions:
+            {" "}
+            {exceptions.length}
+          </div>
+
+          <div>
+            Temporary:
+            {" "}
+            {temporaryCount}
+          </div>
+
+          <div>
+            Legal:
+            {" "}
+            {legalCount}
+          </div>
+
+        </div>
+
       </div>
 
       <div className="space-y-3">
 
-        {exceptions.map((item, index) => {
+        {exceptions.map(
+          (item, index) => {
 
-          const daysLeft =
-            calculateBusinessDays(
-              item.till_date
+            const daysLeft =
+              calculateBusinessDays(
+                item.till_date
+              );
+
+            return (
+              <div
+                key={index}
+                className="
+                  bg-white
+                  rounded-xl
+                  shadow
+                  p-4
+                "
+              >
+
+                <div className="font-bold text-red-700 text-base">
+                  {item.invoice}
+                </div>
+
+                <div className="mt-2 font-medium">
+                  {item.customer_name}
+                </div>
+
+                <div className="text-sm text-slate-500">
+                  {item.customer_code}
+                </div>
+
+                <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+
+                  <div>
+                    <span className="text-slate-500">
+                      Employee:
+                    </span>{" "}
+                    {item.employee_name}
+                  </div>
+
+                  <div>
+                    <span className="text-slate-500">
+                      ATS:
+                    </span>{" "}
+                    {item.ats_code}
+                  </div>
+
+                  <div>
+                    <span className="text-slate-500">
+                      Till Date:
+                    </span>{" "}
+                    {item.permanent
+                      ? "-"
+                      : item.till_date}
+                  </div>
+
+                  <div>
+                    <span className="text-slate-500">
+                      Status:
+                    </span>{" "}
+
+                    {item.permanent ? (
+                      <span className="text-red-600 font-semibold">
+                        Legal
+                      </span>
+                    ) : (
+                      <span className="text-orange-600 font-semibold">
+                        {daysLeft} Days
+                      </span>
+                    )}
+                  </div>
+
+                </div>
+
+              </div>
             );
-
-          return (
-            <div
-              key={index}
-              className="bg-white rounded-xl shadow p-4"
-            >
-              <div className="font-bold text-red-700">
-                {item.invoice}
-              </div>
-
-              <div className="mt-2 font-medium">
-                {item.customer_name}
-              </div>
-
-              <div className="text-sm text-slate-500">
-                {item.customer_code}
-              </div>
-
-              <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-
-                <div>
-                  Employee:
-                  {" "}
-                  {item.employee_name}
-                </div>
-
-                <div>
-                  ATS:
-                  {" "}
-                  {item.ats_code}
-                </div>
-
-                <div>
-                  Till Date:
-                  {" "}
-                  {item.till_date}
-                </div>
-
-                <div>
-                  {item.permanent
-                    ? "Legal"
-                    : `${daysLeft} Days`}
-                </div>
-
-              </div>
-            </div>
-          );
-        })}
+          }
+        )}
 
       </div>
+
+      {exceptions.length === 0 && (
+        <div className="bg-white p-6 rounded-xl text-center text-slate-500">
+          No Exceptions Found
+        </div>
+      )}
+
     </div>
   );
 }
