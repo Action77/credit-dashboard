@@ -1070,7 +1070,18 @@ const whatsappData = useMemo(() => {
   exceptionSet,
   collectedSet,
 ]);
+const displayedData = useMemo(() => {
+  if (!whatsAppVan) {
+    return filteredData;
+  }
 
+  return filteredData.filter(
+    (row) => row["Van Code."] === whatsAppVan
+  );
+}, [
+  filteredData,
+  whatsAppVan,
+]);
 const whatsappVanCodes = useMemo(() => {
   return [
     ...new Set(
@@ -2136,10 +2147,10 @@ await localStorage.setItem(
 
                 <tbody>
 
-                 {filteredData
+                 {displayedData
   .slice(0, 100)
   .map((row, index) => (
-                      <tr
+                          <tr
   key={index}
   className="border-b"
   style={{
