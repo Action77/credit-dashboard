@@ -406,7 +406,7 @@ setIsLoggedIn(!!currentUser);
 
   <Link
     href={`/van/${encodeURIComponent(vanCode)}/exceptions`}
-    className={`text-red-600 text-sm ${isLoggedIn ? "ml-auto" : "mx-auto"}`}
+    className="text-red-600 text-sm ml-auto"
   >
     Exceptions →
   </Link>
