@@ -1082,62 +1082,6 @@ const displayedData = useMemo(() => {
   filteredData,
   whatsAppVan,
 ]);
-const whatsappVanCodes = useMemo(() => {
-  return [
-    ...new Set(
-      filterBaseData
-        .filter((row) => {
-          const invoice = normalizeInvoice(
-            row["Invoice #"]
-          );
-
-          const paymentTerm = String(
-            row["Payment Term"] || ""
-          ).trim();
-
-          const rule = rulesMap.get(
-            normalize(paymentTerm)
-          );
-
-          const creditDays =
-            Number(row["Credit_Days"]) || 0;
-
-          return (
-            !collectedSet.has(invoice) &&
-            (
-              exceptionSet.has(invoice) ||
-              (
-                rule &&
-                creditDays >= rule.block_at_day
-              )
-            )
-          );
-        })
-        .map((row) => row["Van Code."])
-    ),
-  ].sort();
-}, [
-  filterBaseData,
-  rulesMap,
-  exceptionSet,
-  collectedSet,
-]);
-
-useEffect(() => {
-  if (
-    whatsappVanCodes.length > 0 &&
-    !whatsappVanCodes.includes(
-      whatsAppVan
-    )
-  ) {
-    setWhatsAppVan(
-      whatsappVanCodes[0]
-    );
-  }
-}, [
-  whatsappVanCodes,
-  whatsAppVan,
-]);
 const blockedInvoicesData = useMemo(() => {
   return filteredData.filter((row) => {
 
@@ -1154,6 +1098,27 @@ const blockedInvoicesData = useMemo(() => {
   exceptionSet,
   collectedSet,
 ]);
+
+const whatsappVanCodes = useMemo(() => {
+  return [
+    ...new Set(
+      blockedInvoicesData.map(
+        (row) => row["Van Code."]
+      )
+    ),
+  ]
+    .filter(Boolean)
+    .sort();
+}, [blockedInvoicesData]);
+useEffect(() => {
+  if (
+    whatsAppVan &&
+    !whatsappVanCodes.includes(whatsAppVan)
+  ) {
+    setWhatsAppVan("");
+  }
+}, [whatsappVanCodes, whatsAppVan]);
+
 const filteredInvoiceSet = useMemo(
   () =>
     new Set(
