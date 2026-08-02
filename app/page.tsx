@@ -1003,50 +1003,14 @@ const filterBaseData = useMemo(() => {
   searchText,
 ]);
 
-  const whatsappVanCodes = useMemo(() => {
-  return [
-    ...new Set(
-      filterBaseData
-        .filter((row) => {
-          const invoice = String(row["Invoice #"])
-            .replace(/\s/g, "")
-            .toUpperCase();
-
-          return (
-            !exceptionSet.has(invoice) &&
-            !collectedSet.has(invoice)
-          );
-        })
-        .map((row) => row["Van Code."])
-    ),
-  ].sort();
-}, [
-  filterBaseData,
-  exceptions,
-  collectedInvoices,
-]);
-  useEffect(() => {
-
-  if (whatsappVanCodes.length > 0) {
-
-    setWhatsAppVan(
-      whatsappVanCodes[0]
-    );
-
-  } else {
-
-    setWhatsAppVan("");
-
-  }
-
-}, [whatsappVanCodes]);
+  
 const filteredData = useMemo(() => {
   return filterBaseData
     .filter((row) => {
-
       const invoice = normalizeInvoice(
-  row["Invoice #"]
-);
+        row["Invoice #"]
+      );
+
       const matchesWhatsappVan =
         !whatsAppVan ||
         row["Van Code."] === whatsAppVan;
@@ -1063,18 +1027,24 @@ const filteredData = useMemo(() => {
         return false;
       }
 
-      const rule =
-        rulesMap.get(normalize(paymentTerm));
+      const rule = rulesMap.get(
+        normalize(paymentTerm)
+      );
 
       const creditDays =
         Number(row["Credit_Days"]) || 0;
 
-      const showInvoice =
-        rule
-          ? creditDays >= rule.block_at_day
-          : false;
+      const showInvoice = rule
+        ? creditDays >= rule.block_at_day
+        : false;
 
-      return matchesWhatsappVan && showInvoice;
+      return (
+        matchesWhatsappVan &&
+        (
+          showInvoice ||
+          exceptionSet.has(invoice)
+        )
+      );
     })
     .sort((a, b) =>
       String(a["Van Code."] || "").localeCompare(
@@ -1085,8 +1055,41 @@ const filteredData = useMemo(() => {
   filterBaseData,
   whatsAppVan,
   rulesMap,
+  exceptionSet,
+]);
+const whatsappVanCodes = useMemo(() => {
+  return [
+    ...new Set(
+      filteredData
+        .filter((row) => {
+          const invoice = normalizeInvoice(row["Invoice #"]);
+
+          return !collectedSet.has(invoice);
+        })
+        .map((row) => row["Van Code."])
+    ),
+  ].sort();
+}, [
+  filteredData,
+  exceptionSet,
+  collectedSet,
 ]);
 
+useEffect(() => {
+
+  if (whatsappVanCodes.length > 0) {
+
+    setWhatsAppVan(
+      whatsappVanCodes[0]
+    );
+
+  } else {
+
+    setWhatsAppVan("");
+
+  }
+
+}, [whatsappVanCodes]);
 const blockedInvoicesData = useMemo(() => {
   return filteredData.filter((row) => {
 
@@ -1870,46 +1873,26 @@ row["City"] === city
                               >
                                 <input
   type="checkbox"
-  
+  checked={selectedVans.includes(van)}
   onChange={(e) => {
-
-    const cityVans = data
-      .filter(
-        row =>
-          row["Region"] === region &&
-          row["City"] === city
-      )
-      .map(row => row["Van Code."])
-      .filter(Boolean);
 
     if (e.target.checked) {
 
-      setSelectedCities(prev => [
-        ...new Set([...prev, city])
-      ]);
-
       setSelectedVans(prev => [
-        ...new Set([
-          ...prev,
-          ...cityVans
-        ])
+        ...new Set([...prev, van])
       ]);
 
     } else {
 
-      setSelectedCities(prev =>
-        prev.filter(c => c !== city)
-      );
-
       setSelectedVans(prev =>
-        prev.filter(
-          van => !cityVans.includes(van)
-        )
+        prev.filter(v => v !== van)
       );
 
     }
+
   }}
 />
+
 
                                 {van}
 
