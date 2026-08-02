@@ -1027,7 +1027,17 @@ const filteredData = useMemo(() => {
       const rule = rulesMap.get(
         normalize(paymentTerm)
       );
+const whatsappData = useMemo(() => {
 
+  return filteredData.filter(
+    (row) =>
+      row["Van Code."] === whatsAppVan
+  );
+
+}, [
+  filteredData,
+  whatsAppVan,
+]);
       const creditDays =
         Number(row["Credit_Days"]) || 0;
 
