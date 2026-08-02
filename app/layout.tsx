@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Header from "@/components/Header";
+import { usePathname } from "next/navigation";
 import NotificationBell from "@/components/NotificationBell";
 import UserWelcome from "@/components/UserWelcome";
 import { Toaster } from "sonner";
@@ -37,15 +39,7 @@ export default function RootLayout({
           closeButton
         />
 
-        <header className="sticky top-0 z-50 bg-gradient-to-r from-[#071d5c] to-[#0b2a7a] shadow-lg border-b border-blue-800">
-          <div className="flex items-center justify-between px-6 py-3">
-            <UserWelcome />
-
-            <div className="ml-auto">
-              <NotificationBell />
-            </div>
-          </div>
-        </header>
+        <Header />
 
         {children}
       </body>

@@ -170,12 +170,11 @@ row["Invoice status (Due/ Overdue)"] || ""
 )
 .toLowerCase()
 .includes("legal")
+
+
 &&
 
-(
-  !rule ||
-  creditDays >= rule.block_at_day
-)
+showInvoice
 
 );
 
@@ -292,23 +291,16 @@ return "All Collected";
 
 
 return (
+  <div className="min-h-screen bg-slate-100 p-3">
 
-<div className="min-h-screen bg-slate-100 p-3">
-
-
-<div className="flex items-center gap-2 mb-4">
-  <h1 className="text-xl sm:text-2xl font-bold text-slate-800 whitespace-nowrap">
-    Van Performance
-  </h1>
-
+    <div className="mb-4">
   <input
     type="text"
     placeholder="Search Van Code..."
     value={searchTerm}
     onChange={(e) => setSearchTerm(e.target.value)}
     className="
-      flex-1
-      min-w-0
+      w-full
       h-10
       px-3
       text-sm
@@ -322,59 +314,47 @@ return (
     "
   />
 </div>
+    <div className="bg-white rounded-xl shadow overflow-hidden">
 
-<div className="
-bg-white
-rounded-xl
-shadow
-overflow-hidden
-">
-
-
-<div className="
+<div
+  className="
 overflow-x-auto
-">
+"
+>
 
-
-<table className="
+<table
+  className="
 w-full
 text-sm
-">
+"
+>
 
-
-<thead className="
+<thead
+  className="
 bg-[#071d5c]
 text-white
-">
-
+"
+>
 
 <tr>
-
 
 <th className="p-3">
 Status
 </th>
 
-
 <th className="p-3">
 ID
 </th>
-
 
 <th className="p-3">
 Van Code
 </th>
 
-
 </tr>
-
 
 </thead>
 
-
-
 <tbody>
-
 
 {
 filteredVans
@@ -387,7 +367,6 @@ filteredVans
 )
 .map(([van,info]:any)=>(
 
-
 <tr
 key={van}
 className="
@@ -395,9 +374,7 @@ border-b
 "
 >
 
-
 <td className="p-3 text-center">
-
 
 <span className={`
 px-3
@@ -422,9 +399,7 @@ info.remaining>0
 :
 
 "bg-orange-100 text-orange-700"
-
 }
-
 `}>
 
 {getStatus(
@@ -434,23 +409,17 @@ info.exceptions
 
 </span>
 
-
 </td>
-
-
 
 <td className="p-3 text-center">
-
 {[...info.ids].join(" / ")}
-
 </td>
-
 
 <td
   className="
-  p-3
-  text-center
-  font-bold
+    p-3
+    text-center
+    font-bold
   "
 >
   <Link
@@ -461,31 +430,82 @@ info.exceptions
   </Link>
 </td>
 
-
 </tr>
-
 
 ))
 
 }
 
-
 </tbody>
-
 
 </table>
 
+</div>
 
 </div>
 
+{showLoginModal && (
+
+  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+
+    <div className="bg-white p-6 rounded-2xl w-80">
+
+      <input
+        type="text"
+        placeholder="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        className="w-full border p-3 rounded-lg mb-3"
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="w-full border p-3 rounded-lg mb-3"
+      />
+
+      <button
+        className="w-full bg-blue-600 text-white py-3 rounded-lg"
+        onClick={async () => {
+
+          const { data: user } = await supabase
+            .from("app_users")
+            .select("*")
+            .eq("username", username)
+            .single();
+
+          if (!user) {
+            alert("Invalid Username");
+            return;
+          }
+
+          if (user.password !== password) {
+            alert("Invalid Password");
+            return;
+          }
+
+          await localStorage.setItem(
+            "currentUser",
+            user.username
+          );
+
+          window.location.reload();
+
+        }}
+      >
+        Login
+      </button>
+
+    </div>
+
+  </div>
+
+)}
 
 </div>
-
-
-</div>
-
 
 );
-
 
 }
