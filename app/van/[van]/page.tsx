@@ -1,9 +1,10 @@
 "use client";
-
+import { AlertCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { storage as localStorage } from "@/utils/storage";
 
 export default function VanReportPage() {
   const [isSubscribed,setIsSubscribed] =
@@ -23,7 +24,9 @@ export default function VanReportPage() {
 
 const [isRouteUnblocked, setIsRouteUnblocked] =
   useState(false);
-  function urlBase64ToUint8Array(
+
+const [isLoggedIn, setIsLoggedIn] =
+  useState(false);  function urlBase64ToUint8Array(
   base64String: string
 ) {
   const padding =
@@ -204,9 +207,13 @@ setIsRouteUnblocked(
       );
 
       setCreditRules(
-        rules || []
-      );
+  rules || []
+);
 
+const currentUser =
+  await localStorage.getItem("currentUser");
+
+setIsLoggedIn(!!currentUser);
 
     };
 
@@ -387,12 +394,15 @@ setIsRouteUnblocked(
 
 
       <div className="mb-4 flex justify-between items-center">
-  <Link
-    href="/van"
-    className="text-blue-600 text-sm"
-  >
-    ← Back
-  </Link>
+
+  {isLoggedIn && (
+    <Link
+      href="/van"
+      className="text-blue-600 text-sm"
+    >
+      ← Back
+    </Link>
+  )}
 
   <Link
     href={`/van/${encodeURIComponent(vanCode)}/exceptions`}
@@ -400,9 +410,8 @@ setIsRouteUnblocked(
   >
     Exceptions →
   </Link>
+
 </div>
-
-
       <div className="bg-[#071d5c] text-white rounded-xl p-4 mb-4">
 
         <h1 className="text-2xl font-bold">
