@@ -260,7 +260,11 @@ const normalize = (value: string) =>
     .trim()
     .toUpperCase();
 
-
+const normalizeInvoice = (invoice: any) =>
+  String(invoice)
+    .replace(/\s/g, "")
+    .trim()
+    .toUpperCase();
 const rulesMap = useMemo(() => {
   return new Map(
     creditRules.map((rule) => [
@@ -1114,47 +1118,140 @@ const filteredInvoiceSet = useMemo(
     ),
   [filteredData]
 );
+const regions = useMemo(() => {
+  return [...new Set(data.map(row => row["Region"]))]
+    .filter(Boolean)
+    .sort();
+}, [data]);
+const vansByCity = useMemo(() => {
+  const map = new Map();
 
-const blockedCount =
-  blockedInvoicesData.length;
-      const employeeCount =
-  new Set(
-    filteredData.map(
-      (row) => row["Employee Name."]
-    )
-  ).size;
+  data.forEach((row) => {
+    const key =
+      `${row["Region"]}|${row["City"]}`;
+
+    if (!map.has(key)) {
+      map.set(key, new Set());
+    }
+
+    map.get(key).add(row["Van Code."]);
+  });
+
+  return map;
+}, [data]);
+const citiesByRegion = useMemo(() => {
+  const map = new Map();
+
+  data.forEach((row) => {
+    const region = row["Region"];
+    const city = row["City"];
+
+    if (!region || !city) return;
+
+    if (!map.has(region)) {
+      map.set(region, new Set());
+    }
+
+    map.get(region).add(city);
+  });
+
+  return map;
+}, [data]);
+const {
+  blockedCount,
+  employeeCount,
+  legalCount,
+  exceptionCount,
+  activeEmployees,
+} = useMemo(() => {
+
+  const blockedCount =
+    blockedInvoicesData.length;
+
+  const employeeCount =
+    new Set(
+      filteredData.map(
+        (row) => row["Employee Name."]
+      )
+    ).size;
+
   const legalCount =
-  exceptions.filter(
-    (item) => item.permanent
-  ).length;
+    exceptions.filter(
+      (item) => item.permanent
+    ).length;
 
-const exceptionCount =
-  exceptions.filter(
-    (item) => !item.permanent
-  ).length;
+  const exceptionCount =
+    exceptions.filter(
+      (item) => !item.permanent
+    ).length;
+
   const activeEmployees =
-  Object.entries(
-    blockedInvoicesData.reduce(
-      (acc: any, row) => {
+    new Set(
+      blockedInvoicesData.map(
+        (row) => row["Employee Name."]
+      )
+    ).size;
 
-        const employee =
-          row["Employee Name."];
+  return {
+    blockedCount,
+    employeeCount,
+    legalCount,
+    exceptionCount,
+    activeEmployees,
+  };
 
-        if (!acc[employee]) {
-          acc[employee] = [];
-        }
+}, [
+  blockedInvoicesData,
+  filteredData,
+  exceptions,
+]);
+const topBlockedVans = useMemo(() => {
+  return Object.entries(
+    blockedInvoicesData.reduce((acc: any, row) => {
+      const van = row["Van Code."];
 
-        acc[employee].push(row);
+      acc[van] =
+        (acc[van] || 0) + 1;
 
-        return acc;
-
-      },
-      {}
+      return acc;
+    }, {})
+  )
+    .sort(
+      (a: any, b: any) =>
+        Number(b[1]) - Number(a[1])
     )
-  ).filter(
-    ([_, rows]: any) =>
-      rows.length > 0
-  ).length;
+    .slice(0, 5);
+}, [blockedInvoicesData]);
+const topClearedEmployees = useMemo(() => {
+  return Object.entries(
+    data.reduce((acc: any, row) => {
+      const invoice = String(row["Invoice #"])
+        .replace(/\s/g, "")
+        .toUpperCase();
+
+      const employee = row["Employee Name."];
+
+      if (
+        exceptionSet.has(invoice) ||
+        collectedSet.has(invoice)
+      ) {
+        acc[employee] =
+          (acc[employee] || 0) + 1;
+      }
+
+      return acc;
+    }, {})
+  )
+    .sort(
+      (a: any, b: any) =>
+        Number(b[1]) - Number(a[1])
+    )
+    .slice(0, 5);
+}, [
+  data,
+  exceptionSet,
+  collectedSet,
+]);
       const toggleRegion = (
   region: string
 ) => {
@@ -1639,10 +1736,7 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
         Saudi
       </div>
 
-      {[...new Set(data.map(row => row["Region"]))]
-        .filter(Boolean)
-        .sort()
-        .map(region => (
+      {regions.map(region => (
 
           <div key={region}>
 
@@ -1712,15 +1806,9 @@ className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
 
               <div className="ml-5">
 
-                {[...new Set(
-data
-  .filter(row => row["Region"] === region)
-  .map(row => row["City"])
-
-                )]
-                  .filter(Boolean)
-                  .sort()
-                  .map(city => (
+                {[...(citiesByRegion.get(region) || [])]
+  .sort()
+  .map(city => (
 
                     <div key={`${region}-${city}`}>
 
@@ -1787,22 +1875,10 @@ row["City"] === city
 
                         <div className="ml-5">
 
-                          {[...new Set(
-                            data
-                              .filter(
-                                row =>
-                                  row["Region"] === region &&
-                                  row["City"] === city
-                              )
-                              .map(
-                                row => row["Van Code."]
-                              )
-                          )]
-                            .filter(Boolean)
-                            .sort()
-                            .map(van => (
-
-                              <label
+                          {[...(vansByCity.get(`${region}|${city}`) || [])]
+  .sort()
+  .map(van => (
+                                  <label
                                 key={van}
                                 className="flex gap-2 py-1"
                               >
@@ -2523,51 +2599,9 @@ item.created_by === currentUser && (
 
     <tbody>
 
-      {Object.entries(
+     {topClearedEmployees.map(
+  ([employee, total]: any) => (
 
-        data.reduce(
-          (acc: any, row) => {
-
-            const invoice =
-              String(
-                row["Invoice #"]
-              ).replace(/\s/g, "");
-
-            const employee =
-              row["Employee Name."];
-
-const isException =
-  exceptionSet.has(invoice);
-const isCollected =
-collectedSet.has(invoice);
-
-            if (
-              isException ||
-              isCollected
-            ) {
-
-              acc[employee] =
-                (acc[employee] || 0) + 1;
-
-            }
-
-            return acc;
-
-          },
-          {}
-        )
-
-      )
-
-        .sort(
-          (a: any, b: any) =>
-            Number(b[1]) - Number(a[1])
-        )
-
-        .slice(0, 5)
-
-        .map(
-          ([employee, total]: any) => (
 
             <tr key={employee}>
 
@@ -2597,34 +2631,8 @@ collectedSet.has(invoice);
 
   <div className="space-y-4">
 
-    {Object.entries(
-
-      blockedInvoicesData.reduce(
-        (acc: any, row) => {
-
-          const van =
-            row["Van Code."];
-
-          acc[van] =
-            (acc[van] || 0) + 1;
-
-          return acc;
-
-        },
-        {}
-      )
-
-    )
-
-      .sort(
-        (a: any, b: any) =>
-          Number(b[1]) - Number(a[1])
-      )
-
-      .slice(0, 5)
-
-      .map(
-        ([van, total]: any) => (
+    {topBlockedVans.map(
+  ([van, total]: any) => (
 
           <div key={van}>
 
