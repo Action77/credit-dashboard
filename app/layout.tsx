@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import Header from "@/components/Header";
-import { usePathname } from "next/navigation";
-import NotificationBell from "@/components/NotificationBell";
-import UserWelcome from "@/components/UserWelcome";
 import { Toaster } from "sonner";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
