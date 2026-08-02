@@ -7,7 +7,22 @@ import { storage as localStorage } from "@/utils/storage";
 
 export default function MobileSummaryPage() {
 const [searchTerm, setSearchTerm] = useState("");
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [showLoginModal, setShowLoginModal] = useState(false);
 
+const [username, setUsername] = useState("");
+const [password, setPassword] = useState("");
+
+const [currentUser, setCurrentUser] = useState("");
+
+const [selectedRegions, setSelectedRegions] =
+  useState<string[]>([]);
+
+const [selectedCities, setSelectedCities] =
+  useState<string[]>([]);
+
+const [selectedVans, setSelectedVans] =
+  useState<string[]>([]);
   const [data,setData] = useState<any[]>([]);
   const [exceptions,setExceptions] = useState<any[]>([]);
   const [collectedInvoices,setCollectedInvoices] = useState<string[]>([]);
@@ -134,7 +149,9 @@ const creditDays =
 Number(row["Credit_Days"])||0;
 
 
-
+const showInvoice = rule
+  ? creditDays >= rule.block_at_day
+  : creditDays >= 1;
 return (
 
 String(
@@ -155,12 +172,10 @@ row["Invoice status (Due/ Overdue)"] || ""
 .includes("legal")
 &&
 
-rule
-
-&&
-
-creditDays >=
-rule.block_at_day
+(
+  !rule ||
+  creditDays >= rule.block_at_day
+)
 
 );
 
