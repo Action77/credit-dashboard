@@ -466,7 +466,8 @@ useEffect(() => {
   loadFilters();
 
 }, [currentUser]);
-useEffect(() => {
+
+  useEffect(() => {
 
   const loadCollection = async () => {
 
@@ -496,11 +497,14 @@ setCollectionFileInfo(
   loadCollection();
 
 }, []);
+
 useEffect(() => {
 
   const loadCreditData = async () => {
 
-    const response = await fetch("/api/credit-data");
+    const response = await fetch(
+      "/api/credit-data"
+    );
 
     const result = await response.json();
 
@@ -607,9 +611,10 @@ await localStorage.removeItem(
   "lastUpdatedVans"
 );
 
-const response =
-  await fetch("/api/credit-data");
 
+const response = await fetch(
+  "/api/credit-data"
+);
 const result =
   await response.json();
 
@@ -1011,7 +1016,21 @@ const filterBaseData = useMemo(() => {
   exceptions,
   collectedInvoices,
 ]);
-  
+  useEffect(() => {
+
+  if (whatsappVanCodes.length > 0) {
+
+    setWhatsAppVan(
+      whatsappVanCodes[0]
+    );
+
+  } else {
+
+    setWhatsAppVan("");
+
+  }
+
+}, [whatsappVanCodes]);
 const filteredData = useMemo(() => {
   return filterBaseData
     .filter((row) => {
