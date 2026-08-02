@@ -1007,11 +1007,11 @@ const filterBaseData = useMemo(() => {
 const filteredData = useMemo(() => {
   return filterBaseData
     .filter((row) => {
+
       const invoice = normalizeInvoice(
         row["Invoice #"]
       );
 
-    
       const paymentTerm = String(
         row["Payment Term"] || ""
       ).trim();
@@ -1027,29 +1027,16 @@ const filteredData = useMemo(() => {
       const rule = rulesMap.get(
         normalize(paymentTerm)
       );
-const whatsappData = useMemo(() => {
 
-  return filteredData.filter(
-    (row) =>
-      row["Van Code."] === whatsAppVan
-  );
-
-}, [
-  filteredData,
-  whatsAppVan,
-]);
       const creditDays =
         Number(row["Credit_Days"]) || 0;
 
       const showInvoice = rule
-        ? creditDays >= rule.block_at_day
-        : false;
-
+  ? creditDays >= rule.block_at_day
+  : creditDays >= 1;
       return (
-                (
-          showInvoice ||
-          exceptionSet.has(invoice)
-        )
+        showInvoice ||
+        exceptionSet.has(invoice)
       );
     })
     .sort((a, b) =>
@@ -1059,16 +1046,36 @@ const whatsappData = useMemo(() => {
     );
 }, [
   filterBaseData,
-  whatsAppVan,
   rulesMap,
   exceptionSet,
 ]);
+const whatsappData = useMemo(() => {
+  return filteredData.filter((row) => {
+    if (row["Van Code."] !== whatsAppVan) {
+      return false;
+    }
+
+    const invoice = normalizeInvoice(
+      row["Invoice #"]
+    );
+
+    return (
+      !exceptionSet.has(invoice) &&
+      !collectedSet.has(invoice)
+    );
+  });
+}, [
+  filteredData,
+  whatsAppVan,
+  exceptionSet,
+  collectedSet,
+]);
+
 const whatsappVanCodes = useMemo(() => {
   return [
     ...new Set(
       filterBaseData
         .filter((row) => {
-
           const invoice = normalizeInvoice(
             row["Invoice #"]
           );
@@ -1077,10 +1084,9 @@ const whatsappVanCodes = useMemo(() => {
             row["Payment Term"] || ""
           ).trim();
 
-          const rule =
-            rulesMap.get(
-              normalize(paymentTerm)
-            );
+          const rule = rulesMap.get(
+            normalize(paymentTerm)
+          );
 
           const creditDays =
             Number(row["Credit_Days"]) || 0;
@@ -1095,7 +1101,6 @@ const whatsappVanCodes = useMemo(() => {
               )
             )
           );
-
         })
         .map((row) => row["Van Code."])
     ),
@@ -1106,19 +1111,18 @@ const whatsappVanCodes = useMemo(() => {
   exceptionSet,
   collectedSet,
 ]);
+
 useEffect(() => {
-
   if (
-    !whatsAppVan &&
-    whatsappVanCodes.length > 0
+    whatsappVanCodes.length > 0 &&
+    !whatsappVanCodes.includes(
+      whatsAppVan
+    )
   ) {
-
     setWhatsAppVan(
       whatsappVanCodes[0]
     );
-
   }
-
 }, [
   whatsappVanCodes,
   whatsAppVan,
@@ -1415,27 +1419,6 @@ const generateReportImage =
     }
 
   };
-const whatsappData = useMemo(() => {
-  return filteredData.filter((row) => {
-    if (row["Van Code."] !== whatsAppVan) {
-      return false;
-    }
-
-    const invoice = normalizeInvoice(
-      row["Invoice #"]
-    );
-
-    return (
-      !exceptionSet.has(invoice) &&
-      !collectedSet.has(invoice)
-    );
-  });
-}, [
-  filteredData,
-  whatsAppVan,
-  exceptionSet,
-  collectedSet,
-]);
 
 return (
 <>
