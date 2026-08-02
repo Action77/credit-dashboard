@@ -236,16 +236,22 @@ const [collectedInvoices,
   setCollectedInvoices] =
   useState<string[]>([]);
 
-const collectedSet = new Set(
-  collectedInvoices
+const collectedSet = useMemo(
+  () => new Set(collectedInvoices),
+  [collectedInvoices]
 );
-const exceptionSet = new Set(
-  exceptions.map((e) =>
-    String(e.invoice)
-      .replace(/\s/g, "")
-      .trim()
-      .toUpperCase()
-  )
+
+const exceptionSet = useMemo(
+  () =>
+    new Set(
+      exceptions.map((e) =>
+        String(e.invoice)
+          .replace(/\s/g, "")
+          .trim()
+          .toUpperCase()
+      )
+    ),
+  [exceptions]
 );
 const normalize = (value: string) =>
   String(value || "")
@@ -1088,17 +1094,27 @@ const blockedInvoicesData = useMemo(() => {
       .toUpperCase();
 
     return (
-      isBlockedInvoice(row) &&
       !exceptionSet.has(invoice) &&
       !collectedSet.has(invoice)
     );
   });
 }, [
   filteredData,
-  rulesMap,
-  exceptions,
-  collectedInvoices,
+  exceptionSet,
+  collectedSet,
 ]);
+const filteredInvoiceSet = useMemo(
+  () =>
+    new Set(
+      filteredData.map((row) =>
+        String(row["Invoice #"])
+          .replace(/\s/g, "")
+          .toUpperCase()
+      )
+    ),
+  [filteredData]
+);
+
 const blockedCount =
   blockedInvoicesData.length;
       const employeeCount =
@@ -2361,18 +2377,15 @@ await addLog(
   .filter((item) => {
     if (item.permanent) return false;
 
-    return filteredData.some(
-      (row) =>
-        String(row["Invoice #"])
-          .replace(/\s/g, "")
-          .toUpperCase() ===
-        String(item.invoice)
-          .replace(/\s/g, "")
-          .toUpperCase()
-    );
-  })
-  .map((item, index) => {
-          const tillDate =
+    return filteredInvoiceSet.has(
+  String(item.invoice)
+    .replace(/\s/g, "")
+    .toUpperCase()
+);
+
+})
+.map((item, index) => {
+            const tillDate =
             new Date(item.till_date);
 
           const daysLeft =
@@ -2381,7 +2394,7 @@ await addLog(
         item.till_date
       )
     : "-";
-          return (
+              return (
 
 
 <tr key={index}>
