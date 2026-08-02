@@ -1173,7 +1173,10 @@ const {
   exceptionCount,
   activeEmployees,
 } = useMemo(() => {
-
+console.log("DATA", data.length);
+console.log("FILTER BASE", filterBaseData.length);
+console.log("FILTERED", filteredData.length);
+console.log("BLOCKED", blockedInvoicesData.length);
   const blockedCount =
     blockedInvoicesData.length;
 
