@@ -11,10 +11,11 @@ export default function VanReportPage() {
   useState(false);
   const params = useParams();
 
-  const vanCode = decodeURIComponent(
-    String(params.van || "")
-  );
+  const token = decodeURIComponent(
+  String(params.van || "")
+);
 
+const [vanCode, setVanCode] = useState("");
 
   const [data, setData] = useState<any[]>([]);
   const [exceptions, setExceptions] = useState<any[]>([]);
@@ -119,7 +120,31 @@ const subscription =
 };
   useEffect(() => {
 
-    const load = async () => {
+  const load = async () => {
+
+    const { data: vanData } = await supabase
+      .from("van_permissions")
+      .select("van_code")
+      .eq("public_token", token)
+      .single();
+
+    if (!vanData) {
+      return;
+    }
+
+    const currentVanCode = vanData.van_code;
+
+    setVanCode(currentVanCode);
+
+    const { data: vanPermission } = await supabase
+      .from("van_permissions")
+      .select("is_unblocked")
+      .eq("van_code", currentVanCode)
+      .single();
+
+    setIsRouteUnblocked(
+      vanPermission?.is_unblocked ?? false
+    );
 
       const credit =
         await fetch("/api/credit-data");
@@ -145,17 +170,7 @@ const { data: rules } =
   await supabase
     .from("credit_block_rules")
     .select("*");
-      const {
-  data: vanPermission
-} = await supabase
-  .from("van_permissions")
-  .select("is_unblocked")
-  .eq("van_code", vanCode)
-  .single();
-setIsRouteUnblocked(
-  vanPermission?.is_unblocked || false
-);
-
+      
 
       const today =
         new Date();
@@ -221,7 +236,7 @@ setIsLoggedIn(!!currentUser);
     load();
 
 
-  }, []);
+  }, [token]);
 
 
 
@@ -405,7 +420,7 @@ setIsLoggedIn(!!currentUser);
   )}
 
   <Link
-    href={`/van/${encodeURIComponent(vanCode)}/exceptions`}
+    href={`/van/${encodeURIComponent(token)}/exceptions`}
     className="text-red-600 text-sm ml-auto"
   >
     Exceptions →

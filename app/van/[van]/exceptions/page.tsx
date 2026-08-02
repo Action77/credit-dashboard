@@ -1,5 +1,5 @@
 "use client";
-
+import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -7,16 +7,32 @@ import Link from "next/link";
 export default function VanExceptionsPage() {
   const params = useParams();
 
-  const vanCode = decodeURIComponent(
-    String(params.van || "")
-  );
+  const token = decodeURIComponent(
+  String(params.van || "")
+);
 
+const [vanCode, setVanCode] = useState("");
   const [exceptions, setExceptions] =
     useState<any[]>([]);
 
   useEffect(() => {
+    
     const load = async () => {
+        const { data: vanData } = await supabase
+  .from("van_permissions")
+  .select("van_code")
+  .eq("public_token", token)
+  .single();
+
+if (!vanData) {
+  return;
+}
+
+const currentVanCode = vanData.van_code;
+
+setVanCode(currentVanCode);
       const response =
+      
         await fetch("/api/exceptions");
 
       const data =
@@ -65,7 +81,7 @@ export default function VanExceptionsPage() {
             )
               .trim()
               .toUpperCase() ===
-            String(vanCode)
+            String(currentVanCode)
               .trim()
               .toUpperCase()
         );
@@ -74,7 +90,7 @@ export default function VanExceptionsPage() {
     };
 
     load();
-  }, [vanCode]);
+  }, [token]);
 
   const calculateBusinessDays = (
     dateString: string
@@ -131,7 +147,7 @@ export default function VanExceptionsPage() {
       <div className="mb-4 flex justify-between items-center">
 
   <Link
-    href={`/van/${encodeURIComponent(vanCode)}`}
+    href={`/van/${encodeURIComponent(token)}`}
     className="text-blue-600 text-sm"
   >
     ← Back To Van
