@@ -24,7 +24,6 @@ export async function GET() {
         invoice,
         trx_date,
         credit_invoice_amount,
-        collect_amount,
         pending_cim,
         credit_days,
         invoice_status,
