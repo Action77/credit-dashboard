@@ -278,10 +278,14 @@ console.time("UPSERT_COUNTS");
 
 await supabase
   .from("van_invoice_counts")
+  .delete()
+  .neq("van_code", "");
+
+await supabase
+  .from("van_invoice_counts")
   .upsert(vanRows);
 
 console.timeEnd("UPSERT_COUNTS");
-
 console.timeEnd("TOTAL_IMPORT");
 
 return NextResponse.json({
