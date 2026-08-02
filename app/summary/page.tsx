@@ -1361,6 +1361,8 @@ onClick={async () => {
 
   <div className="flex items-center justify-center gap-2">
 
+  <div className="w-[24px] flex justify-center">
+
     {info.remaining > 0 && (
 
       <button
@@ -1377,30 +1379,32 @@ onClick={async () => {
 
     )}
 
-    <span
-      className={`
-        inline-flex
-        items-center
-        justify-center
-        min-w-[130px]
-        px-3
-        py-1
-        rounded-full
-        text-xs
-        font-semibold
-        ${getStatusStyle(
-          info.remaining,
-          info.exceptions,
-          lastUpdatedVans.some(
-            (v) =>
-              String(v).trim() ===
-              String(van).trim()
-          )
-        )}
-      `}
-    >
-      {status}
-    </span>
+  </div>
+
+  <span
+    className={`
+      inline-flex
+      items-center
+      justify-center
+      min-w-[130px]
+      px-3
+      py-1
+      rounded-full
+      text-xs
+      font-semibold
+      ${getStatusStyle(
+        info.remaining,
+        info.exceptions,
+        lastUpdatedVans.some(
+          (v) =>
+            String(v).trim() ===
+            String(van).trim()
+        )
+      )}
+    `}
+  >
+    {status}
+  </span>
 
   </div>
 
