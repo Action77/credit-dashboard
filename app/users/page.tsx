@@ -184,28 +184,39 @@ const handleCollectionImport = async (
 
       return;
     }
+const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
+    const fileName =
+  `${Date.now()}-${file.name}`;
 
-    const formData =
-      new FormData();
+const { error: uploadError } =
+  await supabase.storage
+    .from("imports")
+    .upload(fileName, file, {
+      upsert: true,
+    });
 
-    formData.append(
-      "file",
-      file
-    );
+if (uploadError) {
+  throw uploadError;
+}
 
-    await fetch(
-      "/api/collection-upload",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    const currentUser =
-      await localStorage.getItem(
-        "currentUser"
-      );
-
+await fetch(
+  "/api/collection-upload",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      path: fileName,
+      uploadedBy: currentUser,
+      originalName: file.name,
+    }),
+  }
+);
+    
     let fullName = "";
 
     if (currentUser) {
