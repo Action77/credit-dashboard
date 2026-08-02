@@ -386,17 +386,21 @@ setIsRouteUnblocked(
     <div className="min-h-screen bg-slate-100 p-3">
 
 
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between items-center">
+  <Link
+    href="/van"
+    className="text-blue-600 text-sm"
+  >
+    ← Back
+  </Link>
 
-        <Link
-          href="/van"
-          className="text-blue-600 text-sm"
-        >
-          ← Back
-        </Link>
-
-      </div>
-
+  <Link
+    href={`/van/${encodeURIComponent(vanCode)}/exceptions`}
+    className="text-red-600 text-sm"
+  >
+    Exceptions →
+  </Link>
+</div>
 
 
       <div className="bg-[#071d5c] text-white rounded-xl p-4 mb-4">
