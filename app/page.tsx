@@ -840,25 +840,12 @@ const newCollected =
       !previousInvoices.includes(invoice)
   );
         const affectedVans = [
-          ...new Set(
-            data
-              .filter((row) =>
-                newCollected.includes(
-                  String(
-                    row["Invoice #"]
-                  ).replace(
-                    /\s/g,
-                    ""
-                  )
-                )
-              )
-              .map(
-                (row) =>
-                  row["Van Code."]
-              )
-          ),
-        ];
-
+  ...new Set(
+    newCollected
+      .map((invoice) => dataInvoiceMap.get(invoice))
+      .filter(Boolean)
+  ),
+];
         setLastUpdatedVans(
           affectedVans
         );
@@ -950,6 +937,18 @@ const isBlockedInvoice = (row: any) => {
     !invoiceStatus.includes("legal")
   );
 };
+const dataInvoiceMap = useMemo(() => {
+  const map = new Map();
+
+  data.forEach((row) => {
+    map.set(
+      normalizeInvoice(row["Invoice #"]),
+      row["Van Code."]
+    );
+  });
+
+  return map;
+}, [data]);
 
 const filterBaseData = useMemo(() => {
   return data.filter((row) => {
@@ -1045,11 +1044,9 @@ const filteredData = useMemo(() => {
   return filterBaseData
     .filter((row) => {
 
-      const invoice =
-        String(row["Invoice #"])
-          .replace(/\s/g, "")
-          .toUpperCase();
-
+      const invoice = normalizeInvoice(
+  row["Invoice #"]
+);
       const matchesWhatsappVan =
         !whatsAppVan ||
         row["Van Code."] === whatsAppVan;
@@ -1093,10 +1090,9 @@ const filteredData = useMemo(() => {
 const blockedInvoicesData = useMemo(() => {
   return filteredData.filter((row) => {
 
-    const invoice = String(row["Invoice #"])
-      .replace(/\s/g, "")
-      .toUpperCase();
-
+    const invoice = normalizeInvoice(
+  row["Invoice #"]
+);
     return (
       !exceptionSet.has(invoice) &&
       !collectedSet.has(invoice)
@@ -1111,9 +1107,7 @@ const filteredInvoiceSet = useMemo(
   () =>
     new Set(
       filteredData.map((row) =>
-        String(row["Invoice #"])
-          .replace(/\s/g, "")
-          .toUpperCase()
+        normalizeInvoice(row["Invoice #"])
       )
     ),
   [filteredData]
@@ -1385,35 +1379,27 @@ const generateReportImage =
     }
 
   };
-const whatsappData =
-  filteredData.filter(
-    (row) => {
-
-      if (
-        row["Van Code."] !==
-        whatsAppVan
-      ) {
-        return false;
-      }
-
-      const invoice =
-        String(
-          row["Invoice #"]
-        )
-          .replace(/\s/g, "")
-          .toUpperCase();
-const isException =
-  exceptionSet.has(invoice);
-
-      const isCollected =
-  collectedSet.has(invoice);
-      return (
-        !isException &&
-        !isCollected
-      );
-
+const whatsappData = useMemo(() => {
+  return filteredData.filter((row) => {
+    if (row["Van Code."] !== whatsAppVan) {
+      return false;
     }
-  );  
+
+    const invoice = normalizeInvoice(
+      row["Invoice #"]
+    );
+
+    return (
+      !exceptionSet.has(invoice) &&
+      !collectedSet.has(invoice)
+    );
+  });
+}, [
+  filteredData,
+  whatsAppVan,
+  exceptionSet,
+  collectedSet,
+]);
 
 return (
 <>
@@ -2158,26 +2144,17 @@ await localStorage.setItem(
   key={index}
   className="border-b"
   style={{
-  backgroundColor:
-
-    collectedSet.has(
-  String(row["Invoice #"])
-    .replace(/\s/g, "")
-    .trim()
-    .toUpperCase()
-)
-      ? "#C6EFCE"
-
-      : exceptionSet.has(
-    String(row["Invoice #"])
-      .replace(/\s/g, "")
-      .trim()
-      .toUpperCase()
+  backgroundColor: collectedSet.has(
+    normalizeInvoice(row["Invoice #"])
   )
-      ? "#FFCB96"
-
-      : ""
+    ? "#C6EFCE"
+    : exceptionSet.has(
+        normalizeInvoice(row["Invoice #"])
+      )
+    ? "#FFCB96"
+    : "",
 }}
+
 >
                       <td className="p-3">
   {row["Van Code."]}
@@ -2454,11 +2431,8 @@ await addLog(
     if (item.permanent) return false;
 
     return filteredInvoiceSet.has(
-  String(item.invoice)
-    .replace(/\s/g, "")
-    .toUpperCase()
+  normalizeInvoice(item.invoice)
 );
-
 })
 .map((item, index) => {
             const tillDate =
