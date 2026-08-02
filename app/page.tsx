@@ -1098,17 +1098,34 @@ const blockedInvoicesData = useMemo(() => {
   exceptionSet,
   collectedSet,
 ]);
+const selectedVanData = useMemo(() => {
+  if (!whatsAppVan) {
+    return blockedInvoicesData;
+  }
 
+  return blockedInvoicesData.filter(
+    (row) => row["Van Code."] === whatsAppVan
+  );
+}, [blockedInvoicesData, whatsAppVan]);
+
+const selectedVanFilteredData = useMemo(() => {
+  if (!whatsAppVan) {
+    return filteredData;
+  }
+
+  return filteredData.filter(
+    (row) => row["Van Code."] === whatsAppVan
+  );
+}, [filteredData, whatsAppVan]);
 const whatsappVanCodes = useMemo(() => {
   return [
     ...new Set(
-      filteredData
+      blockedInvoicesData
         .map((row) => row["Van Code."])
         .filter(Boolean)
     ),
   ].sort();
-}, [filteredData]);
-
+}, [blockedInvoicesData]);
 useEffect(() => {
   if (
     whatsAppVan &&
@@ -1178,15 +1195,13 @@ console.log("FILTER BASE", filterBaseData.length);
 console.log("FILTERED", filteredData.length);
 console.log("BLOCKED", blockedInvoicesData.length);
   const blockedCount =
-    blockedInvoicesData.length;
-
+  selectedVanData.length;
   const employeeCount =
-    new Set(
-      filteredData.map(
-        (row) => row["Employee Name."]
-      )
-    ).size;
-
+  new Set(
+    selectedVanFilteredData.map(
+      (row) => row["Employee Name."]
+    )
+  ).size;
   const legalCount =
     exceptions.filter(
       (item) => item.permanent
@@ -1198,12 +1213,11 @@ console.log("BLOCKED", blockedInvoicesData.length);
     ).length;
 
   const activeEmployees =
-    new Set(
-      blockedInvoicesData.map(
-        (row) => row["Employee Name."]
-      )
-    ).size;
-
+  new Set(
+    selectedVanData.map(
+      (row) => row["Employee Name."]
+    )
+  ).size;
   return {
     blockedCount,
     employeeCount,
@@ -1213,8 +1227,8 @@ console.log("BLOCKED", blockedInvoicesData.length);
   };
 
 }, [
-  blockedInvoicesData,
-  filteredData,
+  selectedVanData,
+  selectedVanFilteredData,
   exceptions,
 ]);
 const topBlockedVans = useMemo(() => {
