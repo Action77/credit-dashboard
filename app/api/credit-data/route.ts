@@ -61,7 +61,7 @@ export async function GET() {
   }
 
   // Load all rows only if today's file exists
-  const { data, error } = await supabase
+const { data, error } = await supabase
   .from("credit_data_full")
   .select(`
     van_code,
@@ -86,9 +86,8 @@ export async function GET() {
     file_name,
     file_date
   `)
-
-  .order("created_at", { ascending: false });
-.range(0, 50000);
+  .order("created_at", { ascending: false })
+  .range(0, 50000);
   if (error) {
     return NextResponse.json({
       data: [],
