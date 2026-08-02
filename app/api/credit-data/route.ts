@@ -61,33 +61,60 @@ export async function GET() {
   }
 
   // Load all rows only if today's file exists
-const { data, error } = await supabase
-  .from("credit_data_full")
-  .select(`
-    van_code,
-    employee_name,
-    employee_ats_code,
-    customer_code,
-    customer_name,
-    central_invoice,
-    payment_term,
-    invoice,
-    trx_date,
-    credit_invoice_amount,
-    pending_cim,
-    credit_days,
-    total_rejected_count,
-    status_user_block,
-    invoice_status,
-    region,
-    city,
-    created_at,
-    uploaded_by,
-    file_name,
-    file_date
-  `)
-  .order("created_at", { ascending: false })
-  .range(0, 10000);
+let data: any[] = [];
+let from = 0;
+const batchSize = 1000;
+
+while (true) {
+  const { data: batch, error } = await supabase
+    .from("credit_data_full")
+    .select(`
+      van_code,
+      employee_name,
+      employee_ats_code,
+      customer_code,
+      customer_name,
+      central_invoice,
+      payment_term,
+      invoice,
+      trx_date,
+      credit_invoice_amount,
+      pending_cim,
+      credit_days,
+      total_rejected_count,
+      status_user_block,
+      invoice_status,
+      region,
+      city,
+      created_at,
+      uploaded_by,
+      file_name,
+      file_date
+    `)
+    .order("created_at", { ascending: false })
+    .range(from, from + batchSize - 1);
+
+  if (error) {
+    return NextResponse.json({
+      data: [],
+      fileInfo: "",
+    });
+  }
+
+  if (!batch || batch.length === 0) {
+    break;
+  }
+
+  data.push(...batch);
+
+  if (batch.length < batchSize) {
+    break;
+  }
+
+  from += batchSize;
+}
+
+
   if (error) {
     return NextResponse.json({
       data: [],
