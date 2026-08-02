@@ -2404,9 +2404,22 @@ await addLog(
   .filter((item) => {
     if (item.permanent) return false;
 
-    return filteredInvoiceSet.has(
-  normalizeInvoice(item.invoice)
+    const invoice = normalizeInvoice(
+  item.invoice
 );
+
+if (!filteredInvoiceSet.has(invoice)) {
+  return false;
+}
+
+if (!whatsAppVan) {
+  return true;
+}
+
+return (
+  dataInvoiceMap.get(invoice) === whatsAppVan
+);
+
 })
 .map((item, index) => {
             const tillDate =
