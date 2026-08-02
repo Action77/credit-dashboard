@@ -70,7 +70,7 @@ const calculateBusinessDays = (
   const [isImportingUsers, setIsImportingUsers] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
 
-
+  
   const handleImport = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -300,6 +300,10 @@ const [isUploadingCredit,
 const [isUploadingCollection,
   setIsUploadingCollection] =
   useState(false);
+const isBusy =
+  isImportingUsers ||
+  isUploadingCredit ||
+  isUploadingCollection;
 
 const [isAddingException,
   setIsAddingException] =
