@@ -127,23 +127,16 @@ const allRecords = jsonData.map((row) => ({
 
 
 console.time("INSERT_CREDIT_DATA");
-    for (
-  let i = 0;
-  i < allRecords.length;
-  i += 10000
-) {
-  const batch = allRecords.slice(
-    i,
-    i + 10000
-  );
 
-  const { error } = await supabase
-    .from("credit_data_full")
-    .insert(batch);
-
-  if (error) {
-    throw error;
+const { error } = await supabase.rpc(
+  "import_credit_data",
+  {
+    payload: allRecords,
   }
+);
+
+if (error) {
+  throw error;
 }
 
 console.timeEnd("INSERT_CREDIT_DATA");
