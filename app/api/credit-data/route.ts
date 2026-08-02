@@ -86,8 +86,9 @@ export async function GET() {
     file_name,
     file_date
   `)
-  .order("created_at", { ascending: false });
 
+  .order("created_at", { ascending: false });
+.range(0, 50000);
   if (error) {
     return NextResponse.json({
       data: [],
