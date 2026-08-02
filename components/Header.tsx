@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
@@ -13,6 +13,16 @@ export default function Header() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const user = await localStorage.getItem("currentUser");
+      setIsLoggedIn(!!user);
+    };
+
+    loadUser();
+  }, []);
 
   return (
     <>
@@ -21,14 +31,26 @@ export default function Header() {
           <UserWelcome />
 
           <div className="flex items-center gap-3">
-            {pathname.startsWith("/van") && (
-              <button
-                onClick={() => setShowLoginModal(true)}
-                className="h-9 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-              >
-                Login
-              </button>
-            )}
+            {pathname.startsWith("/van") &&
+              (isLoggedIn ? (
+                <button
+                  onClick={async () => {
+                    await localStorage.removeItem("currentUser");
+                    setIsLoggedIn(false);
+                    window.location.reload();
+                  }}
+                  className="h-9 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                >
+                  Logout
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="h-9 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  Login
+                </button>
+              ))}
 
             <NotificationBell />
           </div>
@@ -38,7 +60,6 @@ export default function Header() {
       {showLoginModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-2xl w-80">
-
             <input
               type="text"
               placeholder="Username"
@@ -79,13 +100,13 @@ export default function Header() {
                   user.username
                 );
 
+                setIsLoggedIn(true);
                 setShowLoginModal(false);
                 window.location.reload();
               }}
             >
               Login
             </button>
-
           </div>
         </div>
       )}
