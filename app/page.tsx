@@ -1394,6 +1394,9 @@ const generateReportImage =
     }
 
   };
+console.log("ALL DATA:", data.length);
+console.log("RULES:", creditRules.length);
+console.log("FILTERED:", filteredData.length);
 
 return (
 <>
