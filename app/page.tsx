@@ -70,7 +70,10 @@ const calculateBusinessDays = (
   const [isImportingUsers, setIsImportingUsers] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
 
-  const isBusy = isImportingUsers;
+  const isBusy =
+  isImportingUsers ||
+  isUploadingCredit ||
+  isUploadingCollection;
 
   const handleImport = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -1637,63 +1640,9 @@ onClick={async () => {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-between mb-6">
+        <div className="flex justify-end mb-6">
 
-          <div className="flex gap-3">
-
-            {isLoggedIn && (
-
-  <label
-  className={`text-white px-5 py-3 rounded-lg cursor-pointer ${
-    isUploadingCredit
-      ? "bg-slate-400 pointer-events-none"
-      : "bg-blue-600 hover:bg-blue-700"
-  }`}
->
-    {isUploadingCredit
-  ? "Uploading..."
-  : "Import Credit"}
-    <input
-      type="file"
-      accept=".xlsx,.xls"
-      className="hidden"
-      onChange={handleCreditImport}
-    />
-
-  </label>
-
-)}
-{isLoggedIn && (
-
-  <label
-  className={`text-white px-5 py-3 rounded-lg cursor-pointer ${
-    isUploadingCollection
-      ? "bg-slate-400 pointer-events-none"
-      : "bg-green-600 hover:bg-green-700"
-  }`}
->
-
-  {isUploadingCollection
-    ? "Uploading..."
-    : "Import Collection"}
-
-    <input
-      type="file"
-      accept=".xlsx,.xls"
-      className="hidden"
-      onChange={handleCollectionImport}
-    />
-
-  </label>
-
-)}
-            
-          </div>
-
-          <div className="flex gap-3 relative">
-
-            <div className="relative">
-
+  <div className="flex gap-3 relative">
               <Search
                 size={18}
                 className="absolute left-3 top-3"
