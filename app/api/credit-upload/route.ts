@@ -237,14 +237,35 @@ console.timeEnd("PUSH_NOTIFICATIONS");
 const vanCounts: Record<string, number> = {};
 
 allRecords.forEach((row) => {
+
   const van =
     String(row.van_code || "").trim();
 
   if (!van) return;
 
+  const centralInvoice =
+    String(row.central_invoice || "")
+      .trim()
+      .toUpperCase();
+
+  const invoiceStatus =
+    String(row.invoice_status || "")
+      .toLowerCase();
+
+  if (
+    centralInvoice !== "NOT CENTRAL"
+  ) {
+    return;
+  }
+
+  if (
+    invoiceStatus.includes("legal")
+  ) {
+    return;
+  }
+
   vanCounts[van] =
     (vanCounts[van] || 0) + 1;
-
 });
 const vanRows = Object.keys(vanCounts).map(
   (vanCode) => ({

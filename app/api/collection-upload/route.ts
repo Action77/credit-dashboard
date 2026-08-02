@@ -182,10 +182,15 @@ const collectedSet = new Set(
 const { data: creditRows } =
   await supabase
     .from("credit_data_full")
-    .select("invoice, van_code");
-
+    .select(`
+      invoice,
+      van_code,
+      central_invoice,
+      invoice_status
+    `);
 (creditRows || []).forEach(
   (row: any) => {
+
     const vanCode = String(
       row.van_code || ""
     ).trim();
@@ -198,11 +203,33 @@ const { data: creditRows } =
       .trim()
       .toUpperCase();
 
+    const centralInvoice =
+      String(row.central_invoice || "")
+        .trim()
+        .toUpperCase();
+
+    const invoiceStatus =
+      String(row.invoice_status || "")
+        .toLowerCase();
+
+    if (
+      centralInvoice !== "NOT CENTRAL"
+    ) {
+      return;
+    }
+
+    if (
+      invoiceStatus.includes("legal")
+    ) {
+      return;
+    }
+
     if (collectedSet.has(invoice))
       return;
 
     currentCounts[vanCode] =
       (currentCounts[vanCode] || 0) + 1;
+
   }
 );
   const { data: savedCounts } =
