@@ -101,7 +101,29 @@ await supabase
 setCreditRules(
   rules || []
 );
+const savedFilters =
+await localStorage.getItem(
+  `savedFilters_${currentUser}`
+);
 
+if (savedFilters) {
+
+  const filters =
+    JSON.parse(savedFilters);
+
+  setSelectedRegions(
+    filters.regions || []
+  );
+
+  setSelectedCities(
+    filters.cities || []
+  );
+
+  setSelectedVans(
+    filters.vans || []
+  );
+
+}
 
 };
 
@@ -148,7 +170,38 @@ Number(row["Credit_Days"])||0;
 const showInvoice = rule
   ? creditDays >= rule.block_at_day
   : creditDays >= 1;
+
+  const matchesFilters =
+
+(
+  selectedRegions.length === 0 ||
+  selectedRegions.includes(
+    row["Region"]
+  )
+)
+
+&&
+
+(
+  selectedCities.length === 0 ||
+  selectedCities.includes(
+    row["City"]
+  )
+)
+
+&&
+
+(
+  selectedVans.length === 0 ||
+  selectedVans.includes(
+    row["Van Code."]
+  )
+);
 return (
+
+matchesFilters
+
+&&
 
 String(
 row["Central Invoice"]
