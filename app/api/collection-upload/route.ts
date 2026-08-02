@@ -104,7 +104,20 @@ const records = invoices.map(
     upload_id: uploadRecord.id,
   })
 );
+const { data: existingCollected } =
+  await supabase
+    .from("collection_invoices")
+    .select("invoice");
 
+const existingCollectedSet =
+  new Set(
+    (existingCollected || []).map(
+      (row: any) =>
+        String(row.invoice)
+          .trim()
+          .toUpperCase()
+    )
+  );
 const uniqueInvoices = [
   ...new Set(records.map(r => r.invoice))
 ];
@@ -114,6 +127,13 @@ const recordsToInsert =
     uploaded_by: uploadedBy,
     upload_id: uploadRecord.id,
   }));
+const newlyCollectedInvoices =
+  recordsToInsert
+    .map(r => r.invoice)
+    .filter(
+      invoice =>
+        !existingCollectedSet.has(invoice)
+    );
 for (
   let i = 0;
   i < recordsToInsert.length;
@@ -148,7 +168,7 @@ await supabase
     message: `Collection ${uploadRecord.id} uploaded successfully by ${user?.full_name || uploadedBy}.`,
   });
 const affectedInvoices =
-  recordsToInsert.map(r => r.invoice);
+  newlyCollectedInvoices;
 
 const { data: affectedCreditRows } =
   await supabase
