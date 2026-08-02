@@ -393,7 +393,7 @@ setIsLoggedIn(!!currentUser);
     <div className="min-h-screen bg-slate-100 p-3">
 
 
-      <div className="mb-4 flex justify-between items-center">
+      <div className="mb-4 flex items-center">
 
   {isLoggedIn && (
     <Link
@@ -406,7 +406,7 @@ setIsLoggedIn(!!currentUser);
 
   <Link
     href={`/van/${encodeURIComponent(vanCode)}/exceptions`}
-    className="text-red-600 text-sm"
+    className={`text-red-600 text-sm ${isLoggedIn ? "ml-auto" : "mx-auto"}`}
   >
     Exceptions →
   </Link>
