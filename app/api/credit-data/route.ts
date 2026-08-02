@@ -8,7 +8,7 @@ const supabase = createClient(
 
 export async function GET() {
 
-  let error = null;
+  
 
   // Get latest uploaded row only
   const { data: latestRow, error: latestError } = await supabase
