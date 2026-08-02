@@ -124,7 +124,7 @@ for (
     i + 5000
   );
 
-  const { error } = await supabase
+    const { error } = await supabase
     .from("collection_invoices")
     .upsert(batch, {
       onConflict: "invoice",
@@ -147,15 +147,29 @@ await supabase
     title: "📦 Collection File Imported",
     message: `Collection ${uploadRecord.id} uploaded successfully by ${user?.full_name || uploadedBy}.`,
   });
+const affectedInvoices =
+  recordsToInsert.map(r => r.invoice);
 
-const { data: creditRows } =
+const { data: affectedCreditRows } =
   await supabase
     .from("credit_data_full")
-    .select("invoice, van_code");
+    .select("invoice, van_code")
+    .in("invoice", affectedInvoices);
 
-const { data: allCollected } = await supabase
-  .from("collection_invoices")
-  .select("invoice");
+const affectedVans = [
+  ...new Set(
+    (affectedCreditRows || [])
+      .map((row: any) => row.van_code)
+      .filter(Boolean)
+  ),
+];
+
+const currentCounts: Record<string, number> = {};
+
+const { data: allCollected } =
+  await supabase
+    .from("collection_invoices")
+    .select("invoice");
 
 const collectedSet = new Set(
   (allCollected || []).map((row: any) =>
@@ -165,55 +179,79 @@ const collectedSet = new Set(
   )
 );
 
-const currentCounts: Record<string, number> = {};
+const { data: creditRows } =
+  await supabase
+    .from("credit_data_full")
+    .select("invoice, van_code");
 
 (creditRows || []).forEach(
   (row: any) => {
-
-    const vanCode =
-      String(
-        row.van_code || ""
-      ).trim();
+    const vanCode = String(
+      row.van_code || ""
+    ).trim();
 
     if (!vanCode) return;
 
-    const invoice =
-      String(
-        row.invoice || ""
-      )
-        .trim()
-        .toUpperCase();
+    const invoice = String(
+      row.invoice || ""
+    )
+      .trim()
+      .toUpperCase();
 
     if (collectedSet.has(invoice))
       return;
 
     currentCounts[vanCode] =
       (currentCounts[vanCode] || 0) + 1;
+  }
+);
+  const { data: savedCounts } =
+  await supabase
+    .from("van_invoice_counts")
+    .select("van_code, invoice_count");
+
+const savedCountsMap = new Map(
+  (savedCounts || []).map((row: any) => [
+    row.van_code,
+    row.invoice_count,
+  ])
+);
+const { data: allSubscriptions } =
+  await supabase
+    .from("push_subscriptions")
+    .select("*");
+
+const subscriptionsMap = new Map();
+
+(allSubscriptions || []).forEach(
+  (row: any) => {
+
+    const vanCode =
+      String(row.van_code || "");
+
+    if (!subscriptionsMap.has(vanCode)) {
+      subscriptionsMap.set(vanCode, []);
+    }
+
+    subscriptionsMap
+      .get(vanCode)
+      .push(row);
 
   }
 );
-
-for (const vanCode in currentCounts) {
+for (const vanCode of affectedVans) {
 
   const newCount =
-    currentCounts[vanCode];
+    currentCounts[vanCode] || 0;
 
-  const { data: savedCount } =
-    await supabase
-      .from("van_invoice_counts")
-      .select("invoice_count")
-      .eq(
-        "van_code",
-        vanCode
-      )
-      .single();
+  const oldCount =
+  savedCountsMap.get(vanCode);
 
- 
-const oldCount =
-  savedCount?.invoice_count;
 
-const reducedBy =
-  oldCount - newCount;
+const reducedBy = Math.max(
+  0,
+  (oldCount || 0) - newCount
+);
 
 if (
   oldCount !== null &&
@@ -221,14 +259,8 @@ if (
   newCount < oldCount
 ){
 
-  const { data: subscriptions } =
-    await supabase
-      .from("push_subscriptions")
-      .select("*")
-      .eq(
-        "van_code",
-        vanCode
-      );
+  const subscriptions =
+  subscriptionsMap.get(vanCode) || [];
 
   await Promise.all(
     (subscriptions || []).map(

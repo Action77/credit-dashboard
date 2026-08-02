@@ -60,71 +60,46 @@ export async function GET() {
     }
   }
 
-  // Load All Rows Using Batches
-  let data: any[] = [];
-  let from = 0;
+  const { data, error } = await supabase
+  .from("credit_data_full")
+  .select(`
+    van_code,
+    employee_name,
+    employee_ats_code,
+    customer_code,
+    customer_name,
+    central_invoice,
+    payment_term,
+    invoice,
+    trx_date,
+    credit_invoice_amount,
+    pending_cim,
+    credit_days,
+    total_rejected_count,
+    status_user_block,
+    invoice_status,
+    region,
+    city,
+    created_at,
+    uploaded_by,
+    file_name,
+    file_date
+  `)
+  .order("created_at", {
+    ascending: false,
+  });
 
-  const batchSize = 1000;
+if (error) {
+  return NextResponse.json({
+    data: [],
+    fileInfo: "",
+  });
+}
 
-  while (true) {
-    const {
-      data: batch,
-      error,
-    } = await supabase
-      .from("credit_data_full")
-      .select(`
-        van_code,
-        employee_name,
-        employee_ats_code,
-        customer_code,
-        customer_name,
-        central_invoice,
-        payment_term,
-        invoice,
-        trx_date,
-        credit_invoice_amount,
-        pending_cim,
-        credit_days,
-        total_rejected_count,
-        status_user_block,
-        invoice_status,
-        region,
-        city,
-        created_at,
-        uploaded_by,
-        file_name,
-        file_date
-      `)
-      .order("created_at", {
-        ascending: false,
-      })
-      .range(
-        from,
-        from + batchSize - 1
-      );
 
-    if (error) {
-      return NextResponse.json({
-        data: [],
-        fileInfo: "",
-      });
-    }
-
-    if (!batch || batch.length === 0) {
-      break;
-    }
-
-    data.push(...batch);
-
-    if (batch.length < batchSize) {
-      break;
-    }
-
-    from += batchSize;
-  }
 
   const uploadTime =
-    data.length > 0
+  data?.length > 0
       ? new Date(
           new Date(
             data[0].created_at
@@ -135,7 +110,7 @@ export async function GET() {
 
   let uploadedByName = "Unknown";
 
-  if (data.length > 0) {
+  if (data?.length > 0) {
     const { data: userData } =
       await supabase
         .from("app_users")
@@ -152,7 +127,7 @@ export async function GET() {
       "Unknown";
   }
 
-  const formattedData = data.map((row) => ({
+  const formattedData = (data || []).map((row) => ({
     "Van Code.": row.van_code,
     "Employee Name.": row.employee_name,
     "Employee ATS Code.":
@@ -181,7 +156,7 @@ export async function GET() {
   return NextResponse.json({
     data: formattedData,
     fileInfo:
-      data.length > 0
+      data?.length > 0
         ? `${data[0].file_name} | ${data[0].file_date} | Uploaded By ${uploadedByName} | ${uploadTime?.toLocaleString(
             "en-US",
             {
