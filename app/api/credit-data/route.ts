@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+
 export const revalidate = 300;
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 export async function GET() {
-
-  
-
-  // Get latest uploaded row only
   const { data: latestRow, error: latestError } = await supabase
     .from("credit_data_full")
     .select("created_at")
@@ -35,14 +33,16 @@ export async function GET() {
       })
     );
 
-    const todayString = saudiToday
-      .toISOString()
-      .split("T")[0];
+    const todayString =
+      saudiToday.toISOString().split("T")[0];
 
     const fileSaudiDate = new Date(
-      new Date(latestRow.created_at).toLocaleString("en-US", {
-        timeZone: "Asia/Riyadh",
-      })
+      new Date(latestRow.created_at).toLocaleString(
+        "en-US",
+        {
+          timeZone: "Asia/Riyadh",
+        }
+      )
     )
       .toISOString()
       .split("T")[0];
@@ -60,71 +60,75 @@ export async function GET() {
     }
   }
 
-  // Load all rows only if today's file exists
-let data: any[] = [];
-let from = 0;
-const batchSize = 1000;
+  // Load All Rows Using Batches
+  let data: any[] = [];
+  let from = 0;
 
-while (true) {
-  const { data: batch, error } = await supabase
-    .from("credit_data_full")
-    .select(`
-      van_code,
-      employee_name,
-      employee_ats_code,
-      customer_code,
-      customer_name,
-      central_invoice,
-      payment_term,
-      invoice,
-      trx_date,
-      credit_invoice_amount,
-      pending_cim,
-      credit_days,
-      total_rejected_count,
-      status_user_block,
-      invoice_status,
-      region,
-      city,
-      created_at,
-      uploaded_by,
-      file_name,
-      file_date
-    `)
-    .order("created_at", { ascending: false })
-    .range(from, from + batchSize - 1);
+  const batchSize = 1000;
 
-  if (error) {
-    return NextResponse.json({
-      data: [],
-      fileInfo: "",
-    });
+  while (true) {
+    const {
+      data: batch,
+      error,
+    } = await supabase
+      .from("credit_data_full")
+      .select(`
+        van_code,
+        employee_name,
+        employee_ats_code,
+        customer_code,
+        customer_name,
+        central_invoice,
+        payment_term,
+        invoice,
+        trx_date,
+        credit_invoice_amount,
+        pending_cim,
+        credit_days,
+        total_rejected_count,
+        status_user_block,
+        invoice_status,
+        region,
+        city,
+        created_at,
+        uploaded_by,
+        file_name,
+        file_date
+      `)
+      .order("created_at", {
+        ascending: false,
+      })
+      .range(
+        from,
+        from + batchSize - 1
+      );
+
+    if (error) {
+      return NextResponse.json({
+        data: [],
+        fileInfo: "",
+      });
+    }
+
+    if (!batch || batch.length === 0) {
+      break;
+    }
+
+    data.push(...batch);
+
+    if (batch.length < batchSize) {
+      break;
+    }
+
+    from += batchSize;
   }
 
-  if (!batch || batch.length === 0) {
-    break;
-  }
-
-  data.push(...batch);
-
-  if (batch.length < batchSize) {
-    break;
-  }
-
-  from += batchSize;
-}
-
-
-  if (error) {
-    return NextResponse.json({
-      data: [],
-      fileInfo: "",
-    });
-  }
   const uploadTime =
     data.length > 0
       ? new Date(
-          new Date(data[0].created_at).getTime() +
+          new Date(
+            data[0].created_at
+          ).getTime() +
             3 * 60 * 60 * 1000
         )
       : null;
@@ -132,14 +136,15 @@ while (true) {
   let uploadedByName = "Unknown";
 
   if (data.length > 0) {
-    const { data: userData } = await supabase
-      .from("app_users")
-      .select("full_name")
-      .eq(
-        "username",
-        data[0].uploaded_by
-      )
-      .single();
+    const { data: userData } =
+      await supabase
+        .from("app_users")
+        .select("full_name")
+        .eq(
+          "username",
+          data[0].uploaded_by
+        )
+        .single();
 
     uploadedByName =
       userData?.full_name ||
@@ -148,28 +153,33 @@ while (true) {
   }
 
   const formattedData = data.map((row) => ({
-  "Van Code.": row.van_code,
-  "Employee Name.": row.employee_name,
-  "Employee ATS Code.": row.employee_ats_code,
-  "Customer Code": row.customer_code,
-  "Customer Name": row.customer_name,
-  "Central Invoice": row.central_invoice,
-  "Payment Term": row.payment_term,
-  "Invoice #": row.invoice,
-  "Trx Date": row.trx_date,
-  "Credit Invoice Amount": row.credit_invoice_amount,
-  "Pending CIM": row.pending_cim,
-  "Credit_Days": row.credit_days,
-  "Total Rejected Count": row.total_rejected_count,
-  "Status User Block": row.status_user_block,
-  "Invoice status (Due/ Overdue)": row.invoice_status,
-  Region: row.region,
-  City: row.city,
-}));
+    "Van Code.": row.van_code,
+    "Employee Name.": row.employee_name,
+    "Employee ATS Code.":
+      row.employee_ats_code,
+    "Customer Code": row.customer_code,
+    "Customer Name": row.customer_name,
+    "Central Invoice":
+      row.central_invoice,
+    "Payment Term": row.payment_term,
+    "Invoice #": row.invoice,
+    "Trx Date": row.trx_date,
+    "Credit Invoice Amount":
+      row.credit_invoice_amount,
+    "Pending CIM": row.pending_cim,
+    "Credit_Days": row.credit_days,
+    "Total Rejected Count":
+      row.total_rejected_count,
+    "Status User Block":
+      row.status_user_block,
+    "Invoice status (Due/ Overdue)":
+      row.invoice_status,
+    Region: row.region,
+    City: row.city,
+  }));
 
   return NextResponse.json({
     data: formattedData,
-
     fileInfo:
       data.length > 0
         ? `${data[0].file_name} | ${data[0].file_date} | Uploaded By ${uploadedByName} | ${uploadTime?.toLocaleString(
