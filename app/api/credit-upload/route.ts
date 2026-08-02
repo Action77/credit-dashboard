@@ -141,17 +141,34 @@ console.timeEnd("MAP_ROWS");
 
 console.time("INSERT_CREDIT_DATA");
 
-const { error } = await supabase.rpc(
-  "import_credit_data",
-  {
-    payload: allRecords,
+const CHUNK_SIZE = 3000;
+
+for (
+  let i = 0;
+  i < allRecords.length;
+  i += CHUNK_SIZE
+) {
+
+  console.time(`CHUNK_${i}`);
+
+  const chunk = allRecords.slice(
+    i,
+    i + CHUNK_SIZE
+  );
+
+  const { error } = await supabase.rpc(
+    "import_credit_data",
+    {
+      payload: chunk,
+    }
+  );
+
+  console.timeEnd(`CHUNK_${i}`);
+
+  if (error) {
+    throw error;
   }
-);
-
-if (error) {
-  throw error;
 }
-
 console.timeEnd("INSERT_CREDIT_DATA");
 const { data: user } = await supabase
   .from("app_users")
