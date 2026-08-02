@@ -317,25 +317,40 @@ if (a1 !== "Collection Submit Time") {
   return;
 }
 
-    const formData =
-      new FormData();
-
-    formData.append(
-      "file",
-      file
-    );
-
-    await fetch(
-      "/api/collection-upload",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-const currentUser =
+    const currentUser =
   await localStorage.getItem(
     "currentUser"
   );
+
+const fileName =
+  `${Date.now()}-${file.name}`;
+
+const { error: uploadError } =
+  await supabase.storage
+    .from("imports")
+    .upload(fileName, file, {
+      upsert: true,
+    });
+
+if (uploadError) {
+  throw uploadError;
+}
+
+await fetch(
+  "/api/collection-upload",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type":
+        "application/json",
+    },
+    body: JSON.stringify({
+      path: fileName,
+      uploadedBy: currentUser,
+      originalName: file.name,
+    }),
+  }
+);
 
 let fullName = "";
 
