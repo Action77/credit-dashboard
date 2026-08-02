@@ -91,7 +91,7 @@ const currentUser =
 await localStorage.getItem(
   "currentUser"
 );
-
+setIsLoggedIn(!!currentUser);
 const { data: rules } =
 await supabase
 .from("credit_block_rules")
@@ -312,11 +312,13 @@ return acc;
 
 );
 
-const filteredVans = vans.filter(([van]) => {
-  return String(van)
-    .toLowerCase()
-    .includes(searchTerm.toLowerCase().trim());
-});
+const filteredVans = !isLoggedIn
+  ? []
+  : vans.filter(([van]) => {
+      return String(van)
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase().trim());
+    });
 const getStatus=(r:number,e:number)=>{
 
 
