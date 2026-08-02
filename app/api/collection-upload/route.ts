@@ -163,7 +163,22 @@ const affectedVans = [
       .filter(Boolean)
   ),
 ];
+const collectedPerVan: Record<string, number> = {};
 
+(affectedCreditRows || []).forEach(
+  (row: any) => {
+
+    const vanCode = String(
+      row.van_code || ""
+    ).trim();
+
+    if (!vanCode) return;
+
+    collectedPerVan[vanCode] =
+      (collectedPerVan[vanCode] || 0) + 1;
+
+  }
+);
 const currentCounts: Record<string, number> = {};
 
 const { data: allCollected } =
@@ -275,16 +290,11 @@ for (const vanCode of affectedVans) {
   savedCountsMap.get(vanCode);
 
 
-const reducedBy = Math.max(
-  0,
-  (oldCount || 0) - newCount
-);
+const reducedBy =
+  collectedPerVan[vanCode] || 0;
 
-if (
-  oldCount !== null &&
-  oldCount !== undefined &&
-  newCount < oldCount
-){
+if (reducedBy > 0)
+{
 
   const subscriptions =
   subscriptionsMap.get(vanCode) || [];
