@@ -263,8 +263,8 @@ if (
   subscriptionsMap.get(vanCode) || [];
 
   await Promise.all(
-    (subscriptions || []).map(
-      async (row) => {
+  (subscriptions || []).map(
+    async (row: { subscription: any }) => {
 
         const subscription =
           typeof row.subscription === "string"
