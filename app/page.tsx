@@ -1102,14 +1102,13 @@ const blockedInvoicesData = useMemo(() => {
 const whatsappVanCodes = useMemo(() => {
   return [
     ...new Set(
-      blockedInvoicesData.map(
-        (row) => row["Van Code."]
-      )
+      filteredData
+        .map((row) => row["Van Code."])
+        .filter(Boolean)
     ),
-  ]
-    .filter(Boolean)
-    .sort();
-}, [blockedInvoicesData]);
+  ].sort();
+}, [filteredData]);
+
 useEffect(() => {
   if (
     whatsAppVan &&
