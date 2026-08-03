@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Smartphone } from "lucide-react";
+import { SmartphoneCharging } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -53,12 +53,25 @@ export default function Header() {
                 </button>
               ))}
 {!pathname.startsWith("/van") && (
-  <Link
-    href="/van"
-    title="Mobile Version"
-    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 shadow hover:bg-slate-100 transition"
-  >
-    <Smartphone className="h-5 w-5" />
+  <Link href="/van" title="Mobile Version">
+    <button
+      className="
+        relative
+        flex
+        items-center
+        justify-center
+        w-11
+        h-11
+        rounded-xl
+        bg-white/10
+        hover:bg-white/20
+        text-white
+        transition-all
+        duration-200
+      "
+    >
+      <SmartphoneCharging size={22} />
+    </button>
   </Link>
 )}
             <NotificationBell />
