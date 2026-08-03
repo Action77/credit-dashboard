@@ -74,10 +74,20 @@ const [
 ]);
 
 if (collectionInvoicesDelete.error) {
+  console.error(
+    "collection_invoices error",
+    collectionInvoicesDelete.error
+  );
+
   throw collectionInvoicesDelete.error;
 }
 
 if (collectionUploadsDelete.error) {
+  console.error(
+    "collection_uploads error",
+    collectionUploadsDelete.error
+  );
+
   throw collectionUploadsDelete.error;
 }
 
