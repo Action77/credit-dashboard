@@ -107,14 +107,7 @@ const allRecords = jsonData.map((row) => ({
   file_date: creditFileDate,
 }));
 
-console.log(
-  "ROWS_COUNT",
-  allRecords.length
-);    
-console.log(
-  "FIRST_RECORD",
-  allRecords[0]
-);
+
 console.timeEnd("MAP_ROWS");
     
 
@@ -137,20 +130,12 @@ for (
     i + CHUNK_SIZE
   );
 
-  const result = await supabase.rpc(
+  const { error } = await supabase.rpc(
   "import_credit_data",
   {
     payload: chunk,
   }
 );
-
-console.log(
-  "IMPORT_RESULT",
-  result
-);
-
-const { error } = result;
-
   console.timeEnd(`CHUNK_${i}`);
 
   if (error) {
@@ -268,12 +253,11 @@ const vanRows = Object.keys(vanCounts).map(
   })
 );
 console.time("UPSERT_COUNTS");
-console.log("BEFORE_VAN_DELETE");
 // await supabase
 //   .from("van_invoice_counts")
 //   .delete()
 //   .neq("van_code", "");
-console.log("AFTER_VAN_DELETE");
+
 
 await supabase
   .from("van_invoice_counts")
