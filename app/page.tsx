@@ -1211,9 +1211,21 @@ console.log("BLOCKED", blockedInvoicesData.length);
     ).length;
 
   const exceptionCount =
-    exceptions.filter(
-      (item) => !item.permanent
-    ).length;
+  exceptions.filter((item) => {
+    if (item.permanent) return false;
+
+    const invoice = normalizeInvoice(item.invoice);
+
+    if (!filteredInvoiceSet.has(invoice)) {
+      return false;
+    }
+
+    if (!whatsAppVan) {
+      return true;
+    }
+
+    return dataInvoiceMap.get(invoice) === whatsAppVan;
+  }).length;
 
   const allEmployees = new Set(
   selectedVanFilteredData.map(
@@ -1243,6 +1255,9 @@ const activeEmployees = [...allEmployees].filter(
   selectedVanData,
   selectedVanFilteredData,
   exceptions,
+  filteredInvoiceSet,
+  dataInvoiceMap,
+  whatsAppVan,
 ]);
 const topBlockedVans = useMemo(() => {
   return Object.entries(
