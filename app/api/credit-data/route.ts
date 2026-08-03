@@ -47,18 +47,17 @@ export async function GET() {
       .toISOString()
       .split("T")[0];
 
-    if (todayString !== fileSaudiDate) {
-      await supabase
-        .from("credit_data_full")
-        .delete()
-        .neq("invoice", "");
-
-      return NextResponse.json({
-        data: [],
-        fileInfo: "",
-      });
-    }
-  }
+    // if (todayString !== fileSaudiDate) {
+//   await supabase
+//     .from("credit_data_full")
+//     .delete()
+//     .neq("invoice", "");
+//
+//   return NextResponse.json({
+//     data: [],
+//     fileInfo: "",
+//   });
+//   }
 
   let data: any[] = [];
 let from = 0;
