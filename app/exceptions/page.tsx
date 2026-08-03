@@ -1063,13 +1063,11 @@ await addLog(
 
 await supabase
   .from("notifications")
-  .insert(
-    invoices.map(invoice => ({
-      username: null,
-      title: "⚠️ Exception Added",
-      message: `${user?.full_name || currentUser} added invoice ${invoice}.`,
-    }))
-  );
+  .insert({
+    username: null,
+    title: "⚠️ Exceptions Added",
+    message: `${user?.full_name || currentUser} added ${invoices.length} exception invoice(s).`,
+  });
       const response =
         await fetch(
           "/api/exceptions"
