@@ -1215,12 +1215,22 @@ console.log("BLOCKED", blockedInvoicesData.length);
       (item) => !item.permanent
     ).length;
 
-  const activeEmployees =
-  new Set(
-    selectedVanData.map(
-      (row) => row["Employee Name."]
-    )
-  ).size;
+  const allEmployees = new Set(
+  selectedVanFilteredData.map(
+    (row) => row["Employee Name."]
+  )
+);
+
+const blockedEmployees = new Set(
+  selectedVanData.map(
+    (row) => row["Employee Name."]
+  )
+);
+
+const activeEmployees = [...allEmployees].filter(
+  (employee) => !blockedEmployees.has(employee)
+).length;
+
   return {
     blockedCount,
     employeeCount,
