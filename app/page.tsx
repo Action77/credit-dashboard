@@ -1251,21 +1251,21 @@ const topBlockedVans = useMemo(() => {
     )
     .slice(0, 5);
 }, [blockedInvoicesData]);
-const topClearedEmployees = useMemo(() => {
+const topClearedVans = useMemo(() => {
   return Object.entries(
-    data.reduce((acc: any, row) => {
-      const invoice = String(row["Invoice #"])
-        .replace(/\s/g, "")
-        .toUpperCase();
+    filteredData.reduce((acc: any, row) => {
+      const invoice = normalizeInvoice(
+        row["Invoice #"]
+      );
 
-      const employee = row["Employee Name."];
+      const van = row["Van Code."];
 
       if (
         exceptionSet.has(invoice) ||
         collectedSet.has(invoice)
       ) {
-        acc[employee] =
-          (acc[employee] || 0) + 1;
+        acc[van] =
+          (acc[van] || 0) + 1;
       }
 
       return acc;
@@ -1277,7 +1277,7 @@ const topClearedEmployees = useMemo(() => {
     )
     .slice(0, 5);
 }, [
-  data,
+  filteredData,
   exceptionSet,
   collectedSet,
 ]);
@@ -2515,8 +2515,8 @@ item.created_by === currentUser && (
     <thead>
       <tr className="border-b">
         <th className="text-left p-2">
-          Employee
-        </th>
+  Van Code
+</th>
 
         <th className="text-left p-2">
           Cleared
@@ -2526,25 +2526,23 @@ item.created_by === currentUser && (
 
     <tbody>
 
-     {topClearedEmployees.map(
-  ([employee, total]: any) => (
+     {topClearedVans.map(
+  ([van, total]: any) => (
 
+    <tr key={van}>
 
-            <tr key={employee}>
+      <td className="p-2">
+        {van}
+      </td>
 
-              <td className="p-2">
-                {employee}
-              </td>
+      <td className="p-2 text-green-600 font-semibold">
+        {total}
+      </td>
 
-              <td className="p-2 text-green-600 font-semibold">
-                {total}
-              </td>
+    </tr>
 
-            </tr>
-
-          )
-        )}
-
+  )
+)}
     </tbody>
 
   </table>
