@@ -55,7 +55,32 @@ const clearCreditDataResult =
   await supabase.rpc(
     "clear_credit_data"
   );
+await supabase
+  .from("collection_invoices")
+  .delete()
+  .neq("invoice", "");
 
+await supabase
+  .from("collection_uploads")
+  .delete()
+  .gt("id", 0);
+
+await supabase
+  .from("van_invoice_counts")
+  .delete()
+  .neq("van_code", "");
+  const { data: files } =
+  await supabase.storage
+    .from("imports")
+    .list();
+
+if (files?.length) {
+  await supabase.storage
+    .from("imports")
+    .remove(
+      files.map(file => file.name)
+    );
+}
 if (clearCreditDataResult.error) {
   throw clearCreditDataResult.error;
 }
