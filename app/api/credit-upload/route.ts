@@ -170,11 +170,22 @@ const vansInFile = [
   ),
 ];
 
-const { data: subscriptions } =
+const { data: vanSubscriptions } =
   await supabase
     .from("push_subscriptions")
     .select("*")
     .in("van_code", vansInFile);
+
+const { data: adminSubscriptions } =
+  await supabase
+    .from("push_subscriptions")
+    .select("*")
+    .eq("van_code", "ADMIN");
+
+const subscriptions = [
+  ...(vanSubscriptions || []),
+  ...(adminSubscriptions || []),
+];
 console.time("PUSH_NOTIFICATIONS");
 await Promise.all(
 
@@ -188,16 +199,25 @@ await Promise.all(
 
       try {
 
-        await webpush.sendNotification(
-          subscription,
-          JSON.stringify({
-            title:
-              "✅ New Credit File Imported",
-            body:
-              "A new credit file has been uploaded. Please review your blocked invoices to see the latest updates affecting your route.",
-            url: `/van/${row.van_code}`,
-          })
-        );
+        const isAdmin =
+  row.van_code === "ADMIN";
+
+await webpush.sendNotification(
+  subscription,
+  JSON.stringify({
+    title: isAdmin
+      ? "📘 Credit File Uploaded"
+      : "✅ New Credit File Imported",
+
+    body: isAdmin
+      ? `${user?.full_name || uploadedBy} uploaded a Credit File`
+      : "A new credit file has been uploaded. Please review your blocked invoices.",
+
+    url: isAdmin
+      ? "/notifications-admin"
+      : `/van/${row.van_code}`,
+  })
+);
       } catch (error) {
 
         console.error(

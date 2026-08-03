@@ -159,7 +159,38 @@ const { data: user } = await supabase
   .select("full_name")
   .eq("username", uploadedBy)
   .single();
+const { data: adminSubscriptions } =
+  await supabase
+    .from("push_subscriptions")
+    .select("*")
+    .eq("van_code", "ADMIN");
 
+await Promise.all(
+  (adminSubscriptions || []).map(
+    async (row: any) => {
+      const subscription =
+        typeof row.subscription === "string"
+          ? JSON.parse(row.subscription)
+          : row.subscription;
+
+      try {
+        await webpush.sendNotification(
+          subscription,
+          JSON.stringify({
+            title: "📗 Collection File Uploaded",
+            body: `${user?.full_name || uploadedBy} has successfully uploaded a Collection file.`,
+            url: "/notifications-admin",
+          })
+        );
+      } catch (error) {
+        console.error(
+          "Admin collection push failed:",
+          error
+        );
+      }
+    }
+  )
+);
 await supabase
   .from("notifications")
   .insert({
