@@ -179,7 +179,7 @@ await Promise.all(
           JSON.stringify({
             title: "📗 Collection File Uploaded",
             body: `${user?.full_name || uploadedBy} has successfully uploaded a Collection file.`,
-            url: "/notifications-admin",
+            url: "https://credit-dashboard-fawn.vercel.app/van",
           })
         );
       } catch (error) {

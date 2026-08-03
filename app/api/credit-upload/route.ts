@@ -187,50 +187,39 @@ const subscriptions = [
   ...(adminSubscriptions || []),
 ];
 console.time("PUSH_NOTIFICATIONS");
+
 await Promise.all(
+  (subscriptions || []).map(async (row) => {
+    const subscription =
+      typeof row.subscription === "string"
+        ? JSON.parse(row.subscription)
+        : row.subscription;
 
-  (subscriptions || []).map(
-    async (row) => {
+    try {
+      const isAdmin = row.van_code === "ADMIN";
 
-      const subscription =
-        typeof row.subscription === "string"
-          ? JSON.parse(row.subscription)
-          : row.subscription;
+      await webpush.sendNotification(
+        subscription,
+        JSON.stringify({
+          title: isAdmin
+            ? "📘 Credit File Uploaded"
+            : "✅ New Credit File Imported",
 
-      try {
+          body: isAdmin
+            ? `${user?.full_name || uploadedBy} has successfully uploaded a Credit file.`
+            : "A new credit file has been uploaded. Please review your blocked invoices.",
 
-        const isAdmin =
-  row.van_code === "ADMIN";
-
-await webpush.sendNotification(
-  subscription,
-  JSON.stringify({
-    title: isAdmin
-      ? "📘 Credit File Uploaded"
-      : "✅ New Credit File Imported",
-
-    body: isAdmin
-      ? `${user?.full_name || uploadedBy} uploaded a Credit File`
-      : "A new credit file has been uploaded. Please review your blocked invoices.",
-
-    url: isAdmin
-      ? "/notifications-admin"
-      : `/van/${row.van_code}`,
+          url: isAdmin
+            ? "https://credit-dashboard-fawn.vercel.app/van"
+            : `/van/${row.van_code}`,
+        })
+      );
+    } catch (error) {
+      console.error("Credit push failed:", error);
+    }
   })
 );
-      } catch (error) {
 
-        console.error(
-          "Credit push failed:",
-          error
-        );
-
-      }
-
-    }
-  )
-
-);
 console.timeEnd("PUSH_NOTIFICATIONS");
 const vanCounts: Record<string, number> = {};
 
