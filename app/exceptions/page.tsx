@@ -993,16 +993,12 @@ const saveResponse =
       body: JSON.stringify(
         newExceptions.map(
           item => ({
-            invoice:
-              item.invoice,
-            till_date:
-              isPermanent
-                ? null
-                : item.tillDate,
-            permanent:
-              isPermanent,
-            van_code:
-              item.vanCode,
+            invoice: item.invoice,
+            till_date: isPermanent
+              ? null
+              : item.tillDate,
+            permanent: isPermanent,
+            van_code: item.vanCode,
             employee_name:
               item.employeeName,
             ats_code:
@@ -1011,20 +1007,53 @@ const saveResponse =
               item.customerCode,
             customer_name:
               item.customerName,
-            created_by: currentUser,          })
+            created_by: currentUser,
+          })
         )
       ),
     }
   );
-      if (!saveResponse.ok) {
 
-        alert(
-          "Failed To Save Exception"
-        );
+if (!saveResponse.ok) {
 
-        return;
+  alert(
+    "Failed To Save Exception"
+  );
 
-      }
+  return;
+}
+
+for (const item of newExceptions) {
+
+  if (!item.vanCode) continue;
+
+  const { count } = await supabase
+    .from("exceptions")
+    .select("*", {
+      count: "exact",
+      head: true,
+    })
+    .eq(
+      "van_code",
+      item.vanCode
+    );
+
+  await fetch(
+    "/api/send-exception-notification",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+      body: JSON.stringify({
+        van_code: item.vanCode,
+        count: count || 0,
+      }),
+    }
+  );
+}
+
 await addLog(
   currentUser,
   user?.full_name || currentUser,
