@@ -18,13 +18,13 @@ export async function POST(request: Request) {
     const { van_code, count } =
       await request.json();
 
-    console.log(
-      "EXCEPTION NOTIFICATION REQUEST",
-      {
-        van_code,
-        count,
-      }
-    );
+console.log(
+  `A new exception has been added. Total active exceptions: ${count}.`,
+  {
+    van_code,
+    count,
+  }
+);
 
     const { data, error } = await supabase
       .from("push_subscriptions")
@@ -62,14 +62,13 @@ export async function POST(request: Request) {
 
         const result =
           await webpush.sendNotification(
-            subscription,
-            JSON.stringify({
-              title:
-                "⚠️ New Exception",
-              body: `You have ${count} active exceptions.`,
-              url: `/van/${van_code}`,
-            })
-          );
+  subscription,
+  JSON.stringify({
+    title: "⚠️ New Exception",
+    body: `A new exception has been added. Total active exceptions: ${count}.`,
+    url: `/van/${van_code}/exceptions`,
+  })
+);
 
         console.log(
           "NOTIFICATION SENT",
