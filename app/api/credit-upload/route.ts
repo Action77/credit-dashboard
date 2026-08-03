@@ -135,6 +135,10 @@ console.log(
   "ROWS_COUNT",
   allRecords.length
 );    
+console.log(
+  "FIRST_RECORD",
+  allRecords[0]
+);
 console.timeEnd("MAP_ROWS");
     
 
@@ -157,18 +161,30 @@ for (
     i + CHUNK_SIZE
   );
 
-  const { error } = await supabase.rpc(
-    "import_credit_data",
-    {
-      payload: chunk,
-    }
-  );
+  const result = await supabase.rpc(
+  "import_credit_data",
+  {
+    payload: chunk,
+  }
+);
+
+console.log(
+  "IMPORT_RESULT",
+  result
+);
+
+const { error } = result;
 
   console.timeEnd(`CHUNK_${i}`);
 
   if (error) {
-    throw error;
-  }
+  console.error(
+    "IMPORT_ERROR",
+    error
+  );
+
+  throw error;
+}
 }
 console.timeEnd("INSERT_CREDIT_DATA");
 const { data: user } = await supabase
