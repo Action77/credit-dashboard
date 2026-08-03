@@ -1,5 +1,6 @@
 "use client";
-
+import Link from "next/link";
+import { Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -51,7 +52,15 @@ export default function Header() {
                   Login
                 </button>
               ))}
-
+{!pathname.startsWith("/van") && (
+  <Link
+    href="/van"
+    title="Mobile Version"
+    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 shadow hover:bg-slate-100 transition"
+  >
+    <Smartphone className="h-5 w-5" />
+  </Link>
+)}
             <NotificationBell />
           </div>
         </div>
