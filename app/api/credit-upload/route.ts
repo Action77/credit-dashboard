@@ -51,52 +51,17 @@ console.time("READ_EXCEL");
 console.timeEnd("READ_EXCEL");
  console.time("DELETE_OLD_DATA");
 
-const [
-  collectionInvoicesDelete,
-  collectionUploadsDelete,
-  clearCreditDataResult
-] = await Promise.all([
-
-  supabase
-    .from("collection_invoices")
-    .delete()
-    .not("id", "is", null),
-
-  supabase
-    .from("collection_uploads")
-    .delete()
-    .not("id", "is", null),
-
-  supabase.rpc(
+const clearCreditDataResult =
+  await supabase.rpc(
     "clear_credit_data"
-  )
-
-]);
-
-
-if (collectionInvoicesDelete.error) {
-  console.error(
-    "collection_invoices error",
-    collectionInvoicesDelete.error
   );
-
-  throw collectionInvoicesDelete.error;
-}
-
-if (collectionUploadsDelete.error) {
-  console.error(
-    "collection_uploads error",
-    collectionUploadsDelete.error
-  );
-
-  throw collectionUploadsDelete.error;
-}
 
 if (clearCreditDataResult.error) {
   throw clearCreditDataResult.error;
 }
 
 console.timeEnd("DELETE_OLD_DATA");
+
 console.time("MAP_ROWS");
 const allRecords = jsonData.map((row) => ({
   invoice: String(row["Invoice #"])
