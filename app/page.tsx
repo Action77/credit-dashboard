@@ -1202,10 +1202,10 @@ console.log("BLOCKED", blockedInvoicesData.length);
   const employeeCount =
   new Set(
     selectedVanFilteredData.map(
-      (row) => row["Employee Name."]
+      (row) => row["Van Code."]
     )
   ).size;
-  const legalCount =
+    const legalCount =
     exceptions.filter(
       (item) => item.permanent
     ).length;
