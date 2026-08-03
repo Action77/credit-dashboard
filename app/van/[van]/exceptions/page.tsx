@@ -1,5 +1,5 @@
 "use client";
-import { supabase } from "@/lib/supabase";
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -7,9 +7,7 @@ import Link from "next/link";
 export default function VanExceptionsPage() {
   const params = useParams();
 
-  const token = decodeURIComponent(
-  String(params.van || "")
-);
+  const token = String(params.van || "");
 
 const [vanCode, setVanCode] = useState("");
   const [exceptions, setExceptions] =
@@ -18,19 +16,7 @@ const [vanCode, setVanCode] = useState("");
   useEffect(() => {
     
     const load = async () => {
-        const { data: vanData } = await supabase
-  .from("van_permissions")
-  .select("van_code")
-  .eq("public_token", token)
-  .single();
-
-if (!vanData) {
-  return;
-}
-
-const currentVanCode = vanData.van_code;
-
-setVanCode(currentVanCode);
+        
       const response =
       
         await fetch("/api/exceptions");
@@ -73,18 +59,15 @@ setVanCode(currentVanCode);
           }
         );
 
-      const filtered =
-        validExceptions.filter(
-          (item: any) =>
-            String(
-              item.van_code || ""
-            )
-              .trim()
-              .toUpperCase() ===
-            String(currentVanCode)
-              .trim()
-              .toUpperCase()
-        );
+      const filtered = validExceptions.filter(
+  (item: any) =>
+    String(item.van_code || "")
+      .trim()
+      .toUpperCase() ===
+    token.trim().toUpperCase()
+);
+
+setVanCode(token);
 
       setExceptions(filtered);
     };
@@ -146,12 +129,12 @@ setVanCode(currentVanCode);
 
       <div className="mb-4 flex justify-between items-center">
 
-  <Link
-    href={`/van/${encodeURIComponent(token)}`}
-    className="text-blue-600 text-sm"
-  >
-    ← Back To Van
-  </Link>
+<Link
+  href={`/van/${token}`}
+  className="text-blue-600 text-sm"
+>
+  ← Back To Van
+</Link>
 
 </div>
       <div className="bg-[#071d5c] text-white rounded-xl p-4 mb-4">

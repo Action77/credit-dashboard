@@ -11,10 +11,8 @@ export default function VanReportPage() {
   useState(false);
   const params = useParams();
 
-  const vanCodeParam = decodeURIComponent(
-  String(params.van || "")
-);
-const [vanCode, setVanCode] = useState("");
+  const vanCodeParam = String(params.van || "");
+  const [vanCode, setVanCode] = useState("");
 
   const [data, setData] = useState<any[]>([]);
   const [exceptions, setExceptions] = useState<any[]>([]);
@@ -405,12 +403,12 @@ setIsLoggedIn(!!currentUser);
     </Link>
   )}
 
-  <Link
-    href={`/van/${encodeURIComponent(vanCode)}/exceptions`}
-    className="text-red-600 text-sm ml-auto"
-  >
-    Exceptions →
-  </Link>
+<Link
+  href={`/van/${vanCode}/exceptions`}
+  className="text-red-600 text-sm ml-auto"
+>
+  Exceptions →
+</Link>
 
 </div>
       <div className="bg-[#071d5c] text-white rounded-xl p-4 mb-4">
