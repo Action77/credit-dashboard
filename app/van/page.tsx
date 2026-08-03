@@ -9,7 +9,6 @@ export default function MobileSummaryPage() {
 const [searchTerm, setSearchTerm] = useState("");
 const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-const [currentUser, setCurrentUser] = useState("");
 
 const [selectedRegions, setSelectedRegions] =
   useState<string[]>([]);
@@ -24,30 +23,13 @@ const [selectedVans, setSelectedVans] =
   const [collectedInvoices,setCollectedInvoices] = useState<string[]>([]);
   const [creditRules,setCreditRules] = useState<any[]>([]);
 
-const [vanTokens, setVanTokens] =
-  useState<Record<string, string>>({});
   
 
 useEffect(()=>{
 
 const load = async()=>{
 
-const { data: permissions } =
-await supabase
-  .from("van_permissions")
-  .select(
-    "van_code, public_token"
-  );
 
-const tokenMap:
-Record<string, string> = {};
-
-permissions?.forEach((row) => {
-  tokenMap[row.van_code] =
-    row.public_token;
-});
-
-setVanTokens(tokenMap);
 const credit =
 await fetch("/api/credit-data");
 
@@ -491,14 +473,12 @@ info.exceptions
     font-bold
   "
 >
-<Link
-  href={`/van/${encodeURIComponent(
-    vanTokens[String(van)] || ""
-  )}`}
-  className="text-blue-600 underline"
->
-  {van}
-</Link>
+  <Link
+    href={`/van/${encodeURIComponent(String(van))}`}
+    className="text-blue-600 underline"
+  >
+    {van}
+  </Link>
 </td>
 
 </tr>
