@@ -60,18 +60,19 @@ const [
   supabase
     .from("collection_invoices")
     .delete()
-    .neq("id", 0),
+    .not("id", "is", null),
 
   supabase
     .from("collection_uploads")
     .delete()
-    .neq("id", 0),
+    .not("id", "is", null),
 
   supabase.rpc(
     "clear_credit_data"
   )
 
 ]);
+
 
 if (collectionInvoicesDelete.error) {
   console.error(
