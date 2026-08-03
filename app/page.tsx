@@ -1227,22 +1227,21 @@ console.log("BLOCKED", blockedInvoicesData.length);
     return dataInvoiceMap.get(invoice) === whatsAppVan;
   }).length;
 
-  const allEmployees = new Set(
+  const allVans = new Set(
   selectedVanFilteredData.map(
-    (row) => row["Employee Name."]
+    (row) => row["Van Code."]
   )
 );
 
-const blockedEmployees = new Set(
+const blockedVans = new Set(
   selectedVanData.map(
-    (row) => row["Employee Name."]
+    (row) => row["Van Code."]
   )
 );
 
-const activeEmployees = [...allEmployees].filter(
-  (employee) => !blockedEmployees.has(employee)
+const activeEmployees = [...allVans].filter(
+  (van) => !blockedVans.has(van)
 ).length;
-
   return {
     blockedCount,
     employeeCount,
