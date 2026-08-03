@@ -268,11 +268,12 @@ const vanRows = Object.keys(vanCounts).map(
   })
 );
 console.time("UPSERT_COUNTS");
-
-await supabase
-  .from("van_invoice_counts")
-  .delete()
-  .neq("van_code", "");
+console.log("BEFORE_VAN_DELETE");
+// await supabase
+//   .from("van_invoice_counts")
+//   .delete()
+//   .neq("van_code", "");
+console.log("AFTER_VAN_DELETE");
 
 await supabase
   .from("van_invoice_counts")
