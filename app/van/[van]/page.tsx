@@ -398,6 +398,7 @@ setIsLoggedIn(!!currentUser);
 
   const oldestDays =
     Math.max(
+      
       ...reportData.map(
         row =>
           Number(
@@ -407,7 +408,64 @@ setIsLoggedIn(!!currentUser);
       0
     );
 
+const canRequestUnblock =
+  !isRouteUnblocked &&
+  reportData.length <= 3;
 
+const requestUnblock = async () => {
+
+  const key =
+    `unblock-request-${vanCode}`;
+
+  const lastRequest =
+    window.localStorage.getItem(key);
+
+  if (
+    lastRequest &&
+    Date.now() - Number(lastRequest) <
+      60000
+  ) {
+    alert(
+      "تم إرسال طلب خلال آخر دقيقة"
+    );
+    return;
+  }
+
+  try {
+
+    const currentUser =
+      await localStorage.getItem(
+        "currentUser"
+      );
+
+    await fetch(
+      "/api/request-unblock",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+  van_code: vanCode,
+  requester: currentUser,
+  invoices: reportData.length,
+}),
+   }
+    );
+
+    window.localStorage.setItem(
+  key,
+  String(Date.now())
+);
+
+
+
+
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
 
@@ -442,42 +500,54 @@ setIsLoggedIn(!!currentUser);
 
   {isRouteUnblocked ? (
 
-    <span
-      className="
-        inline-flex
-        items-center
-        px-4
-        py-2
-        rounded-full
-        bg-green-600
-        text-white
-        text-sm
-        font-semibold
-      "
-    >
-      ✅ Route Unblocked
-    </span>
+  <span
+    className="
+      inline-flex
+      items-center
+      px-4
+      py-2
+      rounded-full
+      bg-green-600
+      text-white
+      text-sm
+      font-semibold
+    "
+  >
+    ✅ Route Unblocked
+  </span>
 
-  ) : (
+) : (
 
-    <span
-      className="
-        inline-flex
-        items-center
-        px-4
-        py-2
-        rounded-full
-        bg-red-600
-        text-white
-        text-sm
-        font-semibold
-      "
-    >
-      ⛔ Route Blocked
-    </span>
+  <button
+    onClick={
+      canRequestUnblock
+        ? requestUnblock
+        : undefined
+    }
+    disabled={!canRequestUnblock}
+    className={`
+      inline-flex
+      items-center
+      px-4
+      py-2
+      rounded-full
+      text-white
+      text-sm
+      font-semibold
 
-  )}
+      ${
+        canRequestUnblock
+          ? "bg-red-600 cursor-pointer"
+          : "bg-red-600 opacity-70 cursor-not-allowed"
+      }
+    `}
+  >
+    ⛔ Route Blocked
+    {reportData.length <= 3 &&
+      " (Tap to Request)"}
+  </button>
 
+)}
 </div>
         <div className="mt-3 space-y-1 text-sm">
 

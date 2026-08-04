@@ -101,10 +101,9 @@ export default function NotificationsAdmin() {
                 "application/json",
             },
             body: JSON.stringify({
-              van_code: "ADMIN",
-              subscription,
-            }),
-          }
+  van_code: "ADMIN",
+  subscription,
+}),          }
         );
 
       if (!response.ok) {
