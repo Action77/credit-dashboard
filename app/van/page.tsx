@@ -603,7 +603,7 @@ border-b
     {info.remaining > 0 && (
       <button
         onClick={() => sendWhatsApp(String(van))}
-        className="absolute left-2 text-green-600 hover:text-green-700"
+        className="absolute left-4 text-green-600 hover:text-green-700"
       >
         <FaWhatsapp size={20} />
       </button>
