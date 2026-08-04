@@ -8,8 +8,7 @@ import { storage as localStorage } from "@/utils/storage";
 export default function MobileSummaryPage() {
   const [isYasser, setIsYasser] =
   useState(false);
-
-const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 
@@ -95,12 +94,6 @@ await localStorage.getItem(
   "currentUser"
 );
 
-setIsYasser(
-  String(currentUser)
-    .trim()
-    .toLowerCase() === "yasser"
-);
-
 if (currentUser) {
 
   const { data: user } =
@@ -110,23 +103,12 @@ if (currentUser) {
       .eq("username", currentUser)
       .single();
 
-  if (
-  user?.role === "user" &&
+  setIsYasser(
   String(currentUser)
     .trim()
-    .toLowerCase() !== "yasser"
-) {
-  alert(
-    "You don't have permission to access this page."
-  );
-
-  window.location.href = "/van";
-
-  return;
+    .toLowerCase() === "yasser"
+);
 }
-
-}
-
 setIsLoggedIn(!!currentUser);
 const { data: rules } =
 await supabase
