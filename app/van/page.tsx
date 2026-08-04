@@ -209,20 +209,18 @@ const matchesFilters =
 &&
 
 (
-  selectedVans.length === 0 ||
-  selectedVans.includes(
-    row["Van Code."]
-  )
-)
-
-&&
-
-(
-  !isYasser ||
-  yasserVans.includes(
-    String(row["Van Code."]).trim()
-  )
+  isYasser
+    ? yasserVans.includes(
+        String(row["Van Code."]).trim()
+      )
+    : (
+        selectedVans.length === 0 ||
+        selectedVans.includes(
+          row["Van Code."]
+        )
+      )
 );
+    
 return (
 
 matchesFilters
