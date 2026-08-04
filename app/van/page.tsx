@@ -96,24 +96,18 @@ await localStorage.getItem(
 
 if (currentUser) {
 
-  await supabase
-  .from("app_users")
-  .select("role")
-  .eq("username", currentUser)
-  .single();
-  
-setIsYasser(
+  setIsYasser(
   String(currentUser)
     .trim()
     .toLowerCase() === "yasser"
 );
+
 }
 setIsLoggedIn(!!currentUser);
 const { data: rules } =
 await supabase
 .from("credit_block_rules")
-.select("*")
-.eq("username", currentUser);
+.select("*");
 setCreditRules(
   rules || []
 );
