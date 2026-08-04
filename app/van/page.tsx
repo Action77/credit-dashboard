@@ -598,12 +598,12 @@ border-b
 
 
 <td className="p-3 text-center">
-  <div className="flex items-center justify-center gap-2">
+  <div className="relative flex justify-center">
 
     {info.remaining > 0 && (
       <button
         onClick={() => sendWhatsApp(String(van))}
-        className="text-green-600 hover:text-green-700"
+        className="absolute left-0 text-green-600 hover:text-green-700"
       >
         <FaWhatsapp size={20} />
       </button>
