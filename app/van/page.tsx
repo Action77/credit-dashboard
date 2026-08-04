@@ -609,24 +609,28 @@ border-b
       </button>
     )}
 
-    <span
-      className={`
-        px-3
-        py-1
-        rounded-full
-        text-xs
-        font-bold
-        ${
-          info.remaining === 0 && info.exceptions === 0
-            ? "bg-green-100 text-green-700"
-            : info.remaining > 0
-            ? "bg-pink-100 text-pink-700"
-            : "bg-orange-100 text-orange-700"
-        }
-      `}
-    >
-      {getStatus(info.remaining, info.exceptions)}
-    </span>
+  <span
+  className={`
+    inline-flex
+    items-center
+    justify-center
+    min-w-[150px]
+    px-3
+    py-1
+    rounded-full
+    text-xs
+    font-bold
+    ${
+      info.remaining === 0 && info.exceptions === 0
+        ? "bg-green-100 text-green-700"
+        : info.remaining > 0
+        ? "bg-pink-100 text-pink-700"
+        : "bg-orange-100 text-orange-700"
+    }
+  `}
+>
+  {getStatus(info.remaining, info.exceptions)}
+</span>
 
   </div>
 </td>
