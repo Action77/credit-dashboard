@@ -504,7 +504,7 @@ useEffect(() => {
         );
 
         window.location.href =
-          "/mobile-summary";
+          "/van";
 
         return;
       }

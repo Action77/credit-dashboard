@@ -6,7 +6,9 @@ import { useEffect, useState } from "react";
 import { storage as localStorage } from "@/utils/storage";
 
 export default function MobileSummaryPage() {
-  const [isYasser, setIsYasser] = useState(false);
+  const [isYasser, setIsYasser] =
+  useState(false);
+
 const [searchTerm, setSearchTerm] = useState("");
 const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -93,24 +95,39 @@ await localStorage.getItem(
   "currentUser"
 );
 
-if (
-  String(currentUser)
-    .trim()
-    .toLowerCase() === "yasser"
-) {
-  alert("ليس لديك صلاحية الدخول لهذه الصفحة");
-  window.location.href = "/mobile-summary";
-  return;
-}
-
 setIsYasser(
   String(currentUser)
     .trim()
     .toLowerCase() === "yasser"
 );
 
-setIsLoggedIn(!!currentUser);
+if (currentUser) {
 
+  const { data: user } =
+    await supabase
+      .from("app_users")
+      .select("role")
+      .eq("username", currentUser)
+      .single();
+
+  if (
+  user?.role === "user" &&
+  String(currentUser)
+    .trim()
+    .toLowerCase() !== "yasser"
+) {
+  alert(
+    "You don't have permission to access this page."
+  );
+
+  window.location.href = "/van";
+
+  return;
+}
+
+}
+
+setIsLoggedIn(!!currentUser);
 const { data: rules } =
 await supabase
 .from("credit_block_rules")

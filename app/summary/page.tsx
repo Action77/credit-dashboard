@@ -447,7 +447,7 @@ if (
   appUser?.role === "user"
 ) {
   alert("You do not have permission to access this page");
-  window.location.href = "/mobile-summary";
+  window.location.href = "/van";
   return;
 }
 

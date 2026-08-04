@@ -574,7 +574,7 @@ useEffect(() => {
           "You do not have permission to access this page"
         );
         window.location.href =
-          "/mobile-summary";
+          "/van";
         return;
       }
 
