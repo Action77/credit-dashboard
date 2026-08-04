@@ -392,6 +392,24 @@ const [currentUser, setCurrentUser] =
 const [tillDate, setTillDate] = useState("");
 const [isPermanent, setIsPermanent] =
   useState(false);
+  const [hasAccess, setHasAccess] =
+  useState(true);
+
+useEffect(() => {
+  const checkAccess = async () => {
+    const role =
+      await localStorage.getItem(
+        "userRole"
+      );
+
+    if (role === "User") {
+      setHasAccess(false);
+    }
+  };
+
+  checkAccess();
+}, []);
+
 useEffect(() => {
 
   const params =
@@ -627,6 +645,15 @@ const uniqueExceptions: any[] = Object.values(
     return acc;
   }, {})
 );
+if (!hasAccess) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <h1 className="text-2xl font-bold text-red-600">
+        You Dont Have Permission To Enter This Page
+      </h1>
+    </div>
+  );
+}
 return (
   <div className="min-h-screen bg-[#f4f7fc] flex">
 
@@ -745,12 +772,15 @@ return (
   );
 
   await localStorage.removeItem(
-    "currentUser"
-  );
+  "currentUser"
+);
 
-  setCurrentUser("");
-  setIsLoggedIn(false);
+await localStorage.removeItem(
+  "userRole"
+);
 
+setCurrentUser("");
+setIsLoggedIn(false);
 }}
     >
       <LogOut size={18} />
@@ -1397,10 +1427,14 @@ await supabase
   }
 
   await localStorage.setItem(
-    "currentUser",
-    data.username
-  );
+  "currentUser",
+  data.username
+);
 
+await localStorage.setItem(
+  "userRole",
+  data.role
+);
   setCurrentUser(data.username);
 
   setIsLoggedIn(true);

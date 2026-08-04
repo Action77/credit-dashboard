@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 
 export default function UsersPage() {
+  
   const [isImportingUsers, setIsImportingUsers] =
   useState(false);
 
@@ -311,7 +312,20 @@ useEffect(() => {
     await loadUsers();
 
     const currentUser =
-      await localStorage.getItem("currentUser");
+      await localStorage.getItem(
+        "currentUser"
+      );
+
+    const role =
+      await localStorage.getItem(
+        "userRole"
+      );
+
+    if (role === "User") {
+      window.location.href =
+        "/mobile-summary";
+      return;
+    }
 
     if (currentUser) {
       setCurrentUser(currentUser);
@@ -652,11 +666,17 @@ return (
     isLoggedIn ? "bg-red-600" : "bg-blue-600"
   }`}
   onClick={async () => {
-  await localStorage.removeItem("currentUser");
+  await localStorage.removeItem(
+  "currentUser"
+);
 
-  setIsLoggedIn(false);
-  setUsername("");
-  setPassword("");
+await localStorage.removeItem(
+  "userRole"
+);
+
+setIsLoggedIn(false);
+setUsername("");
+setPassword("");
 }}
 
 >
@@ -1135,6 +1155,11 @@ if (user.password !== password) {
 await localStorage.setItem(
   "currentUser",
   user.username
+);
+
+await localStorage.setItem(
+  "userRole",
+  user.role
 );
 
 setIsLoggedIn(true);

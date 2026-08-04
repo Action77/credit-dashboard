@@ -376,17 +376,32 @@ useEffect(() => {
 
   const loadUser = async () => {
 
-    const savedUser = await localStorage.getItem(
-      "currentUser"
-    );
+    const savedUser =
+      await localStorage.getItem(
+        "currentUser"
+      );
 
     if (savedUser) {
 
-      const { data: user } = await supabase
-        .from("app_users")
-        .select("full_name")
-        .eq("username", savedUser)
-        .single();
+      const { data: user } =
+        await supabase
+          .from("app_users")
+          .select("full_name, role")
+          .eq("username", savedUser)
+          .single();
+
+      if (
+        user?.role === "user"
+      ) {
+        alert(
+          "You do not have permission to access this page"
+        );
+
+        window.location.href =
+          "/mobile-summary";
+
+        return;
+      }
 
       setCurrentUser(savedUser);
 

@@ -561,6 +561,23 @@ useEffect(() => {
       await localStorage.getItem("currentUser");
 
     if (savedUser) {
+
+      const { data: appUser } =
+        await supabase
+          .from("app_users")
+          .select("role")
+          .eq("username", savedUser)
+          .single();
+
+      if (appUser?.role === "user") {
+        alert(
+          "You do not have permission to access this page"
+        );
+        window.location.href =
+          "/mobile-summary";
+        return;
+      }
+
       setCurrentUser(savedUser);
       setIsLoggedIn(true);
     }

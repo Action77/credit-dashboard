@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { storage as localStorage } from "@/utils/storage";
 
 export default function MobileSummaryPage() {
+  const [isYasser, setIsYasser] = useState(false);
 const [searchTerm, setSearchTerm] = useState("");
 const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -91,13 +92,30 @@ const currentUser =
 await localStorage.getItem(
   "currentUser"
 );
+
+if (
+  String(currentUser)
+    .trim()
+    .toLowerCase() === "yasser"
+) {
+  alert("ليس لديك صلاحية الدخول لهذه الصفحة");
+  window.location.href = "/mobile-summary";
+  return;
+}
+
+setIsYasser(
+  String(currentUser)
+    .trim()
+    .toLowerCase() === "yasser"
+);
+
 setIsLoggedIn(!!currentUser);
+
 const { data: rules } =
 await supabase
 .from("credit_block_rules")
 .select("*")
 .eq("username", currentUser);
-
 setCreditRules(
   rules || []
 );
@@ -134,7 +152,12 @@ load();
 },[]);
 
 
-
+const yasserVans = [
+  "ALK-DD02",
+  "ALK-PS03",
+  "ALK-VS03",
+  "ALK-VS06",
+];
 const filteredData =
 data.filter((row)=>{
 
@@ -171,7 +194,7 @@ const showInvoice = rule
   ? creditDays >= rule.block_at_day
   : creditDays >= 1;
 
-  const matchesFilters =
+const matchesFilters =
 
 (
   selectedRegions.length === 0 ||
@@ -195,6 +218,15 @@ const showInvoice = rule
   selectedVans.length === 0 ||
   selectedVans.includes(
     row["Van Code."]
+  )
+)
+
+&&
+
+(
+  !isYasser ||
+  yasserVans.includes(
+    String(row["Van Code."]).trim()
   )
 );
 return (

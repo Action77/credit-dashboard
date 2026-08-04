@@ -433,13 +433,28 @@ const validExceptions =
   });
 
 setExceptions(validExceptions);
-    const currentUser =
-      await localStorage.getItem("currentUser");
+const currentUser =
+  await localStorage.getItem("currentUser");
 
-    const savedUpdatedVans =
-      await localStorage.getItem(
-        "lastUpdatedVans"
-      );
+const { data: appUser } =
+  await supabase
+    .from("app_users")
+    .select("role")
+    .eq("username", currentUser)
+    .single();
+
+if (
+  appUser?.role === "user"
+) {
+  alert("You do not have permission to access this page");
+  window.location.href = "/mobile-summary";
+  return;
+}
+
+const savedUpdatedVans =
+  await localStorage.getItem(
+    "lastUpdatedVans"
+  );
 
     const filterKey =
   currentUser
