@@ -558,9 +558,6 @@ text-white
 
 <tr>
 
-<th className="p-3">
-WA
-</th>
 
 <th className="p-3">
 Status
@@ -599,60 +596,37 @@ border-b
 "
 >
 
+
 <td className="p-3 text-center">
-
-  {info.remaining > 0 && (
-
-    <button
-      onClick={() =>
-        sendWhatsApp(String(van))
-      }
-      className="
-        text-green-600
-      "
+  <div className="flex items-center justify-center gap-2">
+    <span
+      className={`
+        px-3
+        py-1
+        rounded-full
+        text-xs
+        font-bold
+        ${
+          info.remaining === 0 && info.exceptions === 0
+            ? "bg-green-100 text-green-700"
+            : info.remaining > 0
+            ? "bg-pink-100 text-pink-700"
+            : "bg-orange-100 text-orange-700"
+        }
+      `}
     >
-      <FaWhatsapp size={22} />
-    </button>
+      {getStatus(info.remaining, info.exceptions)}
+    </span>
 
-  )}
-
-</td>
-
-<td className="p-3 text-center">
-
-<span className={`
-px-3
-py-1
-rounded-full
-text-xs
-font-bold
-
-${
-info.remaining===0
-&&
-info.exceptions===0
-?
-"bg-green-100 text-green-700"
-
-:
-
-info.remaining>0
-?
-"bg-pink-100 text-pink-700"
-
-:
-
-"bg-orange-100 text-orange-700"
-}
-`}>
-
-{getStatus(
-info.remaining,
-info.exceptions
-)}
-
-</span>
-
+    {info.remaining > 0 && (
+      <button
+        onClick={() => sendWhatsApp(String(van))}
+        className="text-green-600 hover:text-green-700"
+      >
+        <FaWhatsapp size={20} />
+      </button>
+    )}
+  </div>
 </td>
 
 <td className="p-3 text-center">
