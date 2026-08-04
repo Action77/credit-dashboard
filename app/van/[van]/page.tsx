@@ -425,9 +425,11 @@ const requestUnblock = async () => {
     Date.now() - Number(lastRequest) <
       60000
   ) {
-    alert(
-      "تم إرسال طلب خلال آخر دقيقة"
-    );
+
+     alert(
+  "An unblock request is already pending. Please wait one minute before submitting another request."
+);
+
     return;
   }
 
