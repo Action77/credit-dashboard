@@ -22,7 +22,9 @@ import {
 
 
 export default function LogsPage() {
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState(
+  new Date().toISOString().split("T")[0]
+);
 const [isImportingUsers, setIsImportingUsers] =
   useState(false);
 
@@ -477,34 +479,33 @@ useEffect(() => {
   selectedDate,
 ]);
   const todayActivities =
-    logs.filter(log => {
+  filteredLogs.filter(log => {
 
-      const today =
-        new Date().toDateString();
+    const today =
+      new Date().toDateString();
 
-      return (
-        new Date(
-          log.created_at
-        ).toDateString() === today
-      );
+    return (
+      new Date(
+        log.created_at
+      ).toDateString() === today
+    );
 
-    }).length;
-
+  }).length;
   const uniqueUsers =
-    new Set(
-      logs.map(log => log.username)
-    ).size;
-
+  new Set(
+    filteredLogs.map(
+      log => log.username
+    )
+  ).size;
   const importCount =
-    logs.filter(
-      log =>
-        log.action ===
-          "IMPORT_CREDIT" ||
-        log.action ===
-          "IMPORT_COLLECTION"
-    ).length;
-
-  const getActionBadge = (
+  filteredLogs.filter(
+    log =>
+      log.action ===
+        "IMPORT_CREDIT" ||
+      log.action ===
+        "IMPORT_COLLECTION"
+  ).length;
+    const getActionBadge = (
     action: string
   ) => {
 
@@ -749,7 +750,7 @@ return (
           </div>
 
           <div className="text-4xl font-bold mt-3 text-[#071d5c]">
-            {logs.length}
+            {filteredLogs.length}
           </div>
 
         </div>
