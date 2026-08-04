@@ -599,6 +599,16 @@ border-b
 
 <td className="p-3 text-center">
   <div className="flex items-center justify-center gap-2">
+
+    {info.remaining > 0 && (
+      <button
+        onClick={() => sendWhatsApp(String(van))}
+        className="text-green-600 hover:text-green-700"
+      >
+        <FaWhatsapp size={20} />
+      </button>
+    )}
+
     <span
       className={`
         px-3
@@ -618,17 +628,8 @@ border-b
       {getStatus(info.remaining, info.exceptions)}
     </span>
 
-    {info.remaining > 0 && (
-      <button
-        onClick={() => sendWhatsApp(String(van))}
-        className="text-green-600 hover:text-green-700"
-      >
-        <FaWhatsapp size={20} />
-      </button>
-    )}
   </div>
 </td>
-
 <td className="p-3 text-center">
 {[...info.ids].join(" / ")}
 </td>
