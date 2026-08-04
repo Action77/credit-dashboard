@@ -146,9 +146,7 @@ for (
 
     const { error } = await supabase
     .from("collection_invoices")
-    .upsert(batch, {
-      onConflict: "invoice",
-    });
+.insert(batch);
 
   if (error) {
     throw error;
