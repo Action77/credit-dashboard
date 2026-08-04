@@ -1,11 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { FaWhatsapp } from "react-icons/fa";
+import html2canvas from "html2canvas";
+import WhatsAppReport from "@/components/WhatsAppReport";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { storage as localStorage } from "@/utils/storage";
 
 export default function MobileSummaryPage() {
+  const [whatsAppVan, setWhatsAppVan] =
+  useState("");
+
+const [isSendingWhatsApp,
+  setIsSendingWhatsApp] =
+  useState(false);
   const [isYasser, setIsYasser] =
   useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -343,30 +352,166 @@ const filteredVans = !isLoggedIn
         .toLowerCase()
         .includes(searchTerm.toLowerCase().trim());
     });
-const getStatus=(r:number,e:number)=>{
+    const whatsappData =
+  filteredData.filter(
+    (row) => {
 
+      if (
+        row["Van Code."] !==
+        whatsAppVan
+      ) {
+        return false;
+      }
+
+      const invoice =
+        String(
+          row["Invoice #"]
+        )
+          .replace(/\s/g, "")
+          .toUpperCase();
+
+      const isException =
+        exceptions.some(
+          (e) =>
+            String(e.invoice)
+              .replace(/\s/g, "")
+              .toUpperCase() ===
+            invoice
+        );
+
+      const isCollected =
+        collectedInvoices.some(
+          (i) =>
+            String(i)
+              .replace(/\s/g, "")
+              .toUpperCase() ===
+            invoice
+        );
+
+      return (
+        !isException &&
+        !isCollected
+      );
+
+    }
+  );
+const getStatus=(r:number,e:number)=>{
 
 if(r>0 && e>0)
 return `${r} Remaining , Ex`;
 
-
 if(r>0)
 return `${r} Remaining`;
-
 
 if(e>0)
 return "Ex & All Collected";
 
-
 return "All Collected";
 
+};
+
+const sendWhatsApp = async (
+  vanCode: string
+) => {
+
+  if (isSendingWhatsApp)
+    return;
+
+  setIsSendingWhatsApp(true);
+
+  try {
+
+    setWhatsAppVan(vanCode);
+
+    await new Promise(
+      resolve => setTimeout(resolve, 200)
+    );
+
+    const report =
+      document.getElementById(
+  "whatsapp-report-container"
+);
+    if (!report) return;
+
+    const canvas =
+      await html2canvas(report, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+      });
+
+    const blob =
+      await new Promise<Blob | null>(
+        resolve =>
+          canvas.toBlob(
+            blob => resolve(blob),
+            "image/png"
+          )
+      );
+
+    if (!blob) return;
+
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        "image/png": blob,
+      }),
+    ]);
+
+    const response =
+      await fetch("/api/users");
+
+    const users =
+      await response.json();
+
+    const selectedUser =
+      users.find(
+        (user: any) =>
+          user.van_sub_inventory === vanCode
+      );
+
+    if (!selectedUser) return;
+
+    const phoneNumber = String(
+  selectedUser.contact || ""
+)
+.replace(/\D/g, "");
+    let whatsappNumber = phoneNumber;
+
+if (phoneNumber.startsWith("05")) {
+  whatsappNumber = `966${phoneNumber.slice(1)}`;
+} else if (phoneNumber.startsWith("5")) {
+  whatsappNumber = `966${phoneNumber}`;
+}
+window.open(
+  `https://wa.me/${whatsappNumber}`,
+  "_blank"
+);
+
+  } finally {
+
+    setIsSendingWhatsApp(false);
+
+  }
 
 };
 
 
-
 return (
-  <div className="min-h-screen bg-slate-100 p-3">
+  <>
+    <div
+      id="whatsapp-report-container"
+      style={{
+        position: "absolute",
+        left: "-99999px",
+        top: 0,
+      }}
+    >
+      <WhatsAppReport
+        vanCode={whatsAppVan}
+        data={whatsappData}
+      />
+    </div>
+
+    <div className="min-h-screen bg-slate-100 p-3">
 
     <div className="mb-4">
   <input
@@ -414,6 +559,10 @@ text-white
 <tr>
 
 <th className="p-3">
+WA
+</th>
+
+<th className="p-3">
 Status
 </th>
 
@@ -426,6 +575,7 @@ Van Code
 </th>
 
 </tr>
+
 
 </thead>
 
@@ -448,6 +598,25 @@ className="
 border-b
 "
 >
+
+<td className="p-3 text-center">
+
+  {info.remaining > 0 && (
+
+    <button
+      onClick={() =>
+        sendWhatsApp(String(van))
+      }
+      className="
+        text-green-600
+      "
+    >
+      <FaWhatsapp size={22} />
+    </button>
+
+  )}
+
+</td>
 
 <td className="p-3 text-center">
 
@@ -519,9 +688,8 @@ info.exceptions
 
 </div>
 
-
-</div>
-
+    </div>
+  </>
 );
 
 }
