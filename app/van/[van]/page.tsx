@@ -520,36 +520,48 @@ const requestUnblock = async () => {
 
 ) : (
 
-  <button
-    onClick={
-      canRequestUnblock
-        ? requestUnblock
-        : undefined
-    }
-    disabled={!canRequestUnblock}
-    className={`
-      inline-flex
-      items-center
-      px-4
-      py-2
-      rounded-full
-      text-white
-      text-sm
-      font-semibold
+  <div className="space-y-2">
 
-      ${
-        canRequestUnblock
-          ? "bg-red-600 cursor-pointer"
-          : "bg-red-600 opacity-70 cursor-not-allowed"
-      }
-    `}
-  >
-    ⛔ Route Blocked
-    {reportData.length <= 3 &&
-      " (Tap to Request)"}
-  </button>
+    <span
+      className="
+        inline-flex
+        items-center
+        px-4
+        py-2
+        rounded-full
+        bg-red-600
+        text-white
+        text-sm
+        font-semibold
+      "
+    >
+      ⛔ Route Blocked
+    </span>
+
+    {canRequestUnblock && (
+      <div>
+        <button
+          onClick={requestUnblock}
+          className="
+            bg-orange-500
+            hover:bg-orange-600
+            text-white
+            px-4
+            py-2
+            rounded-lg
+            text-sm
+            font-semibold
+          "
+        >
+          🚚 Request Unblock
+        </button>
+      </div>
+    )}
+
+  </div>
 
 )}
+
 </div>
         <div className="mt-3 space-y-1 text-sm">
 
