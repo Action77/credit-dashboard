@@ -96,14 +96,13 @@ await localStorage.getItem(
 
 if (currentUser) {
 
-  const { data: user } =
-    await supabase
-      .from("app_users")
-      .select("role")
-      .eq("username", currentUser)
-      .single();
-
-  setIsYasser(
+  await supabase
+  .from("app_users")
+  .select("role")
+  .eq("username", currentUser)
+  .single();
+  
+setIsYasser(
   String(currentUser)
     .trim()
     .toLowerCase() === "yasser"
@@ -123,7 +122,12 @@ await localStorage.getItem(
   `savedFilters_${currentUser}`
 );
 
-if (savedFilters) {
+if (
+  savedFilters &&
+  String(currentUser)
+    .trim()
+    .toLowerCase() !== "yasser"
+) {
 
   const filters =
     JSON.parse(savedFilters);
@@ -144,12 +148,9 @@ if (savedFilters) {
 
 };
 
-
 load();
 
-
-},[]);
-
+}, []);
 
 const yasserVans = [
   "ALK-DD02",
