@@ -87,21 +87,43 @@ const subscription =
 
       });
 
-    await fetch(
-      "/api/push-subscribe",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify({
-          van_code: vanCode,
-          subscription,
-        }),
-      }
-    );
+    const currentUser =
+  await localStorage.getItem("currentUser");
 
+const userVans: Record<string, string[]> = {
+  yasser: [
+    "ALK-DD02",
+    "ALK-PS03",
+    "ALK-VS03",
+    "ALK-VS06",
+  ],
+};
+
+const vans =
+  userVans[
+    String(currentUser)
+      .trim()
+      .toLowerCase()
+  ] || [vanCode];
+
+for (const van of vans) {
+
+  await fetch(
+    "/api/push-subscribe",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+      body: JSON.stringify({
+        van_code: van,
+        subscription,
+      }),
+    }
+  );
+
+}
     setIsSubscribed(true);
 
     alert(

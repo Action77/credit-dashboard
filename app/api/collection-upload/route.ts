@@ -367,7 +367,7 @@ if (reducedBy > 0)
             subscription,
             JSON.stringify({
               title: "✅ Collection Updated",
-              body: `${reducedBy} invoice(s) have been collected from your route.`,
+body: `${reducedBy} invoice(s) collected from van ${vanCode}.`,
               url: `/van/${vanCode}`,
             })
           );

@@ -64,8 +64,9 @@ console.log(
           await webpush.sendNotification(
   subscription,
   JSON.stringify({
-    title: "⚠️ New Exception",
-    body: `A new exception has been added. Total active exceptions: ${count}.`,
+title: "⚠️ New Exception",
+
+body: `Van ${van_code} has ${count} active exceptions.`,
     url: `/van/${van_code}/exceptions`,
   })
 );

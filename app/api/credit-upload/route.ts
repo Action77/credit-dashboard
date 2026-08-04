@@ -211,10 +211,29 @@ const subscriptions = [
   ...(vanSubscriptions || []),
   ...(adminSubscriptions || []),
 ];
+const uniqueSubscriptions =
+  Array.from(
+    new Map(
+      subscriptions.map((row) => {
+
+        const subscription =
+          typeof row.subscription === "string"
+            ? JSON.parse(row.subscription)
+            : row.subscription;
+
+        return [
+          subscription.endpoint,
+          row,
+        ];
+
+      })
+    ).values()
+  );
 console.time("PUSH_NOTIFICATIONS");
 
 await Promise.all(
-  (subscriptions || []).map(async (row) => {
+  uniqueSubscriptions.map(async (row) => {
+
     const subscription =
       typeof row.subscription === "string"
         ? JSON.parse(row.subscription)
