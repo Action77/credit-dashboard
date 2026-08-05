@@ -123,28 +123,19 @@ setVanCode(token);
   };
 
   const legalCount =
-    exceptions.filter(
-      x => x.permanent
-    ).length;
+  loggedIn
+    ? exceptions.filter(
+        x => x.permanent
+      ).length
+    : 0;
 
-  const temporaryCount =
-    exceptions.filter(
-      x => !x.permanent
-    ).length;
-
-  if (!loggedIn) {
+const temporaryCount =
+  loggedIn
+    ? exceptions.filter(
+        x => !x.permanent
+      ).length
+    : 0;
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="bg-white p-6 rounded-xl shadow text-center">
-        <h2 className="text-lg font-semibold">
-         
-        </h2>
-      </div>
-    </div>
-  );
-}
-
-return (
     <div className="min-h-screen bg-slate-100 p-3">
 
       <div className="mb-4 flex justify-between items-center">
@@ -183,33 +174,30 @@ return (
 
         <div className="mt-3 space-y-1 text-sm">
 
-          <div>
-            Total Exceptions:
-            {" "}
-            {exceptions.length}
-          </div>
+  <div>
+  Total Exceptions:{" "}
+  {loggedIn ? exceptions.length : 0}
+</div>
 
-          <div>
-            Temporary:
-            {" "}
-            {temporaryCount}
-          </div>
+<div>
+  Temporary:{" "}
+  {loggedIn ? temporaryCount : 0}
+</div>
 
-          <div>
-            Legal:
-            {" "}
-            {legalCount}
-          </div>
+<div>
+  Legal:{" "}
+  {loggedIn ? legalCount : 0}
+</div>
 
-        </div>
-
+</div>
       </div>
 
-      <div className="space-y-3">
+      {loggedIn && (
+  <div className="space-y-3">
 
-        {exceptions.map(
-          (item, index) => {
-
+    {exceptions.map(
+      (item, index) => {
+  
             const daysLeft =
               calculateBusinessDays(
                 item.till_date
@@ -287,12 +275,14 @@ return (
         )}
 
       </div>
+      
+)}
 
-      {exceptions.length === 0 && (
-        <div className="bg-white p-6 rounded-xl text-center text-slate-500">
-          No Exceptions Found
-        </div>
-      )}
+{loggedIn && exceptions.length === 0 && (
+  <div className="bg-white p-6 rounded-xl text-center text-slate-500">
+    No Exceptions Found
+  </div>
+)}
 
     </div>
   );
