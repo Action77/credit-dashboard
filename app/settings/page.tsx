@@ -107,22 +107,23 @@ const rows: any[] =
               row["Contact"] || "",
           }));
 
-        await fetch("/api/users", {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            users: usersData,
-          }),
-        });
-
         const currentUser =
-          await localStorage.getItem(
-            "currentUser"
-          );
+  await localStorage.getItem(
+    "currentUser"
+  );
 
+await fetch("/api/users", {
+  method: "POST",
+  headers: {
+    "Content-Type":
+      "application/json",
+  },
+  body: JSON.stringify({
+    users: usersData,
+    uploadedBy: currentUser,
+  }),
+});
+   
         let fullName = "";
 
         if (currentUser) {
