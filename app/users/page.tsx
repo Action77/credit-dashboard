@@ -419,7 +419,24 @@ const usersData =
             }),
           }
         );
+let fullName = "";
 
+if (currentUser) {
+  const { data: user } = await supabase
+    .from("app_users")
+    .select("full_name")
+    .eq("username", currentUser)
+    .single();
+
+  fullName = user?.full_name || "";
+}
+
+await addLog(
+  currentUser || "",
+  fullName,
+  "IMPORT_USERS",
+  file.name
+);
         await loadUsers();
 
 setIsImportingUsers(false);
