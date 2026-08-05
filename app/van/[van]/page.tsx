@@ -580,8 +580,7 @@ const requestUnblock = async () => {
             Oldest Credit Days:{" "}
             {oldestDays}
           </div>
-{!isSubscribed && (
-
+{isLoggedIn && !isSubscribed && (
   <button
     onClick={subscribeToPush}
     className="
@@ -596,9 +595,7 @@ const requestUnblock = async () => {
   >
     🔔 Enable Notifications
   </button>
-
 )}
-
         </div>
 
       </div>
