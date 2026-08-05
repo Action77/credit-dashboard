@@ -137,7 +137,7 @@ setVanCode(token);
     <div className="min-h-screen flex items-center justify-center bg-slate-100">
       <div className="bg-white p-6 rounded-xl shadow text-center">
         <h2 className="text-lg font-semibold">
-          Please login to view exceptions
+         
         </h2>
 
         <Link
