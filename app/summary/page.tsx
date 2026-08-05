@@ -117,6 +117,11 @@ const rows: any[] =
               row["Contact"] || "",
           }));
 
+const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
+
 await fetch("/api/users", {
   method: "POST",
   headers: {
@@ -125,12 +130,10 @@ await fetch("/api/users", {
   },
   body: JSON.stringify({
     users: usersData,
+    uploadedBy: currentUser,
   }),
 });
-const currentUser =
-  await localStorage.getItem(
-    "currentUser"
-  );
+
 
 let fullName = "";
 
