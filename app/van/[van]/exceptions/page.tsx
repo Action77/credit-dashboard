@@ -8,21 +8,30 @@ export default function VanExceptionsPage() {
   const params = useParams();
 
   const token = String(params.van || "");
-
 const [vanCode, setVanCode] = useState("");
-  const [exceptions, setExceptions] =
-    useState<any[]>([]);
-
+const [exceptions, setExceptions] =
+  useState<any[]>([]);
+const [loggedIn, setLoggedIn] =
+  useState(false);
   useEffect(() => {
-    
     const load = async () => {
-        
-      const response =
-      
-        await fetch("/api/exceptions");
+  const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
 
-      const data =
-        await response.json();
+if (!currentUser) {
+  setLoggedIn(false);
+  setExceptions([]);
+  return;
+}
+
+setLoggedIn(true);
+  const response =
+    await fetch("/api/exceptions");
+
+  const data =
+    await response.json();
 
       const today = new Date();
 
@@ -74,7 +83,6 @@ setVanCode(token);
 
     load();
   }, [token]);
-
   const calculateBusinessDays = (
     dateString: string
   ) => {
@@ -124,7 +132,26 @@ setVanCode(token);
       x => !x.permanent
     ).length;
 
+  if (!loggedIn) {
   return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-100">
+      <div className="bg-white p-6 rounded-xl shadow text-center">
+        <h2 className="text-lg font-semibold">
+          Please login to view exceptions
+        </h2>
+
+        <Link
+          href="/login"
+          className="mt-4 inline-block rounded-lg bg-blue-600 px-4 py-2 text-white"
+        >
+          Login
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+return (
     <div className="min-h-screen bg-slate-100 p-3">
 
       <div className="mb-4 flex justify-between items-center">

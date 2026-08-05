@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { storage as localStorage } from "@/utils/storage";
 
 export default function MobileSummaryPage() {
+  
   const [whatsAppVan, setWhatsAppVan] =
   useState("");
 
@@ -41,6 +42,17 @@ useEffect(()=>{
 const load = async()=>{
 
 
+const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
+
+if (!currentUser) {
+  setIsLoggedIn(false);
+  return;
+}
+
+setIsLoggedIn(true);
 const credit =
 await fetch("/api/credit-data");
 
@@ -50,7 +62,6 @@ await credit.json();
 setData(
  creditData.data || []
 );
-
 
 
 const ex =
@@ -98,10 +109,6 @@ setCollectedInvoices(
 
 
 
-const currentUser =
-await localStorage.getItem(
-  "currentUser"
-);
 
 if (currentUser) {
 
@@ -109,10 +116,9 @@ if (currentUser) {
   String(currentUser)
     .trim()
     .toLowerCase() === "yasser"
-);
+  );
 
 }
-setIsLoggedIn(!!currentUser);
 const { data: rules } =
 await supabase
 .from("credit_block_rules")
@@ -161,8 +167,10 @@ const yasserVans = [
   "ALK-VS03",
   "ALK-VS06",
 ];
-const filteredData =
-data.filter((row)=>{
+const filteredData = !isLoggedIn
+  ? []
+  : data.filter((row)=>{
+
 
 
 const normalize=(v:string)=>
@@ -352,8 +360,9 @@ const filteredVans = !isLoggedIn
         .toLowerCase()
         .includes(searchTerm.toLowerCase().trim());
     });
-    const whatsappData =
-  filteredData.filter(
+    const whatsappData = !isLoggedIn
+  ? []
+  : filteredData.filter(
     (row) => {
 
       if (
@@ -534,14 +543,11 @@ return (
     "
   />
 </div>
-    <div className="bg-white rounded-xl shadow overflow-hidden">
-
-<div
-  className="
-overflow-x-auto
-"
->
-
+    {!isLoggedIn && (
+  <div className="bg-white rounded-xl shadow p-6 text-center">
+  </div>
+)}
+{isLoggedIn && (
 <table
   className="
 w-full
@@ -662,12 +668,10 @@ border-b
 </tbody>
 
 </table>
-
+)}
 </div>
 
-</div>
 
-    </div>
   </>
 );
 
