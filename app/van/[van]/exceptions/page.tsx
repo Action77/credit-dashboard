@@ -139,13 +139,6 @@ setVanCode(token);
         <h2 className="text-lg font-semibold">
          
         </h2>
-
-        <Link
-          href="/login"
-          className="mt-4 inline-block rounded-lg bg-blue-600 px-4 py-2 text-white"
-        >
-          Login
-        </Link>
       </div>
     </div>
   );
