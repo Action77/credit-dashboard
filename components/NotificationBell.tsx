@@ -1,5 +1,5 @@
 "use client";
-
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BellDot } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -10,6 +10,12 @@ export default function NotificationBell() {
 
   const [notifications, setNotifications] =
     useState<any[]>([]);
+
+const pathname = usePathname();
+
+if (pathname.startsWith("/van")) {
+  return null;
+}
 
   const loadNotifications = async () => {
 
