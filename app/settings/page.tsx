@@ -453,14 +453,15 @@ const loadCreditRules = async () => {
         .select("payment_term");
 
     const paymentTerms = [
-      ...new Set(
-        (termsData || [])
-          .map(
-            (x: any) => x.payment_term
-          )
-          .filter(Boolean)
-      ),
-    ];
+  ...new Set(
+    (termsData || [])
+      .map((x: any) =>
+        String(x.payment_term || "")
+          .trim()
+      )
+      .filter(Boolean)
+  ),
+];
 
     const currentUser =
   localStorage.getItem("currentUser");

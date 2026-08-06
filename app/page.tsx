@@ -257,11 +257,10 @@ const exceptionSet = useMemo(
 );
 const normalize = (value: string) =>
   String(value || "")
-    .replace(/^ATS\s+/i, "")
     .replace(/\s+/g, " ")
     .trim()
     .toUpperCase();
-
+    
 const normalizeInvoice = (invoice: any) =>
   String(invoice)
     .replace(/\s/g, "")
