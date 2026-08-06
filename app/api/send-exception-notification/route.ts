@@ -24,13 +24,6 @@ export async function POST(request: Request) {
   days,
 } = await request.json();
 
-console.log(
-  `A new exception has been added. Total active exceptions: ${count}.`,
-  {
-    van_code,
-    count,
-  }
-);
 
     const { data, error } = await supabase
       .from("push_subscriptions")

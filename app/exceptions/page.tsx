@@ -967,10 +967,12 @@ P1316600015512`}
       const newExceptions =
         invoices.map(invoice => {
 
-          const match =
+         const match =
   creditData.find(
     (row: any) =>
-      String(row.invoice || "")
+      String(
+        row["Invoice #"] || ""
+      )
         .replace(/\s/g, "")
         .toUpperCase() ===
       invoice
@@ -982,15 +984,15 @@ return {
   invoice,
   tillDate,
   vanCode:
-    match?.van_code || "",
+    match?.["Van Code."] || "",
   employeeName:
-    match?.employee_name || "",
+    match?.["Employee Name."] || "",
   atsCode:
-    match?.employee_ats_code || "",
+    match?.["Employee ATS Code."] || "",
   customerCode:
-    match?.customer_code || "",
+    match?.["Customer Code"] || "",
   customerName:
-    match?.customer_name || "",
+    match?.["Customer Name"] || "",
 };
         });
 
