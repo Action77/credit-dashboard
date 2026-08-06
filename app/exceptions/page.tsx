@@ -968,41 +968,30 @@ P1316600015512`}
         invoices.map(invoice => {
 
           const match =
-            creditData.find(
-              (row: any) =>
-                String(
-                  row["Invoice #"] || ""
-                )
-                  .replace(/\s/g, "")
-                  .toUpperCase() ===
-                invoice
-                  .replace(/\s/g, "")
-                  .toUpperCase()
-            );
+  creditData.find(
+    (row: any) =>
+      String(row.invoice || "")
+        .replace(/\s/g, "")
+        .toUpperCase() ===
+      invoice
+        .replace(/\s/g, "")
+        .toUpperCase()
+  );
 
-          return {
-
-            invoice,
-
-            tillDate,
-
-            vanCode:
-              match?.["Van Code."] || "",
-
-            employeeName:
-              match?.["Employee Name."] || "",
-
-            atsCode:
-              match?.["Employee ATS Code."] || "",
-
-            customerCode:
-              match?.["Customer Code"] || "",
-
-            customerName:
-              match?.["Customer Name"] || ""
-
-          };
-
+return {
+  invoice,
+  tillDate,
+  vanCode:
+    match?.van_code || "",
+  employeeName:
+    match?.employee_name || "",
+  atsCode:
+    match?.employee_ats_code || "",
+  customerCode:
+    match?.customer_code || "",
+  customerName:
+    match?.customer_name || "",
+};
         });
 
      const { data: user } = await supabase
