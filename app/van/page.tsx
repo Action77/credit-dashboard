@@ -161,12 +161,6 @@ load();
 
 }, []);
 
-const yasserVans = [
-  "ALK-DD02",
-  "ALK-PS03",
-  "ALK-VS03",
-  "ALK-VS06",
-];
 const filteredData = !isLoggedIn
   ? []
   : data.filter((row)=>{
@@ -226,16 +220,18 @@ const matchesFilters =
 &&
 
 (
+  (
   isYasser
-    ? yasserVans.includes(
-        String(row["Van Code."]).trim()
-      )
+    ? String(row["Region"] || "")
+        .trim()
+        .toUpperCase() === "EAST"
     : (
         selectedVans.length === 0 ||
         selectedVans.includes(
           row["Van Code."]
         )
       )
+)
 );
     
 return (
