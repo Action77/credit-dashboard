@@ -457,6 +457,7 @@ const loadCreditRules = async () => {
     (termsData || [])
       .map((x: any) =>
         String(x.payment_term || "")
+          .replace(/\s+/g, " ")
           .trim()
       )
       .filter(Boolean)
@@ -471,22 +472,28 @@ const { data: existingRules } =
     .from("credit_block_rules")
     .select("*")
     .eq("username", currentUser);
-        const existingTerms =
-      existingRules?.map(
-        (x: any) => x.payment_term
-      ) || [];
+        const existingTerms = new Set(
+  (existingRules || []).map((x: any) =>
+    String(x.payment_term || "")
+      .trim()
+      .toUpperCase()
+  )
+);
 
-    const newRules =
-      paymentTerms
-        .filter(
-          term =>
-            !existingTerms.includes(term)
-        )
-        .map(term => ({
-  username: currentUser,
-  payment_term: term,
-  block_at_day: getDefaultBlockDay(term),
-})) 
+const newRules = paymentTerms
+  .filter(
+    term =>
+      !existingTerms.has(
+        String(term)
+          .trim()
+          .toUpperCase()
+      )
+  )
+  .map(term => ({
+    username: currentUser,
+    payment_term: String(term).trim(),
+    block_at_day: getDefaultBlockDay(term),
+  }));
    if (newRules.length > 0) {
 
       await supabase
