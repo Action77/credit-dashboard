@@ -15,8 +15,14 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { van_code, count } =
-      await request.json();
+    const {
+  van_code,
+  count,
+  invoice,
+  customer_code,
+  customer_name,
+  days,
+} = await request.json();
 
 console.log(
   `A new exception has been added. Total active exceptions: ${count}.`,
@@ -66,7 +72,11 @@ console.log(
   JSON.stringify({
 title: "⚠️ New Exception",
 
-body: `Van ${van_code} has ${count} active exceptions.`,
+body:
+  `Invoice: ${invoice}
+Customer: ${customer_code} - ${customer_name}
+Duration: ${days}
+Total Exceptions: ${count}`,
     url: `/van/${van_code}/exceptions`,
   })
 );

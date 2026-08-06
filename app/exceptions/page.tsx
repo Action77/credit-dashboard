@@ -1077,9 +1077,16 @@ for (const item of newExceptions) {
           "application/json",
       },
       body: JSON.stringify({
-        van_code: item.vanCode,
-        count: count || 0,
-      }),
+  van_code: item.vanCode,
+  count: count || 0,
+  invoice: item.invoice,
+  customer_code: item.customerCode,
+  customer_name: item.customerName,
+  days:
+    isPermanent
+      ? "Legal"
+      : calculateBusinessDays(item.tillDate),
+}),
     }
   );
 }

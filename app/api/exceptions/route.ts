@@ -2,9 +2,17 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { addLog } from "@/lib/activityLog";
 
+const webpush = require("web-push");
+
+webpush.setVapidDetails(
+  process.env.VAPID_EMAIL!,
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+  process.env.VAPID_PRIVATE_KEY!
+);
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 export async function GET() {
@@ -64,12 +72,48 @@ if (expiredExceptions?.length) {
 
   if (notifications.length) {
 
-    await supabase
-      .from("notifications")
-      .insert(notifications);
+  await supabase
+    .from("notifications")
+    .insert(notifications);
 
-  }
+}
+
+// إرسال Push Notification للموبايل
 for (const item of expiredExceptions) {
+
+  const { data: subscriptions } =
+    await supabase
+      .from("push_subscriptions")
+      .select("*")
+      .eq("van_code", item.van_code);
+
+  for (const row of subscriptions || []) {
+    try {
+
+      const subscription =
+        typeof row.subscription === "string"
+          ? JSON.parse(row.subscription)
+          : row.subscription;
+
+      await webpush.sendNotification(
+        subscription,
+        JSON.stringify({
+          title: "⌛ Exception Expired",
+          body:
+  `Invoice: ${item.invoice}
+Customer: ${item.customer_code} - ${item.customer_name}
+Exception expired and was removed.`,
+          url: `/van/${item.van_code}/exceptions`,
+        })
+      );
+
+    } catch (sendError) {
+      console.error(
+        "EXPIRED PUSH ERROR",
+        sendError
+      );
+    }
+  }
 
   await addLog(
     "SYSTEM",
@@ -77,14 +121,15 @@ for (const item of expiredExceptions) {
     "DELETE_EXCEPTION",
     `Expired exception removed: ${item.invoice}`
   );
-
 }
-  await supabase
-    .from("exceptions")
-    .delete()
-    .lt("till_date", todayDate);
+
+await supabase
+  .from("exceptions")
+  .delete()
+  .lt("till_date", todayDate);
 
 }  // جلب الاستثناءات الحالية
+
   const { data } =
     await supabase
       .from("exceptions")
