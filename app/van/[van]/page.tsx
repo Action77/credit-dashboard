@@ -621,21 +621,23 @@ const requestUnblock = async () => {
 </div>
         <div className="mt-3 space-y-1 text-sm">
 
-          <div>
-            Invoices: {reportData.length}
-          </div>
+          {!isLoading && (
+  <>
+    <div>
+      Invoices: {reportData.length}
+    </div>
 
+    <div>
+      Credit Amount:{" "}
+      {totalAmount.toLocaleString()}
+    </div>
 
-          <div>
-            Credit Amount:{" "}
-            {totalAmount.toLocaleString()}
-          </div>
-
-
-          <div>
-            Oldest Credit Days:{" "}
-            {oldestDays}
-          </div>
+    <div>
+      Oldest Credit Days:{" "}
+      {oldestDays}
+    </div>
+  </>
+)}
 {!isLoading &&
  !isSubscribed &&
  !hideSubscribeButton && (
