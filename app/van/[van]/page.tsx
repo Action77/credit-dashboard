@@ -459,7 +459,7 @@ if (
 
 const canRequestUnblock =
   !isRouteUnblocked &&
-  reportData.length <= 100;
+  reportData.length <= 3;
 
 const requestUnblock = async () => {
 
