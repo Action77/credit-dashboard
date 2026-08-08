@@ -698,13 +698,26 @@ const filteredData = data.filter((row) => {
   }, {})
 )
 
-.sort((a: any, b: any) =>
-  String(a[0]).localeCompare(
-    String(b[0]),
+.sort((a: any, b: any) => {
+
+  const aVan = String(a[0]);
+  const bVan = String(b[0]);
+
+  if (aVan.includes("HFR"))
+    return 1;
+
+  if (bVan.includes("HFR"))
+    return -1;
+
+  return aVan.localeCompare(
+    bVan,
     undefined,
-    { numeric: true }
-  )
-);
+    {
+      numeric: true,
+    }
+  );
+
+});
   const getStatus = (
   remaining: number,
   ex: number
