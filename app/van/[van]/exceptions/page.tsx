@@ -11,7 +11,10 @@ export default function VanExceptionsPage() {
 const [vanCode, setVanCode] = useState("");
 const [exceptions, setExceptions] =
   useState<any[]>([]);
-const [loggedIn, setLoggedIn] =
+
+const [loaded, setLoaded] =
+  useState(false);
+  const [loggedIn, setLoggedIn] =
   useState(false);
   useEffect(() => {
     const load = async () => {
@@ -20,16 +23,10 @@ const [loggedIn, setLoggedIn] =
     "currentUser"
   );
 
-if (!currentUser) {
-  setLoggedIn(false);
-  setExceptions([]);
-  return;
-}
+setLoggedIn(!!currentUser);
 
-setLoggedIn(true);
-  const response =
-    await fetch("/api/exceptions");
-
+const response =
+  await fetch("/api/exceptions");
   const data =
     await response.json();
 
@@ -79,6 +76,7 @@ setLoggedIn(true);
 setVanCode(token);
 
       setExceptions(filtered);
+setLoaded(true);
     };
 
     load();
@@ -122,20 +120,18 @@ setVanCode(token);
     return count;
   };
 
-  const legalCount =
-  loggedIn
-    ? exceptions.filter(
-        x => x.permanent
-      ).length
-    : 0;
+  const legalCount = loaded
+  ? exceptions.filter(
+      x => x.permanent
+    ).length
+  : "-";
 
-const temporaryCount =
-  loggedIn
-    ? exceptions.filter(
-        x => !x.permanent
-      ).length
-    : 0;
-  return (
+const temporaryCount = loaded
+  ? exceptions.filter(
+      x => !x.permanent
+    ).length
+  : "-";
+      return (
     <div className="min-h-screen bg-slate-100 p-3">
 
       <div className="mb-4 flex justify-between items-center">
@@ -174,26 +170,26 @@ const temporaryCount =
 
         <div className="mt-3 space-y-1 text-sm">
 
-  <div>
-  Total Exceptions:{" "}
-  {loggedIn ? exceptions.length : 0}
+ <div>
+  Total Exceptions: {
+    loaded
+      ? exceptions.length
+      : "-"
+  }
 </div>
 
 <div>
-  Temporary:{" "}
-  {loggedIn ? temporaryCount : 0}
+  Temporary: {temporaryCount}
 </div>
 
 <div>
-  Legal:{" "}
-  {loggedIn ? legalCount : 0}
+  Legal: {legalCount}
 </div>
 
 </div>
       </div>
 
-      {loggedIn && (
-  <div className="space-y-3">
+        <div className="space-y-3">
 
     {exceptions.map(
       (item, index) => {
@@ -276,14 +272,13 @@ const temporaryCount =
 
       </div>
       
-)}
 
-{loggedIn && exceptions.length === 0 && (
+
+{exceptions.length === 0 && (
   <div className="bg-white p-6 rounded-xl text-center text-slate-500">
     No Exceptions Found
   </div>
 )}
-
     </div>
   );
 }
