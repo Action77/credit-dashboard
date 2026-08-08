@@ -265,9 +265,15 @@ export default function WhatsAppReport({
                 {row["Invoice #"]}
               </td>
 
-              <td style={td}>
-                {row["Trx Date"]}
-              </td>
+<td style={td}>
+  {row["Trx Date"]
+    ? new Date(
+        (Number(row["Trx Date"]) - 25569) *
+          86400 *
+          1000
+      ).toLocaleDateString("en-GB")
+    : ""}
+</td>
 
               <td style={td}>
                 {row["Pending CIM"]}
