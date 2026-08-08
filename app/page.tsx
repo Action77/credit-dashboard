@@ -496,7 +496,41 @@ useEffect(() => {
   loadFilters();
 
 }, [currentUser]);
+useEffect(() => {
+  if (!data.length) return;
 
+  const selectedCitySet = new Set(selectedCities);
+  const newVans = new Set(selectedVans);
+
+  data.forEach((row) => {
+    const city = String(row["City"] || "");
+    const van = String(row["Van Code."] || "");
+
+    if (!van) return;
+
+    // Add new vans only when their city is selected
+    if (selectedCitySet.has(city)) {
+      newVans.add(van);
+    }
+  });
+
+  const updatedVans = [...newVans];
+
+  const changed =
+    updatedVans.length !== selectedVans.length ||
+    updatedVans.some(
+      (van) => !selectedVans.includes(van)
+    );
+
+  if (changed) {
+    setSelectedVans(updatedVans);
+  }
+
+}, [
+  data,
+  selectedCities,
+  selectedVans,
+]);
   useEffect(() => {
 
   const loadCollection = async () => {
