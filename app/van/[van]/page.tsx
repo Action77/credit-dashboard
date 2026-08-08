@@ -560,28 +560,8 @@ const requestUnblock = async () => {
         </h1>
 <div className="mt-3">
 
-  {isRouteUnblocked ? (
-
-  <span
-    className="
-      inline-flex
-      items-center
-      px-4
-      py-2
-      rounded-full
-      bg-green-600
-      text-white
-      text-sm
-      font-semibold
-    "
-  >
-    ✅ Route Unblocked
-  </span>
-
-) : (
-
-  <div className="space-y-2">
-
+  {!isLoading && (
+  isRouteUnblocked ? (
     <span
       className="
         inline-flex
@@ -589,19 +569,53 @@ const requestUnblock = async () => {
         px-4
         py-2
         rounded-full
-        bg-red-600
+        bg-green-600
         text-white
         text-sm
         font-semibold
       "
     >
-      ⛔ Route Blocked
+      ✅ Route Unblocked
     </span>
+  ) : (
+    <>
+      <span
+        className="
+          inline-flex
+          items-center
+          px-4
+          py-2
+          rounded-full
+          bg-red-600
+          text-white
+          text-sm
+          font-semibold
+        "
+      >
+        ⛔ Route Blocked
+      </span>
 
-    {canRequestUnblock && ( <div> <button onClick={requestUnblock} className=" bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold " > 🚚 Request Unblock </button> </div> )}
-
-  </div>
-
+      {canRequestUnblock && (
+        <div>
+          <button
+            onClick={requestUnblock}
+            className="
+              bg-orange-500
+              hover:bg-orange-600
+              text-white
+              px-4
+              py-2
+              rounded-lg
+              text-sm
+              font-semibold
+            "
+          >
+            🚚 Request Unblock
+          </button>
+        </div>
+      )}
+    </>
+  )
 )}
 
 </div>
