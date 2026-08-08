@@ -14,7 +14,7 @@ const [exceptions, setExceptions] =
 
 const [loaded, setLoaded] =
   useState(false);
-  const [loggedIn, setLoggedIn] =
+    const [loggedIn, setLoggedIn] =
   useState(false);
   useEffect(() => {
     const load = async () => {
@@ -76,7 +76,10 @@ const response =
 setVanCode(token);
 
       setExceptions(filtered);
-setLoaded(true);
+
+setTimeout(() => {
+  setLoaded(true);
+}, 0);
     };
 
     load();
@@ -168,25 +171,24 @@ const temporaryCount = loaded
           </span>
         </div>
 
-        <div className="mt-3 space-y-1 text-sm">
+        {loaded && (
+  <div className="mt-3 space-y-1 text-sm">
 
- <div>
-  Total Exceptions: {
-    loaded
-      ? exceptions.length
-      : "-"
-  }
-</div>
+    <div>
+      Total Exceptions: {exceptions.length}
+    </div>
 
-<div>
-  Temporary: {temporaryCount}
-</div>
+    <div>
+      Temporary: {temporaryCount}
+    </div>
 
-<div>
-  Legal: {legalCount}
-</div>
+    <div>
+      Legal: {legalCount}
+    </div>
 
-</div>
+  </div>
+)}
+
       </div>
 
         <div className="space-y-3">
