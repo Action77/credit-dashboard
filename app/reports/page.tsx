@@ -1026,14 +1026,19 @@ return (
           (key, cellIndex) => (
 
             <td
-              key={cellIndex}
-              className="p-2"
-            >
-              {String(
-                row[key] ?? ""
-              )}
-            </td>
-
+  key={cellIndex}
+  className="p-2"
+>
+  {key === "trx_date"
+    ? row[key]
+      ? new Date(
+          (Number(row[key]) - 25569) *
+            86400 *
+            1000
+        ).toLocaleDateString("en-GB")
+      : ""
+    : String(row[key] ?? "")}
+</td>
           )
         )}
 
