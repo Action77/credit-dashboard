@@ -251,7 +251,7 @@ const temporaryCount = loaded
 
                   <div>
                     <span className="text-slate-500">
-                      Status:
+                      Expires In:
                     </span>{" "}
 
                     {item.permanent ? (
