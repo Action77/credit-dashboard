@@ -44,10 +44,7 @@ export default function NotificationsAdmin() {
 
         if (!registration) return;
 
-        const existing =
-          await registration.pushManager.getSubscription();
-
-        setEnabled(!!existing);
+setEnabled(false);
       };
 
     checkSubscription();
