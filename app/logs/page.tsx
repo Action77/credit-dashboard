@@ -435,14 +435,35 @@ useEffect(() => {
 
     const loadLogs = async () => {
 
-      const { data } = await supabase
-        .from("activity_logs")
-        .select("*")
-        .order("created_at", {
-          ascending: false,
-        });
+  const firstDayOfMonth =
+    new Date();
 
-      setLogs(data || []);
+  firstDayOfMonth.setDate(1);
+
+  firstDayOfMonth.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  await supabase
+    .from("activity_logs")
+    .delete()
+    .lt(
+      "created_at",
+      firstDayOfMonth.toISOString()
+    );
+
+  const { data } = await supabase
+    .from("activity_logs")
+    .select("*")
+    .order("created_at", {
+      ascending: false,
+    });
+
+  setLogs(data || []);
+
 
     };
 
