@@ -102,7 +102,7 @@ export default function WhatsAppReport({
           gap: "6px",
         }}
       >
-        <Truck size={14} />
+        
 
         <span
           style={{
