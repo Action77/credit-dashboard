@@ -27,7 +27,11 @@ const [isRouteUnblocked, setIsRouteUnblocked] =
   useState(false);
 
 const [isLoggedIn, setIsLoggedIn] =
-  useState(false);  function urlBase64ToUint8Array(
+  useState(false);
+
+const [isLoading, setIsLoading] =
+  useState(true);
+    function urlBase64ToUint8Array(
   base64String: string
 ) {
   const padding =
@@ -163,16 +167,21 @@ for (const van of vans) {
 
   const load = async () => {
 
-    setVanCode(vanCodeParam);
+    setIsLoading(true);
 
-const { data: vanPermission } = await supabase
-  .from("van_permissions")
-  .select("is_unblocked")
-  .eq("van_code", vanCodeParam)
-  .single();
-    setIsRouteUnblocked(
-      vanPermission?.is_unblocked ?? false
-    );
+    try {
+
+      setVanCode(vanCodeParam);
+
+      const { data: vanPermission } = await supabase
+        .from("van_permissions")
+        .select("is_unblocked")
+        .eq("van_code", vanCodeParam)
+        .single();
+
+      setIsRouteUnblocked(
+        vanPermission?.is_unblocked ?? false
+      );
 
       const credit =
         await fetch("/api/credit-data");
@@ -180,13 +189,11 @@ const { data: vanPermission } = await supabase
       const creditData =
         await credit.json();
 
-
       const ex =
         await fetch("/api/exceptions");
 
       const exceptionsData =
         await ex.json();
-
 
       const col =
         await fetch("/api/collection-data");
@@ -194,11 +201,10 @@ const { data: vanPermission } = await supabase
       const colData =
         await col.json();
 
-const { data: rules } =
-  await supabase
-    .from("credit_block_rules")
-    .select("*");
-      
+      const { data: rules } =
+        await supabase
+          .from("credit_block_rules")
+          .select("*");
 
       const today =
         new Date();
@@ -210,32 +216,26 @@ const { data: rules } =
         0
       );
 
-
       const validExceptions =
         (exceptionsData || [])
-        .filter((item:any)=>{
+          .filter((item: any) => {
 
-          const tillDate =
-            new Date(
-              item.till_date
+            const tillDate =
+              new Date(item.till_date);
+
+            tillDate.setHours(
+              0,
+              0,
+              0,
+              0
             );
 
-          tillDate.setHours(
-            0,
-            0,
-            0,
-            0
-          );
+            return (
+              item.permanent ||
+              tillDate >= today
+            );
 
-
-          return (
-            item.permanent ||
-            tillDate >= today
-          );
-
-        });
-
-
+          });
 
       setData(
         creditData.data || []
@@ -250,48 +250,62 @@ const { data: rules } =
       );
 
       setCreditRules(
-  rules || []
-);
+        rules || []
+      );
 
-const currentUser =
-  await localStorage.getItem("currentUser");
+      const currentUser =
+        await localStorage.getItem(
+          "currentUser"
+        );
 
-setIsLoggedIn(!!currentUser);
+      setIsLoggedIn(
+        !!currentUser
+      );
 
-const response =
-  await fetch(
-    `/api/push-subscribe-status?van_code=${vanCodeParam}`
-  );
+      const response =
+        await fetch(
+          `/api/push-subscribe-status?van_code=${vanCodeParam}`
+        );
 
-const result =
-  await response.json();
+      const result =
+        await response.json();
 
-setHideSubscribeButton(
-  result.hidden
-);
+      setHideSubscribeButton(
+        result.hidden
+      );
 
-if (
-  "serviceWorker" in navigator
-) {
+      if ("serviceWorker" in navigator) {
 
-  const registration =
-    await navigator.serviceWorker.getRegistration();
+        const registration =
+          await navigator.serviceWorker.getRegistration();
 
-  const existing =
-    await registration?.pushManager.getSubscription();
+        const existing =
+          await registration?.pushManager
+            .getSubscription();
 
-  setIsSubscribed(
-    !!existing
-  );
+        setIsSubscribed(
+          !!existing
+        );
 
-}
-    };
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+    } finally {
+
+      setIsLoading(false);
+
+    }
+
+  };
+
+  load();
+
+}, [vanCodeParam]);
 
 
-    load();
-
-
-  }, [vanCodeParam]);
 
 
 
@@ -457,10 +471,7 @@ if (
       0
     );
 
-const canRequestUnblock =
-  !isRouteUnblocked &&
-  reportData.length <= 3;
-
+const canRequestUnblock = !isLoading && !isRouteUnblocked && reportData.length <= 3;
 const requestUnblock = async () => {
 
   const key =
@@ -587,25 +598,7 @@ const requestUnblock = async () => {
       ⛔ Route Blocked
     </span>
 
-    {canRequestUnblock && (
-      <div>
-        <button
-          onClick={requestUnblock}
-          className="
-            bg-orange-500
-            hover:bg-orange-600
-            text-white
-            px-4
-            py-2
-            rounded-lg
-            text-sm
-            font-semibold
-          "
-        >
-          🚚 Request Unblock
-        </button>
-      </div>
-    )}
+    {canRequestUnblock && ( <div> <button onClick={requestUnblock} className=" bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold " > 🚚 Request Unblock </button> </div> )}
 
   </div>
 
@@ -629,7 +622,9 @@ const requestUnblock = async () => {
             Oldest Credit Days:{" "}
             {oldestDays}
           </div>
-{!isSubscribed && !hideSubscribeButton && (
+{!isLoading &&
+ !isSubscribed &&
+ !hideSubscribeButton && (
   <button
     onClick={subscribeToPush}
     className="
@@ -644,8 +639,7 @@ const requestUnblock = async () => {
   >
     🔔 Enable Notifications
   </button>
-)}
-        </div>
+)}        </div>
 
       </div>
 
@@ -730,7 +724,7 @@ const requestUnblock = async () => {
 
 
 
-      {reportData.length === 0 && (
+      {!isLoading && reportData.length === 0 && (
 
         <div className="bg-white p-6 rounded-xl text-center text-slate-500">
 
