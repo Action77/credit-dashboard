@@ -235,7 +235,7 @@ const temporaryCount = loaded
 
                   <div>
                     <span className="text-slate-500">
-                      ATS:
+                      ID:
                     </span>{" "}
                     {item.ats_code}
                   </div>
