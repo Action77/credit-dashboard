@@ -9,6 +9,9 @@ import { storage as localStorage } from "@/utils/storage";
 export default function VanReportPage() {
   const [isSubscribed,setIsSubscribed] =
   useState(false);
+  const [hideSubscribeButton,
+  setHideSubscribeButton] =
+  useState(false);
   const params = useParams();
 
   const vanCodeParam = String(params.van || "");
@@ -73,7 +76,11 @@ const existingSubscription =
   await registration.pushManager.getSubscription();
 
 if (existingSubscription) {
-  await existingSubscription.unsubscribe();
+
+  setIsSubscribed(true);
+
+  return;
+
 }
 const subscription =
   await registration.pushManager.subscribe({
@@ -108,7 +115,7 @@ const vans =
 
 for (const van of vans) {
 
-  await fetch(
+  const response = await fetch(
     "/api/push-subscribe",
     {
       method: "POST",
@@ -123,7 +130,22 @@ for (const van of vans) {
     }
   );
 
+  const result =
+    await response.json();
+
+  if (result.limitReached) {
+
+    setHideSubscribeButton(true);
+
+    alert(
+      "Maximum subscriptions reached"
+    );
+
+    return;
+  }
+
 }
+ 
     setIsSubscribed(true);
 
     alert(
@@ -236,6 +258,33 @@ const currentUser =
 
 setIsLoggedIn(!!currentUser);
 
+const response =
+  await fetch(
+    `/api/push-subscribe-status?van_code=${vanCodeParam}`
+  );
+
+const result =
+  await response.json();
+
+setHideSubscribeButton(
+  result.hidden
+);
+
+if (
+  "serviceWorker" in navigator
+) {
+
+  const registration =
+    await navigator.serviceWorker.getRegistration();
+
+  const existing =
+    await registration?.pushManager.getSubscription();
+
+  setIsSubscribed(
+    !!existing
+  );
+
+}
     };
 
 
@@ -580,7 +629,7 @@ const requestUnblock = async () => {
             Oldest Credit Days:{" "}
             {oldestDays}
           </div>
-{isLoggedIn && !isSubscribed && (
+{!isSubscribed && !hideSubscribeButton && (
   <button
     onClick={subscribeToPush}
     className="

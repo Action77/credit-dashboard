@@ -13,15 +13,62 @@ export async function POST(
   const body =
     await request.json();
 
-  const { error } =
-await supabase
+  const { count } = await supabase
+  .from("push_subscriptions")
+  .select("*", {
+    count: "exact",
+    head: true,
+  })
+  .eq("van_code", body.van_code);
+
+if (
+  body.van_code !== "ADMIN" &&
+  (count || 0) >= 2
+) {
+  return NextResponse.json(
+    {
+      success: false,
+      limitReached: true,
+    },
+    { status: 400 }
+  );
+}
+
+const { error } = await supabase
   .from("push_subscriptions")
   .insert({
     van_code: body.van_code,
     subscription: body.subscription,
   });
 
+if (body.van_code !== "ADMIN") {
+  const { data: admins } = await supabase
+    .from("push_subscriptions")
+    .select("subscription")
+    .eq("van_code", "ADMIN");
 
+  if (admins?.length) {
+    const webpush = require("web-push");
+
+    webpush.setVapidDetails(
+      "mailto:admin@company.com",
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+      process.env.VAPID_PRIVATE_KEY!
+    );
+
+    await Promise.allSettled(
+      admins.map((admin) =>
+        webpush.sendNotification(
+          admin.subscription,
+          JSON.stringify({
+            title: "🔔 New Subscription",
+            body: `Van ${body.van_code} subscribed to notifications`,
+          })
+        )
+      )
+    );
+  }
+}
   if (error) {
     return NextResponse.json(
       {
