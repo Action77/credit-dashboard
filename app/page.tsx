@@ -1719,23 +1719,7 @@ onClick={async () => {
 
   <div className="mt-4 h-1 rounded-full bg-red-500" />
 
-</div>
-  <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
 
-  <ShieldCheck
-    size={130}
-    className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500/5"
-  />
-
-  <p className="text-slate-500 text-sm relative z-10">
-    Active
-  </p>
-
-  <h2 className="text-4xl font-bold text-slate-900 mt-2 relative z-10">
-    {activeEmployees}
-  </h2>
-
-  <div className="mt-4 h-1 rounded-full bg-green-500" />
 
 </div>
   <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
@@ -1761,6 +1745,24 @@ onClick={async () => {
   </span>
 </div>
 
+</div>
+  <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
+
+  <ShieldCheck
+    size={130}
+    className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500/5"
+  />
+
+  <p className="text-slate-500 text-sm relative z-10">
+    Active
+  </p>
+
+  <h2 className="text-4xl font-bold text-slate-900 mt-2 relative z-10">
+    {activeEmployees}
+  </h2>
+
+  <div className="mt-4 h-1 rounded-full bg-green-500" />
+  
 </div>
   <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
 
