@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import { SmartphoneCharging, Filter } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -27,65 +28,42 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-gradient-to-r from-[#071d5c] to-[#0b2a7a] shadow-lg border-b border-blue-800">
-        <div className="flex items-center justify-between px-6 py-3">
-          <UserWelcome />
+      <header className="sticky top-0 z-40 w-full">
+        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500">
+          
+          <div className="flex items-center gap-3">
+            <UserWelcome />
+          </div>
 
           <div className="flex items-center gap-3">
+            {/* Filter button - hidden on /van */}
+            {!pathname.startsWith("/van") && (
+              <button
+                type="button"
+                onClick={() => {
+                  window.dispatchEvent(new Event("toggle-filters"));
+                }}
+                title="Filters"
+                aria-label="Filters"
+                className="
+                  relative
+                  flex
+                  items-center
+                  justify-center
+                  w-11
+                  h-11
+                  rounded-xl
+                  bg-white/10
+                  hover:bg-white/20
+                  text-white
+                  transition-all
+                  duration-200
+                "
+              >
+                <Filter size={22} />
+              </button>
+            )}
 
-  {!pathname.startsWith("/van") && (
-  <button
-    onClick={() => {
-      window.dispatchEvent(new Event("toggle-filters"));
-    }}
-    className="h-9 px-4 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center gap-2"
-  >
-    <Filter size={16} />
-    Filters
-  </button>
-)}
-  {pathname.startsWith("/van") &&
-    (isLoggedIn ? (
-      <button
-        onClick={async () => {
-          await localStorage.removeItem("currentUser");
-          setIsLoggedIn(false);
-          window.location.reload();
-        }}
-        className="h-9 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
-      >
-        Logout
-      </button>
-    ) : (
-      <button
-        onClick={() => setShowLoginModal(true)}
-        className="h-9 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-      >
-        Login
-      </button>
-    ))}
-{!pathname.startsWith("/van") && (
-  <Link href="/van" title="Mobile Version">
-    <button
-      className="
-        relative
-        flex
-        items-center
-        justify-center
-        w-11
-        h-11
-        rounded-xl
-        bg-white/10
-        hover:bg-white/20
-        text-white
-        transition-all
-        duration-200
-      "
-    >
-      <SmartphoneCharging size={22} />
-    </button>
-  </Link>
-)}
             <NotificationBell />
           </div>
         </div>
@@ -111,15 +89,16 @@ export default function Header() {
             />
 
             <button
+              type="button"
               className="w-full bg-blue-600 text-white py-3 rounded-lg"
               onClick={async () => {
-                const { data: user } = await supabase
+                const { data: user, error } = await supabase
                   .from("app_users")
                   .select("*")
                   .eq("username", username)
                   .single();
 
-                if (!user) {
+                if (error || !user) {
                   alert("Invalid Username");
                   return;
                 }
@@ -136,6 +115,7 @@ export default function Header() {
 
                 setIsLoggedIn(true);
                 setShowLoginModal(false);
+
                 window.location.reload();
               }}
             >
