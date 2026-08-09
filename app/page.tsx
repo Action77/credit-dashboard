@@ -10,11 +10,6 @@ import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
 import {
-  FileSpreadsheet,
-  CheckCircle,
-  Database,
-} from "lucide-react";
-import {
   LayoutDashboard,
   Upload,
   AlertCircle,
@@ -1746,197 +1741,54 @@ onClick={async () => {
         </div>
 
 {/* Alert */}
-        {showImportModal && (
-  <div
-    className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 backdrop-blur-lg p-4"
-    onClick={() => {
-      if (!isBusy) setShowImportModal(false);
-    }}
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="w-full max-w-5xl overflow-hidden rounded-[32px] bg-white shadow-[0_25px_60px_rgba(0,0,0,0.25)]"
-    >
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#071d5c] via-[#0d348b] to-[#1a57d6] text-white p-8">
+        {data.length > 0 && (
 
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-3xl font-bold">
-              Data Import Hub
-            </h2>
+  <div className="bg-white border rounded-xl p-5 mb-6">
+    <h3 className="font-bold text-lg mb-4">
+      Import Status
+    </h3>
 
-            <p className="mt-2 text-blue-100">
-              Upload and manage system data
-            </p>
-          </div>
+    <div className="space-y-3">
 
-          <button
-            disabled={isBusy}
-            onClick={() => setShowImportModal(false)}
-            className="w-12 h-12 rounded-2xl bg-white/10 hover:bg-white/20 transition"
-          >
-            ✕
-          </button>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+
+        <div className="font-semibold text-blue-700">
+          Credit File
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mt-8">
-          <div className="bg-white/10 rounded-2xl p-4">
-            <p className="text-sm text-blue-100">
-              Credit
-            </p>
-            <h3 className="font-bold">
-              Invoice Data
-            </h3>
-          </div>
-
-          <div className="bg-white/10 rounded-2xl p-4">
-            <p className="text-sm text-blue-100">
-              Collection
-            </p>
-            <h3 className="font-bold">
-              Payment Updates
-            </h3>
-          </div>
-
-          <div className="bg-white/10 rounded-2xl p-4">
-            <p className="text-sm text-blue-100">
-              Users
-            </p>
-            <h3 className="font-bold">
-              Van Mapping
-            </h3>
-          </div>
+        <div className="text-sm text-slate-600">
+          {creditFileInfo || "Not Imported"}
         </div>
 
       </div>
 
-      {/* Body */}
-      <div className="p-8 bg-slate-50">
+      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
 
-        <h3 className="text-xl font-bold mb-6">
-          Upload Files
-        </h3>
-
-        <div className="grid md:grid-cols-3 gap-6">
-
-          {/* Credit */}
-          <label className="group">
-            <div className="bg-white rounded-3xl border-2 border-slate-200 hover:border-blue-500 hover:shadow-xl hover:-translate-y-1 transition-all p-6 cursor-pointer">
-
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
-                <FileSpreadsheet size={30} />
-              </div>
-
-              <h4 className="text-lg font-bold mt-5">
-                Credit Report
-              </h4>
-
-              <p className="text-sm text-slate-500 mt-2">
-                Credit block and invoice file
-              </p>
-
-              <div className="mt-5">
-                <span className="bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1 rounded-full">
-                  XLSX / XLS
-                </span>
-              </div>
-
-            </div>
-
-            <input
-              type="file"
-              accept=".xlsx,.xls"
-              className="hidden"
-              onChange={handleCreditImport}
-            />
-          </label>
-
-          {/* Collection */}
-          <label className="group">
-            <div className="bg-white rounded-3xl border-2 border-slate-200 hover:border-green-500 hover:shadow-xl hover:-translate-y-1 transition-all p-6 cursor-pointer">
-
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-green-600">
-                <CheckCircle size={30} />
-              </div>
-
-              <h4 className="text-lg font-bold mt-5">
-                Collection Report
-              </h4>
-
-              <p className="text-sm text-slate-500 mt-2">
-                Collection and payment updates
-              </p>
-
-              <div className="mt-5">
-                <span className="bg-green-50 text-green-600 text-xs font-semibold px-3 py-1 rounded-full">
-                  XLSX / XLS
-                </span>
-              </div>
-
-            </div>
-
-            <input
-              type="file"
-              accept=".xlsx,.xls"
-              className="hidden"
-              onChange={handleCollectionImport}
-            />
-          </label>
-
-          {/* Users */}
-          <label className="group">
-            <div className="bg-white rounded-3xl border-2 border-slate-200 hover:border-purple-500 hover:shadow-xl hover:-translate-y-1 transition-all p-6 cursor-pointer">
-
-              <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600">
-                <Users size={30} />
-              </div>
-
-              <h4 className="text-lg font-bold mt-5">
-                Users Report
-              </h4>
-
-              <p className="text-sm text-slate-500 mt-2">
-                Users and van assignment data
-              </p>
-
-              <div className="mt-5">
-                <span className="bg-purple-50 text-purple-600 text-xs font-semibold px-3 py-1 rounded-full">
-                  XLSX / XLS
-                </span>
-              </div>
-
-            </div>
-
-            <input
-              type="file"
-              accept=".xlsx,.xls"
-              className="hidden"
-              onChange={handleImport}
-            />
-          </label>
-
+        <div className="font-semibold text-green-700">
+          Collection File
         </div>
 
-        <div className="mt-8 bg-white border rounded-2xl p-4 flex justify-between items-center">
-
-          <div className="flex items-center gap-2">
-            <Database size={18} />
-            <span className="text-sm text-slate-600">
-              Files are validated before processing
-            </span>
-          </div>
-
-          <span className="text-xs font-bold text-green-600">
-            SYSTEM READY
-          </span>
-
+        <div className="text-sm text-slate-600">
+          {collectionFileInfo || "Not Imported"}
         </div>
 
       </div>
+
+      <div className="text-sm text-slate-500">
+
+        Active Block Records:
+        <span className="font-bold ml-2">
+          {blockedCount}
+        </span>
+
+      </div>
+
     </div>
+
   </div>
+
 )}
+
         <div className="grid grid-cols-3 gap-6">
 
           {/* Table */}
@@ -2558,71 +2410,32 @@ item.created_by === currentUser && (
 </div>
     <div className="bg-white rounded-xl border shadow-sm p-5">
 
-  <h3 className="font-bold mb-4">
-    Collection Progress
-  </h3>
+    <h3 className="font-bold mb-4">
+      Invoice Status
+    </h3>
 
-  <div className="flex justify-between mb-4">
+    <div className="flex flex-col items-center justify-center h-full">
 
-    <div>
-      <p className="text-sm text-slate-500">
-        Cleared
-      </p>
+      <div className="w-40 h-40 rounded-full border-[20px] border-red-500 flex items-center justify-center">
 
-      <h2 className="text-3xl font-bold text-green-600">
-        {
-          filteredData.filter((row) => {
-            const invoice = normalizeInvoice(
-              row["Invoice #"]
-            );
+        <div className="text-center">
 
-            return (
-              exceptionSet.has(invoice) ||
-              collectedSet.has(invoice)
-            );
-          }).length
-        }
-      </h2>
-    </div>
-
-    <div>
-      <p className="text-sm text-slate-500">
-        Remaining
-      </p>
-
-      <h2 className="text-3xl font-bold text-red-600">
-        {blockedCount}
-      </h2>
-    </div>
-
-  </div>
-
-  <div className="w-full bg-slate-200 rounded-full h-4">
-
-    <div
-      className="bg-green-600 h-4 rounded-full"
-      style={{
-        width: `${Math.round(
-          (
-            filteredData.filter((row) => {
-              const invoice = normalizeInvoice(
-                row["Invoice #"]
-              );
-
-              return (
-                exceptionSet.has(invoice) ||
-                collectedSet.has(invoice)
-              );
-            }).length /
-            Math.max(filteredData.length, 1)
-          ) * 100
-        )}%`,
-      }}
-    />
-
-  </div>
-
+          <div className="text-3xl font-bold">
+  {blockedCount}
 </div>
+
+          <div className="text-sm text-gray-500">
+            Block
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
            </main>
 
@@ -2726,6 +2539,160 @@ setShowLoginModal(false);
        )}
 
 
+  {showImportModal && (
+  <div
+    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center"
+    onClick={() => {
+
+      if (isBusy) return;
+
+      setShowImportModal(false);
+
+    }}
+  >
+    <div
+      className="bg-white w-[540px] rounded-3xl shadow-2xl overflow-hidden"
+      onClick={(e) => e.stopPropagation()}
+    >
+
+      <div className="bg-[#071d5c] text-white px-6 py-5 flex items-center justify-between">
+
+  <div>
+
+    <h2 className="text-2xl font-bold">
+      Import Files
+    </h2>
+
+    <p className="text-blue-100 text-sm mt-1">
+      Upload and process system files
+    </p>
+
+  </div>
+
+  <button
+    disabled={isBusy}
+    onClick={() => {
+
+      if (isBusy) return;
+
+      setShowImportModal(false);
+
+    }}
+    className={`w-10 h-10 rounded-full flex items-center justify-center transition ${
+      isBusy
+        ? "opacity-40 cursor-not-allowed"
+        : "hover:bg-white/20"
+    }`}
+  >
+    ✕
+  </button>
+
+</div>
+
+      
+
+      <div className="p-6 space-y-4">
+
+  {/* Import Collection */}
+  <label
+    className={`block rounded-2xl transition-all duration-200 ${
+      isUploadingCollection
+        ? "bg-slate-300 cursor-not-allowed"
+        : "bg-green-600 hover:bg-green-700 hover:scale-[1.02] cursor-pointer"
+    }`}
+  >
+    <div className="p-5 text-white text-center">
+
+      <div className="text-lg font-bold">
+        {isUploadingCollection
+          ? "Uploading Collection..."
+          : "Import Collection"}
+      </div>
+
+      <div className="text-sm text-green-100 mt-1">
+        Collected Invoices File
+      </div>
+
+    </div>
+
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleCollectionImport}
+      disabled={isUploadingCollection}
+    />
+  </label>
+
+  {/* Import Users */}
+  <label
+    className={`block rounded-2xl transition-all duration-200 ${
+      isImportingUsers
+        ? "bg-slate-300 cursor-not-allowed"
+        : "bg-purple-600 hover:bg-purple-700 hover:scale-[1.02] cursor-pointer"
+    }`}
+  >
+    <div className="p-5 text-white text-center">
+
+      <div className="text-lg font-bold">
+        {isImportingUsers
+          ? "Importing Users..."
+          : "Import Users"}
+      </div>
+
+      <div className="text-sm text-purple-100 mt-1">
+        Users &amp; Van Mapping File
+      </div>
+
+    </div>
+
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleImport}
+      disabled={isImportingUsers}
+    />
+  </label>
+
+  {/* Import Credit */}
+  <label
+    className={`block rounded-2xl transition-all duration-200 ${
+      isUploadingCredit
+        ? "bg-slate-300 cursor-not-allowed"
+        : "bg-blue-600 hover:bg-blue-700 hover:scale-[1.02] cursor-pointer"
+    }`}
+  >
+    <div className="p-5 text-white text-center">
+
+      <div className="text-lg font-bold">
+        {isUploadingCredit
+          ? "Uploading Credit..."
+          : "Import Credit"}
+      </div>
+
+      <div className="text-sm text-blue-100 mt-1">
+        Credit Block File
+      </div>
+
+    </div>
+
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      className="hidden"
+      onChange={handleCreditImport}
+      disabled={isUploadingCredit}
+    />
+  </label>
+
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 </>
 );
 }
