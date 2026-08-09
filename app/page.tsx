@@ -10,6 +10,11 @@ import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
 import {
+  FileSpreadsheet,
+  CheckCircle,
+  Database,
+} from "lucide-react";
+import {
   LayoutDashboard,
   Upload,
   AlertCircle,
@@ -1742,51 +1747,121 @@ onClick={async () => {
 
 {/* Alert */}
         {data.length > 0 && (
+  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
 
-  <div className="bg-white border rounded-xl p-5 mb-6">
-    <h3 className="font-bold text-lg mb-4">
-      Import Status
-    </h3>
+    <div className="flex items-center justify-between mb-5">
+      <div>
+        <h3 className="text-xl font-bold">
+          Import Center
+        </h3>
 
-    <div className="space-y-3">
+        <p className="text-sm text-slate-500">
+          Latest imported files and system status
+        </p>
+      </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+      <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl font-semibold">
+        {blockedCount} Active Blocks
+      </div>
+    </div>
 
-        <div className="font-semibold text-blue-700">
+    <div className="grid md:grid-cols-3 gap-4">
+
+      {/* Credit */}
+      <div className="border rounded-2xl p-4 bg-gradient-to-br from-blue-50 to-white">
+
+        <div className="flex items-center justify-between mb-3">
+          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+            <FileSpreadsheet
+              size={24}
+              className="text-blue-600"
+            />
+          </div>
+
+          <CheckCircle
+            size={20}
+            className={
+              creditFileInfo
+                ? "text-green-500"
+                : "text-slate-300"
+            }
+          />
+        </div>
+
+        <h4 className="font-semibold text-slate-800">
           Credit File
-        </div>
+        </h4>
 
-        <div className="text-sm text-slate-600">
+        <p className="text-sm text-slate-500 mt-2 break-words">
           {creditFileInfo || "Not Imported"}
-        </div>
+        </p>
 
       </div>
 
-      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+      {/* Collection */}
+      <div className="border rounded-2xl p-4 bg-gradient-to-br from-green-50 to-white">
 
-        <div className="font-semibold text-green-700">
+        <div className="flex items-center justify-between mb-3">
+          <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+            <FileSpreadsheet
+              size={24}
+              className="text-green-600"
+            />
+          </div>
+
+          <CheckCircle
+            size={20}
+            className={
+              collectionFileInfo
+                ? "text-green-500"
+                : "text-slate-300"
+            }
+          />
+        </div>
+
+        <h4 className="font-semibold text-slate-800">
           Collection File
-        </div>
+        </h4>
 
-        <div className="text-sm text-slate-600">
+        <p className="text-sm text-slate-500 mt-2 break-words">
           {collectionFileInfo || "Not Imported"}
-        </div>
+        </p>
 
       </div>
 
-      <div className="text-sm text-slate-500">
+      {/* Statistics */}
+      <div className="border rounded-2xl p-4 bg-gradient-to-br from-purple-50 to-white">
 
-        Active Block Records:
-        <span className="font-bold ml-2">
-          {blockedCount}
-        </span>
+        <div className="flex items-center justify-between mb-3">
+
+          <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+            <Database
+              size={24}
+              className="text-purple-600"
+            />
+          </div>
+
+        </div>
+
+        <h4 className="font-semibold text-slate-800">
+          Records Status
+        </h4>
+
+        <div className="mt-3">
+          <div className="text-3xl font-bold text-purple-700">
+            {blockedCount}
+          </div>
+
+          <div className="text-sm text-slate-500">
+            Active Credit Blocks
+          </div>
+        </div>
 
       </div>
 
     </div>
 
   </div>
-
 )}
 
         <div className="grid grid-cols-3 gap-6">
