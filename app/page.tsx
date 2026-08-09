@@ -1753,11 +1753,12 @@ onClick={async () => {
   </h2>
 
   <div className="flex items-center mt-4 relative z-10">
-    <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs">
-      Legal: {legalCount}
-    </span>
-  </div>
+  <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs">
+    Legal: {legalCount}
+  </span>
+</div>
 
+<div className="mt-4 h-1 rounded-full bg-orange-500" />
 </div>
   <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
 
