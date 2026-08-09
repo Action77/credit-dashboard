@@ -2,16 +2,17 @@
 import Link from "next/link";
 import { SmartphoneCharging, Filter } from "lucide-react";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { storage as localStorage } from "@/utils/storage";
 import NotificationBell from "@/components/NotificationBell";
 import UserWelcome from "@/components/UserWelcome";
 
 export default function Header() {
-  const pathname = usePathname();
+const pathname = usePathname();
+const router = useRouter();
 
-  const [showLoginModal, setShowLoginModal] = useState(false);
+const [showLoginModal, setShowLoginModal] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -65,26 +66,14 @@ className="h-9 w-9 rounded-lg bg-blue-900 text-white hover:bg-blue-800 flex item
       </button>
     ))}
 {!pathname.startsWith("/van") && (
-  <Link href="/van" title="Mobile Version">
-    <button
-      className="
-        relative
-        flex
-        items-center
-        justify-center
-        w-11
-        h-11
-        rounded-xl
-        bg-white/10
-        hover:bg-white/20
-        text-white
-        transition-all
-        duration-200
-      "
-    >
-      <SmartphoneCharging size={22} />
-    </button>
-  </Link>
+  <button
+  type="button"
+  onClick={() => router.push("/van")}
+  className="h-9 w-9 rounded-lg bg-blue-900 text-white hover:bg-blue-800 flex items-center justify-center"
+  title="Van"
+>
+  <SmartphoneCharging size={20} strokeWidth={2} />
+</button>
 )}
             <NotificationBell />
           </div>
