@@ -1694,64 +1694,58 @@ onClick={async () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
 
-  <div className="bg-gradient-to-br from-red-500 to-red-700 text-white rounded-3xl p-6 shadow-xl">
-    <p className="text-sm opacity-80">
+  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
+    <p className="text-slate-500 text-sm">
       Blocked Invoices
     </p>
 
-    <h2 className="text-5xl font-extrabold mt-3">
+    <h2 className="text-4xl font-bold text-slate-900 mt-2">
       {blockedCount}
     </h2>
 
-    <div className="mt-4 text-xs bg-white/20 inline-block px-3 py-1 rounded-full">
-      Current Blocks
-    </div>
+    <div className="mt-4 h-1 rounded-full bg-red-500" />
   </div>
 
-  <div className="bg-gradient-to-br from-green-500 to-emerald-700 text-white rounded-3xl p-6 shadow-xl">
-    <p className="text-sm opacity-80">
+  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
+    <p className="text-slate-500 text-sm">
       Active
     </p>
 
-    <h2 className="text-5xl font-extrabold mt-3">
+    <h2 className="text-4xl font-bold text-slate-900 mt-2">
       {activeEmployees}
     </h2>
 
-    <div className="mt-4 text-xs bg-white/20 inline-block px-3 py-1 rounded-full">
-      Ready For Work
-    </div>
+    <div className="mt-4 h-1 rounded-full bg-green-500" />
   </div>
 
-  <div className="bg-gradient-to-br from-orange-400 to-orange-600 text-white rounded-3xl p-6 shadow-xl">
-    <p className="text-sm opacity-80">
+  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
+    <p className="text-slate-500 text-sm">
       Exceptions
     </p>
 
-    <h2 className="text-5xl font-extrabold mt-3">
+    <h2 className="text-4xl font-bold text-slate-900 mt-2">
       {exceptionCount}
     </h2>
 
-    <div className="mt-4">
-      <span className="bg-white/25 px-3 py-1 rounded-full text-xs font-semibold">
+    <div className="flex items-center mt-4">
+      <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs">
         Legal: {legalCount}
       </span>
     </div>
   </div>
 
-  <div className="bg-gradient-to-br from-violet-500 to-indigo-700 text-white rounded-3xl p-6 shadow-xl">
-    <p className="text-sm opacity-80">
+  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
+    <p className="text-slate-500 text-sm">
       Employees
     </p>
 
-    <h2 className="text-5xl font-extrabold mt-3">
+    <h2 className="text-4xl font-bold text-slate-900 mt-2">
       {employeeCount}
     </h2>
 
-    <div className="mt-4 text-xs bg-white/20 inline-block px-3 py-1 rounded-full">
-      Total Vans
-    </div>
+    <div className="mt-4 h-1 rounded-full bg-blue-500" />
   </div>
 
 </div>
