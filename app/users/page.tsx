@@ -50,22 +50,17 @@ const handleCreditImport = async (
   try {
 
     const file =
-  event.target.files?.[0];
+      event.target.files?.[0];
 
-if (!file) return;
+    if (!file) return;
 
-const currentUser =
-  await localStorage.getItem(
-    "currentUser"
-  );
+    const buffer =
+      await file.arrayBuffer();
 
-const buffer =
-  await file.arrayBuffer();
-
-const workbook =
-  XLSX.read(buffer, {
-    type: "array",
-  });
+    const workbook =
+      XLSX.read(buffer, {
+        type: "array",
+      });
 
     const worksheet =
       workbook.Sheets[
@@ -85,58 +80,31 @@ const workbook =
       return;
     }
 
-    const fileName =
-  `${Date.now()}-${file.name}`;
+    const formData =
+      new FormData();
 
-const { error: uploadError } =
-  await supabase.storage
-    .from("imports")
-    .upload(fileName, file, {
-      upsert: true,
-    });
+    formData.append(
+      "file",
+      file
+    );
 
-if (uploadError) {
-  throw uploadError;
-}
-const jobResponse = await fetch(
-  "/api/import-job",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      type: "CREDIT",
-      filePath: fileName,
-      fileName: file.name,
-      uploadedBy: currentUser,
-    }),
-  }
-);
-
-const jobResult =
-  await jobResponse.json();
-
-if (
-  !jobResponse.ok ||
-  !jobResult.success
-) {
-  throw new Error(
-    jobResult.error ||
-    "Failed to create import job"
-  );
-}
-setShowImportModal(false);
-
-toast.success(
-  "Credit file uploaded. Processing started."
-);
+    await fetch(
+      "/api/credit-upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 await supabase
   .from("van_permissions")
   .delete()
   .neq("van_code", "");
 
-    
+    const currentUser =
+      await localStorage.getItem(
+        "currentUser"
+      );
+
     let fullName = "";
 
     if (currentUser) {
@@ -164,6 +132,7 @@ await supabase
 
     setShowImportModal(false);
 
+    window.location.reload();
 
   } finally {
 
@@ -234,34 +203,21 @@ if (uploadError) {
   throw uploadError;
 }
 
-const jobResponse = await fetch(
-  "/api/import-job",
+await fetch(
+  "/api/collection-upload",
   {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      type: "COLLECTION",
-      filePath: fileName,
-      fileName: file.name,
+      path: fileName,
       uploadedBy: currentUser,
+      originalName: file.name,
     }),
   }
 );
-
-const jobResult = await jobResponse.json();
-
-if (!jobResponse.ok || !jobResult.success) {
-  throw new Error(
-    jobResult.error || "Failed to create import job"
-  );
-}
-setShowImportModal(false);
-
-toast.success(
-  "Collection file uploaded. Processing started."
-);    
+    
     let fullName = "";
 
     if (currentUser) {
@@ -289,6 +245,7 @@ toast.success(
 
     setShowImportModal(false);
 
+    window.location.reload();
 
   } finally {
 
@@ -483,6 +440,7 @@ await addLog(
         await loadUsers();
 
 setIsImportingUsers(false);
+window.location.reload();
 
       } finally {
 
