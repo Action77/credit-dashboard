@@ -1517,19 +1517,27 @@ const generateReportImage =
 
  };
 
-const today =
-  new Date().toLocaleDateString("en-GB");
+const today = new Date();
+
+const isToday = (text: string) => {
+  const match =
+    text.match(/\d{2}\/\d{2}\/\d{4}/);
+
+  if (!match) return false;
+
+  return match[0] ===
+    today.toLocaleDateString("en-GB");
+};
 
 const creditFileToday =
-  creditFileInfo.includes(today);
+  isToday(creditFileInfo);
 
 const collectionFileToday =
-  collectionFileInfo.includes(today);
+  isToday(collectionFileInfo);
 
 const allFilesToday =
   creditFileToday &&
   collectionFileToday;
-
 return (
 <>
   <div
