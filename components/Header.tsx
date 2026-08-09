@@ -135,8 +135,11 @@ className="h-9 w-9 rounded-lg bg-blue-900 text-white hover:bg-blue-800 flex item
                 );
 
                 setIsLoggedIn(true);
-                setShowLoginModal(false);
-                window.location.reload();
+setShowLoginModal(false);
+
+window.dispatchEvent(
+  new Event("user-changed")
+);
               }}
             >
               Login
