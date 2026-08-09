@@ -1748,18 +1748,6 @@ onClick={async () => {
 {data.length > 0 && (
   <div className="mb-6">
 
-    <div className="bg-[#071d5c] rounded-3xl text-white p-6 mb-5">
-
-      <h3 className="text-2xl font-bold">
-        System Import Status
-      </h3>
-
-      <p className="text-blue-100 mt-1">
-        Latest data synchronization overview
-      </p>
-
-    </div>
-
     <div className="grid md:grid-cols-2 gap-5">
 
       {/* Credit Status */}
