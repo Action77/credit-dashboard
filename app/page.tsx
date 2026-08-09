@@ -27,7 +27,7 @@ import {
   ClipboardList,
   PieChart,
 } from "lucide-react";
-.
+
 export default function Home() {
   
   const handleDateChange = (value: string) => {
