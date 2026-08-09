@@ -34,8 +34,7 @@ import {
 } from "lucide-react";
 
 export default function Home() {
-  
-  const handleDateChange = (value: string) => {
+    const handleDateChange = (value: string) => {
   const selectedDate = new Date(value);
 
   if (selectedDate.getDay() === 5) {
@@ -298,7 +297,23 @@ const [tillDate, setTillDate] =
 const [collectionFileInfo,
   setCollectionFileInfo] =
   useState("");
+const isCreditOutdated = (() => {
+  if (!creditFileInfo) return false;
 
+  const match = creditFileInfo.match(
+    /\d{4}-\d{2}-\d{2}/
+  );
+
+  if (!match) return false;
+
+  const fileDate = new Date(match[0]);
+  fileDate.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return fileDate < today;
+})();
 const [loadedExceptions,
   setLoadedExceptions] =
   useState(false);
@@ -1762,7 +1777,7 @@ onClick={async () => {
   </h2>
 
   <div className="mt-4 h-1 rounded-full bg-green-500" />
-  
+
 </div>
   <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
 
@@ -1792,69 +1807,130 @@ onClick={async () => {
 
       {/* Credit Status */}
 
-      <div className="relative bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div
+  className={`relative bg-white rounded-3xl shadow-sm overflow-hidden ${
+    isCreditOutdated
+      ? "border-2 border-red-600 animate-bounce"
+      : "border border-slate-200"
+  }`}
+>
 
   <FileSpreadsheet
     size={140}
-    className="absolute right-6 top-1/2 -translate-y-1/2 text-blue-500/5"
+    className={`absolute right-6 top-1/2 -translate-y-1/2 ${
+      isCreditOutdated
+        ? "text-red-500/10"
+        : "text-blue-500/5"
+    }`}
   />
 
-  <div className="h-2 bg-blue-600" />
+  <div
+    className={`h-2 ${
+      isCreditOutdated
+        ? "bg-red-600"
+        : "bg-blue-600"
+    }`}
+  />
 
   <div className="p-6 relative z-10">
 
-          <div className="flex items-center justify-between mb-5">
+    <div className="flex items-center justify-between mb-5">
 
-            <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4">
 
-              <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center">
-                <FileSpreadsheet
-                  size={28}
-                  className="text-blue-600"
-                />
-              </div>
+        <div
+          className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+            isCreditOutdated
+              ? "bg-red-100"
+              : "bg-blue-100"
+          }`}
+        >
+          <FileSpreadsheet
+            size={28}
+            className={
+              isCreditOutdated
+                ? "text-red-600"
+                : "text-blue-600"
+            }
+          />
+        </div>
 
-              <div>
+        <div>
 
-                <h4 className="font-bold text-lg">
-                  Credit Data
-                </h4>
+          <h4
+            className={`font-bold text-lg ${
+              isCreditOutdated
+                ? "text-red-700"
+                : ""
+            }`}
+          >
+            Credit Data
+          </h4>
 
-                <p className="text-sm text-slate-500">
-                  Credit Block Report
-                </p>
-
-              </div>
-
-            </div>
-
-            <CheckCircle
-              size={24}
-              className={
-                creditFileInfo
-                  ? "text-green-500"
-                  : "text-slate-300"
-              }
-            />
-
-          </div>
-
-          <div className="bg-slate-50 rounded-2xl p-4">
-
-            <p className="text-xs uppercase tracking-wide text-slate-400 mb-1">
-              Latest File
-            </p>
-
-            <p className="text-sm text-slate-700 break-words">
-              {creditFileInfo || "No Credit File Imported"}
-            </p>
-
-          </div>
+          <p
+            className={`text-sm ${
+              isCreditOutdated
+                ? "text-red-500"
+                : "text-slate-500"
+            }`}
+          >
+            Credit Block Report
+          </p>
 
         </div>
 
       </div>
 
+      <CheckCircle
+        size={24}
+        className={
+          creditFileInfo
+            ? "text-green-500"
+            : "text-slate-300"
+        }
+      />
+
+    </div>
+
+    <div
+      className={`rounded-2xl p-4 ${
+        isCreditOutdated
+          ? "bg-red-50 border border-red-200"
+          : "bg-slate-50"
+      }`}
+    >
+
+      <p
+        className={`text-xs uppercase tracking-wide mb-1 ${
+          isCreditOutdated
+            ? "text-red-400"
+            : "text-slate-400"
+        }`}
+      >
+        Latest File
+      </p>
+
+      <p
+        className={`text-sm break-words ${
+          isCreditOutdated
+            ? "text-red-700 font-semibold"
+            : "text-slate-700"
+        }`}
+      >
+        {creditFileInfo || "No Credit File Imported"}
+      </p>
+
+      {isCreditOutdated && (
+        <div className="mt-3 bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-xl font-bold">
+          ⚠ Credit File Is Outdated
+        </div>
+      )}
+
+    </div>
+
+  </div>
+
+</div>
       {/* Collection Status */}
 
       <div className="relative bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
