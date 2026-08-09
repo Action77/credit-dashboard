@@ -1746,96 +1746,139 @@ onClick={async () => {
 
 {/* Import Center */}
 {data.length > 0 && (
-  <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 mb-6">
+  <div className="mb-6">
 
-    <div className="flex items-center justify-between mb-6">
+    <div className="bg-[#071d5c] rounded-3xl text-white p-6 mb-5">
 
-      <div>
-        <h3 className="text-2xl font-bold text-slate-900">
-          Import Center
-        </h3>
+      <h3 className="text-2xl font-bold">
+        System Import Status
+      </h3>
 
-        <p className="text-sm text-slate-500 mt-1">
-          Latest uploaded files
-        </p>
-      </div>
-
-      <button
-        onClick={() => {
-          if (!isLoggedIn) {
-            setShowLoginModal(true);
-            return;
-          }
-          setShowImportModal(true);
-        }}
-        className="bg-[#071d5c] text-white px-5 py-3 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition"
-      >
-        <Upload size={18} />
-        Import Files
-      </button>
+      <p className="text-blue-100 mt-1">
+        Latest data synchronization overview
+      </p>
 
     </div>
 
     <div className="grid md:grid-cols-2 gap-5">
 
-      <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-3xl p-5">
+      {/* Credit Status */}
 
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
 
-          <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center">
-            <FileSpreadsheet
-              size={28}
-              className="text-blue-600"
+        <div className="h-2 bg-blue-600" />
+
+        <div className="p-6">
+
+          <div className="flex items-center justify-between mb-5">
+
+            <div className="flex items-center gap-4">
+
+              <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center">
+                <FileSpreadsheet
+                  size={28}
+                  className="text-blue-600"
+                />
+              </div>
+
+              <div>
+
+                <h4 className="font-bold text-lg">
+                  Credit Data
+                </h4>
+
+                <p className="text-sm text-slate-500">
+                  Credit Block Report
+                </p>
+
+              </div>
+
+            </div>
+
+            <CheckCircle
+              size={24}
+              className={
+                creditFileInfo
+                  ? "text-green-500"
+                  : "text-slate-300"
+              }
             />
+
           </div>
 
-          <CheckCircle
-            size={24}
-            className={
-              creditFileInfo
-                ? "text-green-500"
-                : "text-slate-300"
-            }
-          />
-        </div>
+          <div className="bg-slate-50 rounded-2xl p-4">
 
-        <div className="text-lg font-bold text-slate-800">
-          Credit File
-        </div>
+            <p className="text-xs uppercase tracking-wide text-slate-400 mb-1">
+              Latest File
+            </p>
 
-        <div className="text-sm text-slate-500 mt-2 break-words">
-          {creditFileInfo || "No file uploaded"}
+            <p className="text-sm text-slate-700 break-words">
+              {creditFileInfo || "No Credit File Imported"}
+            </p>
+
+          </div>
+
         </div>
 
       </div>
 
-      <div className="bg-gradient-to-br from-green-50 to-white border border-green-100 rounded-3xl p-5">
+      {/* Collection Status */}
 
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
 
-          <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center">
-            <FileSpreadsheet
-              size={28}
-              className="text-green-600"
+        <div className="h-2 bg-green-600" />
+
+        <div className="p-6">
+
+          <div className="flex items-center justify-between mb-5">
+
+            <div className="flex items-center gap-4">
+
+              <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center">
+                <FileSpreadsheet
+                  size={28}
+                  className="text-green-600"
+                />
+              </div>
+
+              <div>
+
+                <h4 className="font-bold text-lg">
+                  Collection Data
+                </h4>
+
+                <p className="text-sm text-slate-500">
+                  Collection Report
+                </p>
+
+              </div>
+
+            </div>
+
+            <CheckCircle
+              size={24}
+              className={
+                collectionFileInfo
+                  ? "text-green-500"
+                  : "text-slate-300"
+              }
             />
+
           </div>
 
-          <CheckCircle
-            size={24}
-            className={
-              collectionFileInfo
-                ? "text-green-500"
-                : "text-slate-300"
-            }
-          />
-        </div>
+          <div className="bg-slate-50 rounded-2xl p-4">
 
-        <div className="text-lg font-bold text-slate-800">
-          Collection File
-        </div>
+            <p className="text-xs uppercase tracking-wide text-slate-400 mb-1">
+              Latest File
+            </p>
 
-        <div className="text-sm text-slate-500 mt-2 break-words">
-          {collectionFileInfo || "No file uploaded"}
+            <p className="text-sm text-slate-700 break-words">
+              {collectionFileInfo ||
+                "No Collection File Imported"}
+            </p>
+
+          </div>
+
         </div>
 
       </div>
