@@ -1797,7 +1797,7 @@ onClick={async () => {
             <div className="flex justify-between items-center mb-5">
 
   <h3 className="font-bold text-xl">
-    Invoices
+    Active Credit Blocks
   </h3>
 
   <div className="flex gap-2 items-center">
@@ -1814,8 +1814,7 @@ onClick={async () => {
     setSearchText(e.target.value)
   }
   placeholder="Search..."
-  className="border rounded-lg pl-10 py-2 px-4 w-52 h-[42px]"
-/>
+  className="border rounded-lg pl-10 py-2 px-4 w-40 h-[42px]"/>
     </div>
 
     <select
