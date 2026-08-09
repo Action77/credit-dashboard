@@ -1694,55 +1694,67 @@ onClick={async () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-5 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
 
-          <div className="bg-white border rounded-xl p-6 shadow-sm">
-            <p className="text-gray-500">
-              Blocked Invoices
-            </p>
+  <div className="bg-gradient-to-br from-red-500 to-red-700 text-white rounded-3xl p-6 shadow-xl">
+    <p className="text-sm opacity-80">
+      Blocked Invoices
+    </p>
 
-            <h2 className="text-4xl font-bold mt-3">
-              {blockedCount}
-            </h2>
-          </div>
+    <h2 className="text-5xl font-extrabold mt-3">
+      {blockedCount}
+    </h2>
 
-          <div className="bg-white border rounded-xl p-6 shadow-sm">
-            <p className="text-gray-500">
-              Active
-            </p>
+    <div className="mt-4 text-xs bg-white/20 inline-block px-3 py-1 rounded-full">
+      Current Blocks
+    </div>
+  </div>
 
-            <h2 className="text-5xl font-bold text-green-600 mt-3">
-  {activeEmployees}
-</h2>
-          </div>
+  <div className="bg-gradient-to-br from-green-500 to-emerald-700 text-white rounded-3xl p-6 shadow-xl">
+    <p className="text-sm opacity-80">
+      Active
+    </p>
 
-          <div className="bg-white border rounded-xl p-6 shadow-sm">
-            <p className="text-gray-500">
-              Exceptions
-            </p>
+    <h2 className="text-5xl font-extrabold mt-3">
+      {activeEmployees}
+    </h2>
 
-            <h2 className="text-5xl font-bold text-orange-500 mt-3">
-  {exceptionCount}
-</h2>
+    <div className="mt-4 text-xs bg-white/20 inline-block px-3 py-1 rounded-full">
+      Ready For Work
+    </div>
+  </div>
 
-<div className="mt-2">
-  <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
-    Legal: {legalCount}
-  </span>
+  <div className="bg-gradient-to-br from-orange-400 to-orange-600 text-white rounded-3xl p-6 shadow-xl">
+    <p className="text-sm opacity-80">
+      Exceptions
+    </p>
+
+    <h2 className="text-5xl font-extrabold mt-3">
+      {exceptionCount}
+    </h2>
+
+    <div className="mt-4">
+      <span className="bg-white/25 px-3 py-1 rounded-full text-xs font-semibold">
+        Legal: {legalCount}
+      </span>
+    </div>
+  </div>
+
+  <div className="bg-gradient-to-br from-violet-500 to-indigo-700 text-white rounded-3xl p-6 shadow-xl">
+    <p className="text-sm opacity-80">
+      Employees
+    </p>
+
+    <h2 className="text-5xl font-extrabold mt-3">
+      {employeeCount}
+    </h2>
+
+    <div className="mt-4 text-xs bg-white/20 inline-block px-3 py-1 rounded-full">
+      Total Vans
+    </div>
+  </div>
+
 </div>
-          </div>
-
-          <div className="bg-white border rounded-xl p-6 shadow-sm">
-            <p className="text-gray-500">
-              Employees
-            </p>
-
-            <h2 className="text-5xl font-bold text-purple-600 mt-3">
-  {employeeCount}
-</h2>
-          </div>
-
-        </div>
 
 {/* Import Center */}
 {data.length > 0 && (
