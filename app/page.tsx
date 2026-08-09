@@ -1520,15 +1520,22 @@ const generateReportImage =
 const today =
   new Date().toLocaleDateString("en-GB");
 
+const creditDate =
+  creditFileInfo.split("|").pop()?.trim() || "";
+
+const collectionDate =
+  collectionFileInfo.split("|").pop()?.trim() || "";
+
 const creditFileToday =
-  creditFileInfo.includes(today);
+  creditDate.includes(today);
 
 const collectionFileToday =
-  collectionFileInfo.includes(today);
+  collectionDate.includes(today);
 
 const allFilesToday =
   creditFileToday &&
   collectionFileToday;
+  
 return (
 <>
   <div
