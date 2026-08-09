@@ -34,15 +34,15 @@ export default function Header() {
           <div className="flex items-center gap-3">
 
   {!pathname.startsWith("/van") && (
-    <button
-      onClick={() => {
-        window.dispatchEvent(new Event("toggle-filters"));
-      }}
-      className="h-9 px-4 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center gap-2"
-    >
-      <Filter size={16} />
-      Filters
-    </button>
+   <button
+  onClick={() => {
+    window.dispatchEvent(new Event("toggle-filters"));
+  }}
+  className="h-9 w-9 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center"
+  title="Filters"
+>
+  <Filter size={20} strokeWidth={2} />
+</button>
   )}
 
   {pathname.startsWith("/van") &&
