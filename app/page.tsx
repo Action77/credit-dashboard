@@ -12,7 +12,6 @@ import Link from "next/link";
 import {
   FileSpreadsheet,
   CheckCircle,
-  Database,
 } from "lucide-react";
 import {
   LayoutDashboard,
@@ -1745,38 +1744,53 @@ onClick={async () => {
 
         </div>
 
-{/* Alert */}
-        {data.length > 0 && (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
+{/* Import Center */}
+{data.length > 0 && (
+  <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 mb-6">
 
-    <div className="flex items-center justify-between mb-5">
+    <div className="flex items-center justify-between mb-6">
+
       <div>
-        <h3 className="text-xl font-bold">
+        <h3 className="text-2xl font-bold text-slate-900">
           Import Center
         </h3>
 
-        <p className="text-sm text-slate-500">
-          Latest imported files and system status
+        <p className="text-sm text-slate-500 mt-1">
+          Latest uploaded files
         </p>
       </div>
 
+      <button
+        onClick={() => {
+          if (!isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+          }
+          setShowImportModal(true);
+        }}
+        className="bg-[#071d5c] text-white px-5 py-3 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition"
+      >
+        <Upload size={18} />
+        Import Files
+      </button>
+
     </div>
 
-    <div className="grid md:grid-cols-3 gap-4">
+    <div className="grid md:grid-cols-2 gap-5">
 
-      {/* Credit */}
-      <div className="border rounded-2xl p-4 bg-gradient-to-br from-blue-50 to-white">
+      <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-3xl p-5">
 
-        <div className="flex items-center justify-between mb-3">
-          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+        <div className="flex items-center justify-between mb-4">
+
+          <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center">
             <FileSpreadsheet
-              size={24}
+              size={28}
               className="text-blue-600"
             />
           </div>
 
           <CheckCircle
-            size={20}
+            size={24}
             className={
               creditFileInfo
                 ? "text-green-500"
@@ -1785,29 +1799,29 @@ onClick={async () => {
           />
         </div>
 
-        <h4 className="font-semibold text-slate-800">
+        <div className="text-lg font-bold text-slate-800">
           Credit File
-        </h4>
+        </div>
 
-        <p className="text-sm text-slate-500 mt-2 break-words">
-          {creditFileInfo || "Not Imported"}
-        </p>
+        <div className="text-sm text-slate-500 mt-2 break-words">
+          {creditFileInfo || "No file uploaded"}
+        </div>
 
       </div>
 
-      {/* Collection */}
-      <div className="border rounded-2xl p-4 bg-gradient-to-br from-green-50 to-white">
+      <div className="bg-gradient-to-br from-green-50 to-white border border-green-100 rounded-3xl p-5">
 
-        <div className="flex items-center justify-between mb-3">
-          <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+        <div className="flex items-center justify-between mb-4">
+
+          <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center">
             <FileSpreadsheet
-              size={24}
+              size={28}
               className="text-green-600"
             />
           </div>
 
           <CheckCircle
-            size={20}
+            size={24}
             className={
               collectionFileInfo
                 ? "text-green-500"
@@ -1816,42 +1830,12 @@ onClick={async () => {
           />
         </div>
 
-        <h4 className="font-semibold text-slate-800">
+        <div className="text-lg font-bold text-slate-800">
           Collection File
-        </h4>
-
-        <p className="text-sm text-slate-500 mt-2 break-words">
-          {collectionFileInfo || "Not Imported"}
-        </p>
-
-      </div>
-
-      {/* Statistics */}
-      <div className="border rounded-2xl p-4 bg-gradient-to-br from-purple-50 to-white">
-
-        <div className="flex items-center justify-between mb-3">
-
-          <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-            <Database
-              size={24}
-              className="text-purple-600"
-            />
-          </div>
-
         </div>
 
-        <h4 className="font-semibold text-slate-800">
-          Records Status
-        </h4>
-
-        <div className="mt-3">
-          <div className="text-3xl font-bold text-purple-700">
-            {blockedCount}
-          </div>
-
-          <div className="text-sm text-slate-500">
-            Active Credit Blocks
-          </div>
+        <div className="text-sm text-slate-500 mt-2 break-words">
+          {collectionFileInfo || "No file uploaded"}
         </div>
 
       </div>
@@ -1860,7 +1844,6 @@ onClick={async () => {
 
   </div>
 )}
-
         <div className="grid grid-cols-3 gap-6">
 
           {/* Table */}
