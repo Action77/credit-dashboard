@@ -75,8 +75,9 @@ const creditResponse =
 const creditResult =
   await creditResponse.json();
 
-const fileDate =
-  creditResult.fileDate || "";
+const fileDate = String(
+  creditResult.fileDate || ""
+).slice(0, 10);
 
 const saudiToday = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Asia/Riyadh",
@@ -84,9 +85,8 @@ const saudiToday = new Intl.DateTimeFormat("en-CA", {
   month: "2-digit",
   day: "2-digit",
 }).format(new Date());
-setCreditAlert(
-  fileDate !== saudiToday
-);
+
+setCreditAlert(fileDate !== saudiToday);
 
 let filtered = data || [];
 
