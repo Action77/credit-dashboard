@@ -212,7 +212,23 @@ const [searchText, setSearchText] =
   const [showFilters,
   setShowFilters] =
   useState(false);
-  
+  useEffect(() => {
+  const handleToggleFilters = () => {
+    setShowFilters((prev) => !prev);
+  };
+
+  window.addEventListener(
+    "toggle-filters",
+    handleToggleFilters
+  );
+
+  return () => {
+    window.removeEventListener(
+      "toggle-filters",
+      handleToggleFilters
+    );
+  };
+}, []);
 const [isLoggedIn,
   setIsLoggedIn] =
   useState(false);
@@ -1748,17 +1764,6 @@ onClick={async () => {
   
 
 
-<button
-  onClick={() =>
-    setShowFilters(
-      !showFilters
-    )
-  }
-className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
->
-  <Filter size={16} />
-  Filters
-</button>
 
 {showFilters && (
   <div className="absolute right-0 top-14 bg-white border shadow-xl rounded-xl w-[380px] z-50 p-4">

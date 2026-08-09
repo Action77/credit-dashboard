@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { SmartphoneCharging } from "lucide-react";
+import { SmartphoneCharging, Filter } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -32,26 +32,38 @@ export default function Header() {
           <UserWelcome />
 
           <div className="flex items-center gap-3">
-            {pathname.startsWith("/van") &&
-              (isLoggedIn ? (
-                <button
-                  onClick={async () => {
-                    await localStorage.removeItem("currentUser");
-                    setIsLoggedIn(false);
-                    window.location.reload();
-                  }}
-                  className="h-9 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
-                >
-                  Logout
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowLoginModal(true)}
-                  className="h-9 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-                >
-                  Login
-                </button>
-              ))}
+
+  {!pathname.startsWith("/van") && (
+  <button
+    onClick={() => {
+      window.dispatchEvent(new Event("toggle-filters"));
+    }}
+    className="h-9 px-4 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+  >
+    <Filter size={16} />
+    Filters
+  </button>
+)}
+  {pathname.startsWith("/van") &&
+    (isLoggedIn ? (
+      <button
+        onClick={async () => {
+          await localStorage.removeItem("currentUser");
+          setIsLoggedIn(false);
+          window.location.reload();
+        }}
+        className="h-9 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
+      >
+        Logout
+      </button>
+    ) : (
+      <button
+        onClick={() => setShowLoginModal(true)}
+        className="h-9 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+      >
+        Login
+      </button>
+    ))}
 {!pathname.startsWith("/van") && (
   <Link href="/van" title="Mobile Version">
     <button
