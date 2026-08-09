@@ -1747,73 +1747,81 @@ onClick={async () => {
 
 {/* Alert */}
         {data.length > 0 && (
-  <div className="bg-white rounded-xl border border-slate-200 mb-6 overflow-hidden">
+  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden">
 
-    <div className="flex items-center justify-between px-6 py-4 bg-[#071d5c] text-white">
-      <h3 className="font-semibold">
-        System Status
+    <div className="px-6 py-4 border-b bg-slate-50">
+      <h3 className="text-lg font-bold text-slate-800">
+        Import Status
       </h3>
-
-      <div className="flex items-center gap-2 text-green-300">
-        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-        Online
-      </div>
+      <p className="text-sm text-slate-500">
+        Latest uploaded files
+      </p>
     </div>
 
-    <div className="p-6">
+    <div className="grid md:grid-cols-2">
 
-      <div className="space-y-4">
+      {/* Credit File */}
+      <div className="p-5 border-r border-slate-100">
 
-        <div className="flex justify-between border-b pb-3">
-          <span className="text-slate-500">
-            Credit Report
-          </span>
-
-          <span
-            className={
-              creditFileInfo
-                ? "text-green-600 font-semibold"
-                : "text-red-600 font-semibold"
-            }
-          >
-            {creditFileInfo ? "Loaded" : "Missing"}
-          </span>
-        </div>
-
-        <div className="flex justify-between border-b pb-3">
-          <span className="text-slate-500">
-            Collection Report
-          </span>
-
-          <span
-            className={
-              collectionFileInfo
-                ? "text-green-600 font-semibold"
-                : "text-red-600 font-semibold"
-            }
-          >
-            {collectionFileInfo ? "Loaded" : "Missing"}
-          </span>
-        </div>
-
-        <div>
-          <div className="text-xs text-slate-400 mb-1">
-            Credit File
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center">
+            📊
           </div>
 
-          <div className="font-medium break-all">
-            {creditFileInfo || "-"}
+          <div>
+            <h4 className="font-semibold">
+              Credit File
+            </h4>
+
+            <span
+              className={`text-xs px-2 py-1 rounded-full ${
+                creditFileInfo
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {creditFileInfo
+                ? "Imported"
+                : "Not Imported"}
+            </span>
           </div>
         </div>
 
-        <div>
-          <div className="text-xs text-slate-400 mb-1">
-            Collection File
+        <div className="text-sm text-slate-600 break-all">
+          {creditFileInfo || "-"}
+        </div>
+
+      </div>
+
+      {/* Collection File */}
+      <div className="p-5">
+
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center">
+            ✅
           </div>
 
-          <div className="font-medium break-all">
-            {collectionFileInfo || "-"}
+          <div>
+            <h4 className="font-semibold">
+              Collection File
+            </h4>
+
+            <span
+              className={`text-xs px-2 py-1 rounded-full ${
+                collectionFileInfo
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {collectionFileInfo
+                ? "Imported"
+                : "Not Imported"}
+            </span>
           </div>
+        </div>
+
+        <div className="text-sm text-slate-600 break-all">
+          {collectionFileInfo || "-"}
         </div>
 
       </div>
