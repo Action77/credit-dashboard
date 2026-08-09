@@ -1760,9 +1760,6 @@ onClick={async () => {
         </p>
       </div>
 
-      <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl font-semibold">
-        {blockedCount} Active Blocks
-      </div>
     </div>
 
     <div className="grid md:grid-cols-3 gap-4">
