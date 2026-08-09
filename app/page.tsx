@@ -1,4 +1,5 @@
 "use client";
+
 import {
   ShieldX,
   ShieldCheck,
@@ -1789,11 +1790,16 @@ onClick={async () => {
 
       {/* Credit Status */}
 
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="relative bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
 
-        <div className="h-2 bg-blue-600" />
+  <FileSpreadsheet
+    size={140}
+    className="absolute right-6 top-1/2 -translate-y-1/2 text-blue-500/5"
+  />
 
-        <div className="p-6">
+  <div className="h-2 bg-blue-600" />
+
+  <div className="p-6 relative z-10">
 
           <div className="flex items-center justify-between mb-5">
 
@@ -1849,12 +1855,16 @@ onClick={async () => {
 
       {/* Collection Status */}
 
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="relative bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
 
-        <div className="h-2 bg-green-600" />
+  <ClipboardList
+    size={140}
+    className="absolute right-6 top-1/2 -translate-y-1/2 text-green-500/5"
+  />
 
-        <div className="p-6">
+  <div className="h-2 bg-green-600" />
 
+  <div className="p-6 relative z-10">
           <div className="flex items-center justify-between mb-5">
 
             <div className="flex items-center gap-4">
