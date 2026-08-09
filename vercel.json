@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "app/api/import-worker/route.ts": {
+      "maxDuration": 300
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/import-worker",
+      "schedule": "* * * * *"
+    }
+  ]
+}
