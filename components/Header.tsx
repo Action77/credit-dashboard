@@ -1,6 +1,4 @@
-
 "use client";
-
 import Link from "next/link";
 import { SmartphoneCharging, Filter } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -29,85 +27,71 @@ export default function Header() {
 
   return (
     <>
-      <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-50 bg-gradient-to-r from-[#071d5c] to-[#0b2a7a] shadow-lg border-b border-blue-800">
+        <div className="flex items-center justify-between px-6 py-3">
+          <UserWelcome />
 
-        {/* Mobile - LINK ONLY */}
-        {!pathname.startsWith("/van") && (
-          <Link
-            href="/mobile"
-            title="Mobile"
-            className="
-              relative
-              flex
-              items-center
-              justify-center
-              w-11
-              h-11
-              rounded-xl
-              bg-white/10
-              hover:bg-white/20
-              text-white
-              transition-all
-              duration-200
-            "
-          >
-            <SmartphoneCharging size={22} />
-          </Link>
-        )}
+          <div className="flex items-center gap-3">
 
-        {/* Filter - POPUP / EVENT ONLY */}
-        {!pathname.startsWith("/van") && (
-          <button
-            type="button"
-            onClick={() => {
-              window.dispatchEvent(new Event("toggle-filters"));
-            }}
-            title="Filters"
-            className="
-              relative
-              flex
-              items-center
-              justify-center
-              w-11
-              h-11
-              rounded-xl
-              bg-white/10
-              hover:bg-white/20
-              text-white
-              transition-all
-              duration-200
-            "
-          >
-            <Filter size={22} />
-          </button>
-        )}
+  {!pathname.startsWith("/van") && (
+    <button
+      onClick={() => {
+        window.dispatchEvent(new Event("toggle-filters"));
+      }}
+      className="h-9 px-4 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+    >
+      <Filter size={16} />
+      Filters
+    </button>
+  )}
 
-        {/* Login / Logout - POPUP ONLY */}
-        {pathname.startsWith("/van") &&
-          (isLoggedIn ? (
-            <button
-              type="button"
-              onClick={async () => {
-                await localStorage.removeItem("currentUser");
-                setIsLoggedIn(false);
-                window.location.reload();
-              }}
-              className="h-9 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
-            >
-              Logout
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setShowLoginModal(true)}
-              className="h-9 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-            >
-              Login
-            </button>
-          ))}
-      </div>
+  {pathname.startsWith("/van") &&
+    (isLoggedIn ? (
+      <button
+        onClick={async () => {
+          await localStorage.removeItem("currentUser");
+          setIsLoggedIn(false);
+          window.location.reload();
+        }}
+        className="h-9 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
+      >
+        Logout
+      </button>
+    ) : (
+      <button
+        onClick={() => setShowLoginModal(true)}
+        className="h-9 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+      >
+        Login
+      </button>
+    ))}
+{!pathname.startsWith("/van") && (
+  <Link href="/van" title="Mobile Version">
+    <button
+      className="
+        relative
+        flex
+        items-center
+        justify-center
+        w-11
+        h-11
+        rounded-xl
+        bg-white/10
+        hover:bg-white/20
+        text-white
+        transition-all
+        duration-200
+      "
+    >
+      <SmartphoneCharging size={22} />
+    </button>
+  </Link>
+)}
+            <NotificationBell />
+          </div>
+        </div>
+      </header>
 
-      {/* Login Modal */}
       {showLoginModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-2xl w-80">
@@ -128,7 +112,6 @@ export default function Header() {
             />
 
             <button
-              type="button"
               className="w-full bg-blue-600 text-white py-3 rounded-lg"
               onClick={async () => {
                 const { data: user } = await supabase
