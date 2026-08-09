@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  
   const handleDateChange = (value: string) => {
   const selectedDate = new Date(value);
 
@@ -209,9 +210,6 @@ const [selectedVans,
 
 const [searchText, setSearchText] =
   useState("");
-  const [showFilters,
-  setShowFilters] =
-  useState(false);
   
 const [isLoggedIn,
   setIsLoggedIn] =
@@ -496,7 +494,41 @@ useEffect(() => {
   loadFilters();
 
 }, [currentUser]);
+useEffect(() => {
+  if (!data.length) return;
 
+  const selectedCitySet = new Set(selectedCities);
+  const newVans = new Set(selectedVans);
+
+  data.forEach((row) => {
+    const city = String(row["City"] || "");
+    const van = String(row["Van Code."] || "");
+
+    if (!van) return;
+
+    // Add new vans only when their city is selected
+    if (selectedCitySet.has(city)) {
+      newVans.add(van);
+    }
+  });
+
+  const updatedVans = [...newVans];
+
+  const changed =
+    updatedVans.length !== selectedVans.length ||
+    updatedVans.some(
+      (van) => !selectedVans.includes(van)
+    );
+
+  if (changed) {
+    setSelectedVans(updatedVans);
+  }
+
+}, [
+  data,
+  selectedCities,
+  selectedVans,
+]);
   useEffect(() => {
 
   const loadCollection = async () => {
@@ -1481,7 +1513,8 @@ const generateReportImage =
 
     }
 
-  };
+ };
+
 
 return (
 <>
@@ -1707,310 +1740,10 @@ onClick={async () => {
 
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-end mb-6">
-
-  <div className="flex gap-3 relative">
-              <Search
-                size={18}
-                className="absolute left-3 top-3"
-              />
-
-<input
-  value={searchText}
-  onChange={(e) =>
-    setSearchText(e.target.value)
-  }
-  placeholder="Search Invoice, Van, Customer..."
-  className="bg-white border rounded-lg pl-10 py-3 pr-4"
-/>
-
-            </div>
-
-
-
-<button
-  onClick={() =>
-    setShowFilters(
-      !showFilters
-    )
-  }
-className="bg-white border px-5 py-3 rounded-lg flex items-center gap-2"
->
-  <Filter size={16} />
-  Filters
-</button>
-
-{showFilters && (
-  <div className="absolute right-0 top-14 bg-white border shadow-xl rounded-xl w-[380px] z-50 p-4">
-
-    <div className="max-h-[450px] overflow-auto">
-
-      <div className="font-bold mb-3">
-        Saudi
-      </div>
-
-      {regions.map(region => (
-
-          <div key={region}>
-
-            <div className="flex items-center gap-2 py-1">
-<input
-  type="checkbox"
-  checked={selectedRegions.includes(region)}
-  onChange={(e) => {
-
-    const regionCities = data
-      .filter(row => row["Region"] === region)
-      .map(row => row["City"])
-      .filter(Boolean);
-
-    const regionVans = data
-      .filter(row => row["Region"] === region)
-      .map(row => row["Van Code."])
-      .filter(Boolean);
-
-    if (e.target.checked) {
-
-      setSelectedRegions(prev => [
-        ...new Set([...prev, region])
-      ]);
-
-      setSelectedCities(prev => [
-        ...new Set([...prev, ...regionCities])
-      ]);
-
-      setSelectedVans(prev => [
-        ...new Set([...prev, ...regionVans])
-      ]);
-
-    } else {
-
-      setSelectedRegions(prev =>
-        prev.filter(r => r !== region)
-      );
-
-      setSelectedCities(prev =>
-        prev.filter(
-          city => !regionCities.includes(city)
-        )
-      );
-
-      setSelectedVans(prev =>
-        prev.filter(
-          van => !regionVans.includes(van)
-        )
-      );
-
-    }
-
-  }}
-/>
-  <span
-    className="cursor-pointer"
-    onClick={() => toggleRegion(region)}
-  >
-    {expandedRegions.includes(region) ? "▼" : "▶"}
-  </span>
-
-  <span>{region}</span>
-</div>
-
-            {expandedRegions.includes(region) && (
-
-              <div className="ml-5">
-
-                {[...(citiesByRegion.get(region) || [])]
-  .sort()
-  .map(city => (
-
-                    <div key={`${region}-${city}`}>
-
-                      <div className="flex items-center gap-2 py-1">
-<input
-  type="checkbox"
-  checked={selectedCities.includes(city)}
-  onChange={(e) => {
-
-    const cityVans = data
-      .filter(
-        row =>
-          row["Region"] === region &&
-row["City"] === city
-      )
-      .map(row => row["Van Code."])
-      .filter(Boolean);
-
-    if (e.target.checked) {
-
-      setSelectedCities(prev => [
-        ...new Set([...prev, city])
-      ]);
-
-      setSelectedVans(prev => [
-        ...new Set([
-          ...prev,
-          ...cityVans
-        ])
-      ]);
-
-    } else {
-
-      setSelectedCities(prev =>
-        prev.filter(c => c !== city)
-      );
-
-      setSelectedVans(prev =>
-        prev.filter(
-          van => !cityVans.includes(van)
-        )
-      );
-
-    }
-  }}
-/>
-
-  <span
-    className="cursor-pointer"
-    onClick={() =>
-      toggleCity(`${region}-${city}`)
-    }
-  >
-    {expandedCities.includes(`${region}-${city}`)
-      ? "▼"
-      : "▶"}
-  </span>
-
-  <span>{city}</span>
-</div>
-                      {expandedCities.includes(
-                        `${region}-${city}`
-                      ) && (
-
-                        <div className="ml-5">
-
-                          {[...(vansByCity.get(`${region}|${city}`) || [])]
-  .sort()
-  .map(van => (
-                                  <label
-                                key={van}
-                                className="flex gap-2 py-1"
-                              >
-                                <input
-  type="checkbox"
-  checked={selectedVans.includes(van)}
-  onChange={(e) => {
-
-    if (e.target.checked) {
-
-      setSelectedVans(prev => [
-        ...new Set([...prev, van])
-      ]);
-
-    } else {
-
-      setSelectedVans(prev =>
-        prev.filter(v => v !== van)
-      );
-
-    }
-
-  }}
-/>
-
-
-                                {van}
-
-                              </label>
-
-                            ))}
-
-                        </div>
-
-                      )}
-
-                    </div>
-
-                  ))}
-
-              </div>
-
-            )}
-
-          </div>
-
-        ))}
-
-    </div>
-
-    <div className="flex gap-2 mt-4">
-
-      <button
-        className="bg-red-600 text-white px-4 py-2 rounded-lg"
-        onClick={() => {
-          setSelectedRegions([]);
-          setSelectedCities([]);
-          setSelectedVans([]);
-        }}
-      >
-        Clear
-      </button>
-
-<button
-  className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-  onClick={async () => {
-
-    const filterData = {
-      regions: selectedRegions,
-      cities: selectedCities,
-      vans: selectedVans,
-    };
-
-    const filterKey =
-  currentUser
-    ? `savedFilters_${currentUser}`
-    : "savedFilters_guest";
-
-await localStorage.setItem(
-  filterKey,
-  JSON.stringify(filterData)
-);
-    await localStorage.setItem(
-      "summaryFilters",
-      JSON.stringify(filterData)
-    );
-
-    if (currentUser) {
-
-      await supabase
-        .from("user_filters")
-        .upsert({
-          username: currentUser,
-          regions: selectedRegions,
-          cities: selectedCities,
-          vans: selectedVans,
-        });
-
-    }
-
-    setShowFilters(false);
-
-  }}
->
-  Apply
-</button>
-    </div>
-
-  </div>
-)}
-</div>
-
-
 {/* Alert */}
         {data.length > 0 && (
 
   <div className="bg-white border rounded-xl p-5 mb-6">
-
     <h3 className="font-bold text-lg mb-4">
       Import Status
     </h3>
@@ -2064,20 +1797,34 @@ await localStorage.setItem(
             <div className="flex justify-between items-center mb-5">
 
   <h3 className="font-bold text-xl">
-    Invoices
+    Active Credit Blocks
   </h3>
 
-  <div className="flex gap-2">
+  <div className="flex gap-2 items-center">
+
+    <div className="relative">
+      <Search
+        size={18}
+        className="absolute left-3 top-3"
+      />
+
+    <input
+  value={searchText}
+  onChange={(e) =>
+    setSearchText(e.target.value)
+  }
+  placeholder="Search..."
+  className="border rounded-lg pl-10 py-2 px-4 w-40 h-[42px]"/>
+    </div>
 
     <select
       value={whatsAppVan}
       onChange={(e) =>
-        setWhatsAppVan(
-          e.target.value
-        )
+        setWhatsAppVan(e.target.value)
       }
       className="border rounded-lg px-3 py-2"
     >
+
       <option value="">
         Select Van
       </option>
