@@ -38,8 +38,7 @@ export default function Header() {
   onClick={() => {
     window.dispatchEvent(new Event("toggle-filters"));
   }}
-  className="h-9 w-9 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center"
-  title="Filters"
+className="h-9 w-9 rounded-lg bg-blue-900 text-white hover:bg-blue-800 flex items-center justify-center"  title="Filters"
 >
   <Filter size={20} strokeWidth={2} />
 </button>
