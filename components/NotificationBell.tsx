@@ -10,8 +10,9 @@ export default function NotificationBell() {
 
   const [notifications, setNotifications] =
     useState<any[]>([]);
-
-const pathname = usePathname();
+const [creditAlert, setCreditAlert] =
+  useState(false);
+  const pathname = usePathname();
 
 if (pathname.startsWith("/van")) {
   return null;
@@ -68,6 +69,26 @@ const { data: settings } = await supabase
   .eq("username", username)
   .single();
 
+const creditResponse =
+  await fetch("/api/credit-data");
+
+const creditResult =
+  await creditResponse.json();
+
+const fileInfo =
+  creditResult.fileInfo || "";
+
+const todaySaudi =
+  new Date().toLocaleDateString(
+    "en-US",
+    {
+      timeZone: "Asia/Riyadh",
+    }
+  );
+
+setCreditAlert(
+  !fileInfo.includes(todaySaudi)
+);
 let filtered = data || [];
 
 if (settings) {
@@ -163,10 +184,10 @@ useEffect(() => {
 }, []);
 
   const unreadCount =
-    notifications.filter(
-      (n) => !n.is_read
-    ).length;
-
+  notifications.filter(
+    (n) => !n.is_read
+  ).length +
+  (creditAlert ? 1 : 0);
   return (
     <div className="relative">
 
@@ -194,20 +215,21 @@ useEffect(() => {
       }
     }
   }}
-  className="
-    relative
-    flex
-    items-center
-    justify-center
-    w-11
-    h-11
-    rounded-xl
-    bg-white/10
-    hover:bg-white/20
-    text-white
-    transition-all
-    duration-200
-  "
+  className={`
+  relative
+  flex
+  items-center
+  justify-center
+  w-11
+  h-11
+  rounded-xl
+  bg-white/10
+  hover:bg-white/20
+  text-white
+  transition-all
+  duration-200
+  ${creditAlert ? "animate-shake" : ""}
+`}
 >
   <BellDot size={22} />
 
@@ -251,14 +273,28 @@ useEffect(() => {
 >
           <div className="p-4 border-b">
             <h3 className="font-bold">
-  Notifications ({notifications.length})
+  Notifications (
+  {notifications.length +
+    (creditAlert ? 1 : 0)}
+)
 </h3>
           </div>
 
           <div className="max-h-80 overflow-auto">
 
-            {notifications.length === 0 ? (
+  {creditAlert && (
+    <div className="p-4 border-b bg-red-50 sticky top-0 z-10">
+      <div className="font-bold text-red-700">
+        🚨 Credit File Not Updated Today
+      </div>
 
+      <div className="text-sm text-red-600 mt-1">
+        Please upload today's Credit file.
+      </div>
+    </div>
+  )}
+
+  {notifications.length === 0 ? (
               <p className="p-4 text-gray-500">
                 No notifications
               </p>
