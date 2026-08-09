@@ -1515,7 +1515,8 @@ const generateReportImage =
 
     }
 
-  };
+ };
+
 const today =
   new Date().toLocaleDateString("en-GB");
 
@@ -2051,18 +2052,6 @@ await localStorage.setItem(
 )}
 </div>
 
-const today =
-  new Date().toLocaleDateString("en-GB");
-
-const creditFileToday =
-  creditFileInfo.includes(today);
-
-const collectionFileToday =
-  collectionFileInfo.includes(today);
-
-const allFilesToday =
-  creditFileToday &&
-  collectionFileToday;
 
 {/* Alert */}
         {data.length > 0 && (
