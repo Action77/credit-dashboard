@@ -28,44 +28,34 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full">
-        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500">
-          
-          <div className="flex items-center gap-3">
-            <UserWelcome />
-          </div>
+      <header>
+        <div className="flex items-center gap-3">
+          {!pathname.startsWith("/van") && (
+            <button
+              onClick={() => {
+                window.dispatchEvent(new Event("toggle-filters"));
+              }}
+              title="Filters"
+              className="
+                relative
+                flex
+                items-center
+                justify-center
+                w-11
+                h-11
+                rounded-xl
+                bg-white/10
+                hover:bg-white/20
+                text-white
+                transition-all
+                duration-200
+              "
+            >
+              <Filter size={22} />
+            </button>
+          )}
 
-          <div className="flex items-center gap-3">
-            {/* Filter button - hidden on /van */}
-            {!pathname.startsWith("/van") && (
-              <button
-                type="button"
-                onClick={() => {
-                  window.dispatchEvent(new Event("toggle-filters"));
-                }}
-                title="Filters"
-                aria-label="Filters"
-                className="
-                  relative
-                  flex
-                  items-center
-                  justify-center
-                  w-11
-                  h-11
-                  rounded-xl
-                  bg-white/10
-                  hover:bg-white/20
-                  text-white
-                  transition-all
-                  duration-200
-                "
-              >
-                <Filter size={22} />
-              </button>
-            )}
-
-            <NotificationBell />
-          </div>
+          <NotificationBell />
         </div>
       </header>
 
@@ -89,16 +79,15 @@ export default function Header() {
             />
 
             <button
-              type="button"
               className="w-full bg-blue-600 text-white py-3 rounded-lg"
               onClick={async () => {
-                const { data: user, error } = await supabase
+                const { data: user } = await supabase
                   .from("app_users")
                   .select("*")
                   .eq("username", username)
                   .single();
 
-                if (error || !user) {
+                if (!user) {
                   alert("Invalid Username");
                   return;
                 }
@@ -115,7 +104,6 @@ export default function Header() {
 
                 setIsLoggedIn(true);
                 setShowLoginModal(false);
-
                 window.location.reload();
               }}
             >
