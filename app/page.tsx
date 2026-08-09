@@ -1747,81 +1747,114 @@ onClick={async () => {
 
 {/* Alert */}
         {data.length > 0 && (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden">
+  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
 
-    <div className="px-6 py-4 border-b bg-slate-50">
-      <h3 className="text-lg font-bold text-slate-800">
-        Import Status
-      </h3>
-      <p className="text-sm text-slate-500">
-        Latest uploaded files
-      </p>
+    <div className="flex items-center justify-between mb-5">
+      <div>
+        <h3 className="text-xl font-bold">
+          Import Center
+        </h3>
+
+        <p className="text-sm text-slate-500">
+          Latest imported files and system status
+        </p>
+      </div>
+
+      <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl font-semibold">
+        {blockedCount} Active Blocks
+      </div>
     </div>
 
-    <div className="grid md:grid-cols-2">
+    <div className="grid md:grid-cols-3 gap-4">
 
-      {/* Credit File */}
-      <div className="p-5 border-r border-slate-100">
+      {/* Credit */}
+      <div className="border rounded-2xl p-4 bg-gradient-to-br from-blue-50 to-white">
 
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center">
-            📊
+        <div className="flex items-center justify-between mb-3">
+          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+            <FileSpreadsheet
+              size={24}
+              className="text-blue-600"
+            />
           </div>
 
-          <div>
-            <h4 className="font-semibold">
-              Credit File
-            </h4>
-
-            <span
-              className={`text-xs px-2 py-1 rounded-full ${
-                creditFileInfo
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
-            >
-              {creditFileInfo
-                ? "Imported"
-                : "Not Imported"}
-            </span>
-          </div>
+          <CheckCircle
+            size={20}
+            className={
+              creditFileInfo
+                ? "text-green-500"
+                : "text-slate-300"
+            }
+          />
         </div>
 
-        <div className="text-sm text-slate-600 break-all">
-          {creditFileInfo || "-"}
-        </div>
+        <h4 className="font-semibold text-slate-800">
+          Credit File
+        </h4>
+
+        <p className="text-sm text-slate-500 mt-2 break-words">
+          {creditFileInfo || "Not Imported"}
+        </p>
 
       </div>
 
-      {/* Collection File */}
-      <div className="p-5">
+      {/* Collection */}
+      <div className="border rounded-2xl p-4 bg-gradient-to-br from-green-50 to-white">
 
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center">
-            ✅
+        <div className="flex items-center justify-between mb-3">
+          <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+            <FileSpreadsheet
+              size={24}
+              className="text-green-600"
+            />
           </div>
 
-          <div>
-            <h4 className="font-semibold">
-              Collection File
-            </h4>
-
-            <span
-              className={`text-xs px-2 py-1 rounded-full ${
-                collectionFileInfo
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
-            >
-              {collectionFileInfo
-                ? "Imported"
-                : "Not Imported"}
-            </span>
-          </div>
+          <CheckCircle
+            size={20}
+            className={
+              collectionFileInfo
+                ? "text-green-500"
+                : "text-slate-300"
+            }
+          />
         </div>
 
-        <div className="text-sm text-slate-600 break-all">
-          {collectionFileInfo || "-"}
+        <h4 className="font-semibold text-slate-800">
+          Collection File
+        </h4>
+
+        <p className="text-sm text-slate-500 mt-2 break-words">
+          {collectionFileInfo || "Not Imported"}
+        </p>
+
+      </div>
+
+      {/* Statistics */}
+      <div className="border rounded-2xl p-4 bg-gradient-to-br from-purple-50 to-white">
+
+        <div className="flex items-center justify-between mb-3">
+
+          <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+            <Database
+              size={24}
+              className="text-purple-600"
+            />
+          </div>
+
+        </div>
+
+        <h4 className="font-semibold text-slate-800">
+          Records Status
+        </h4>
+
+        <div className="mt-3">
+          <div className="text-3xl font-bold text-purple-700">
+            {blockedCount}
+          </div>
+
+          <div className="text-sm text-slate-500">
+            Active Credit Blocks
+          </div>
         </div>
 
       </div>
@@ -1830,6 +1863,7 @@ onClick={async () => {
 
   </div>
 )}
+
         <div className="grid grid-cols-3 gap-6">
 
           {/* Table */}
@@ -2451,32 +2485,71 @@ item.created_by === currentUser && (
 </div>
     <div className="bg-white rounded-xl border shadow-sm p-5">
 
-    <h3 className="font-bold mb-4">
-      Invoice Status
-    </h3>
+  <h3 className="font-bold mb-4">
+    Collection Progress
+  </h3>
 
-    <div className="flex flex-col items-center justify-center h-full">
+  <div className="flex justify-between mb-4">
 
-      <div className="w-40 h-40 rounded-full border-[20px] border-red-500 flex items-center justify-center">
+    <div>
+      <p className="text-sm text-slate-500">
+        Cleared
+      </p>
 
-        <div className="text-center">
+      <h2 className="text-3xl font-bold text-green-600">
+        {
+          filteredData.filter((row) => {
+            const invoice = normalizeInvoice(
+              row["Invoice #"]
+            );
 
-          <div className="text-3xl font-bold">
-  {blockedCount}
-</div>
+            return (
+              exceptionSet.has(invoice) ||
+              collectedSet.has(invoice)
+            );
+          }).length
+        }
+      </h2>
+    </div>
 
-          <div className="text-sm text-gray-500">
-            Block
-          </div>
+    <div>
+      <p className="text-sm text-slate-500">
+        Remaining
+      </p>
 
-        </div>
-
-      </div>
-
+      <h2 className="text-3xl font-bold text-red-600">
+        {blockedCount}
+      </h2>
     </div>
 
   </div>
 
+  <div className="w-full bg-slate-200 rounded-full h-4">
+
+    <div
+      className="bg-green-600 h-4 rounded-full"
+      style={{
+        width: `${Math.round(
+          (
+            filteredData.filter((row) => {
+              const invoice = normalizeInvoice(
+                row["Invoice #"]
+              );
+
+              return (
+                exceptionSet.has(invoice) ||
+                collectedSet.has(invoice)
+              );
+            }).length /
+            Math.max(filteredData.length, 1)
+          ) * 100
+        )}%`,
+      }}
+    />
+
+  </div>
+
+</div>
 </div>
            </main>
 
