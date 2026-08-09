@@ -1745,20 +1745,21 @@ onClick={async () => {
   />
 
   <p className="text-slate-500 text-sm relative z-10">
-    Exceptions
-  </p>
+  Exceptions
+</p>
 
-  <h2 className="text-4xl font-bold text-slate-900 mt-2 relative z-10">
-    {exceptionCount}
-  </h2>
+<h2 className="text-4xl font-bold text-slate-900 mt-2 relative z-10">
+  {exceptionCount}
+</h2>
 
-  <div className="flex items-center mt-4 relative z-10">
+<div className="mt-4 h-1 rounded-full bg-orange-500" />
+
+<div className="flex items-center mt-4 relative z-10">
   <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs">
     Legal: {legalCount}
   </span>
 </div>
 
-<div className="mt-4 h-1 rounded-full bg-orange-500" />
 </div>
   <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
 
