@@ -2093,14 +2093,14 @@ await localStorage.setItem(
         className="absolute left-3 top-3"
       />
 
-      <input
-        value={searchText}
-        onChange={(e) =>
-          setSearchText(e.target.value)
-        }
-        placeholder="Search Invoice, Van, Customer..."
-        className="border rounded-lg pl-10 py-2 pr-4 w-72"
-      />
+    <input
+  value={searchText}
+  onChange={(e) =>
+    setSearchText(e.target.value)
+  }
+  placeholder="Search..."
+  className="border rounded-lg pl-10 py-2 px-4 w-52 h-[42px]"
+/>
     </div>
 
     <select
