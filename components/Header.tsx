@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -28,37 +29,85 @@ export default function Header() {
 
   return (
     <>
-      <header>
-        <div className="flex items-center gap-3">
-          {!pathname.startsWith("/van") && (
+      <div className="flex items-center gap-3">
+
+        {/* Mobile - LINK ONLY */}
+        {!pathname.startsWith("/van") && (
+          <Link
+            href="/mobile"
+            title="Mobile"
+            className="
+              relative
+              flex
+              items-center
+              justify-center
+              w-11
+              h-11
+              rounded-xl
+              bg-white/10
+              hover:bg-white/20
+              text-white
+              transition-all
+              duration-200
+            "
+          >
+            <SmartphoneCharging size={22} />
+          </Link>
+        )}
+
+        {/* Filter - POPUP / EVENT ONLY */}
+        {!pathname.startsWith("/van") && (
+          <button
+            type="button"
+            onClick={() => {
+              window.dispatchEvent(new Event("toggle-filters"));
+            }}
+            title="Filters"
+            className="
+              relative
+              flex
+              items-center
+              justify-center
+              w-11
+              h-11
+              rounded-xl
+              bg-white/10
+              hover:bg-white/20
+              text-white
+              transition-all
+              duration-200
+            "
+          >
+            <Filter size={22} />
+          </button>
+        )}
+
+        {/* Login / Logout - POPUP ONLY */}
+        {pathname.startsWith("/van") &&
+          (isLoggedIn ? (
             <button
-              onClick={() => {
-                window.dispatchEvent(new Event("toggle-filters"));
+              type="button"
+              onClick={async () => {
+                await localStorage.removeItem("currentUser");
+                setIsLoggedIn(false);
+                window.location.reload();
               }}
-              title="Filters"
-              className="
-                relative
-                flex
-                items-center
-                justify-center
-                w-11
-                h-11
-                rounded-xl
-                bg-white/10
-                hover:bg-white/20
-                text-white
-                transition-all
-                duration-200
-              "
+              className="h-9 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
             >
-              <Filter size={22} />
+              Logout
             </button>
-          )}
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowLoginModal(true)}
+              className="h-9 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Login
+            </button>
+          ))}
+      </div>
 
-          <NotificationBell />
-        </div>
-      </header>
-
+      {/* Login Modal */}
       {showLoginModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-2xl w-80">
@@ -79,6 +128,7 @@ export default function Header() {
             />
 
             <button
+              type="button"
               className="w-full bg-blue-600 text-white py-3 rounded-lg"
               onClick={async () => {
                 const { data: user } = await supabase
