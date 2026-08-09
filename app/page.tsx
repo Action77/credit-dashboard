@@ -1,4 +1,9 @@
 "use client";
+import {
+  ShieldX,
+  ShieldCheck,
+  FileWarning,
+} from "lucide-react";
 import { useMemo } from "react";
 import { addLog } from "@/lib/activityLog";
 import { toast } from "sonner";
@@ -1696,58 +1701,82 @@ onClick={async () => {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
 
-  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
-    <p className="text-slate-500 text-sm">
-      Blocked Invoices
-    </p>
+  <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
 
-    <h2 className="text-4xl font-bold text-slate-900 mt-2">
-      {blockedCount}
-    </h2>
+  <ShieldX
+    size={130}
+    className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500/5"
+  />
 
-    <div className="mt-4 h-1 rounded-full bg-red-500" />
+  <p className="text-slate-500 text-sm relative z-10">
+    Blocked Invoices
+  </p>
+
+  <h2 className="text-4xl font-bold text-slate-900 mt-2 relative z-10">
+    {blockedCount}
+  </h2>
+
+  <div className="mt-4 h-1 rounded-full bg-red-500" />
+
+</div>
+  <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
+
+  <ShieldCheck
+    size={130}
+    className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500/5"
+  />
+
+  <p className="text-slate-500 text-sm relative z-10">
+    Active
+  </p>
+
+  <h2 className="text-4xl font-bold text-slate-900 mt-2 relative z-10">
+    {activeEmployees}
+  </h2>
+
+  <div className="mt-4 h-1 rounded-full bg-green-500" />
+
+</div>
+  <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
+
+  <FileWarning
+    size={130}
+    className="absolute right-4 top-1/2 -translate-y-1/2 text-orange-500/5"
+  />
+
+  <p className="text-slate-500 text-sm relative z-10">
+    Exceptions
+  </p>
+
+  <h2 className="text-4xl font-bold text-slate-900 mt-2 relative z-10">
+    {exceptionCount}
+  </h2>
+
+  <div className="flex items-center mt-4 relative z-10">
+    <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs">
+      Legal: {legalCount}
+    </span>
   </div>
 
-  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
-    <p className="text-slate-500 text-sm">
-      Active
-    </p>
+</div>
+  <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
 
-    <h2 className="text-4xl font-bold text-slate-900 mt-2">
-      {activeEmployees}
-    </h2>
+  <Users
+    size={130}
+    className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-500/5"
+  />
 
-    <div className="mt-4 h-1 rounded-full bg-green-500" />
-  </div>
+  <p className="text-slate-500 text-sm relative z-10">
+    Employees
+  </p>
 
-  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
-    <p className="text-slate-500 text-sm">
-      Exceptions
-    </p>
+  <h2 className="text-4xl font-bold text-slate-900 mt-2 relative z-10">
+    {employeeCount}
+  </h2>
 
-    <h2 className="text-4xl font-bold text-slate-900 mt-2">
-      {exceptionCount}
-    </h2>
+  <div className="mt-4 h-1 rounded-full bg-blue-500" />
 
-    <div className="flex items-center mt-4">
-      <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs">
-        Legal: {legalCount}
-      </span>
-    </div>
-  </div>
-
-  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
-    <p className="text-slate-500 text-sm">
-      Employees
-    </p>
-
-    <h2 className="text-4xl font-bold text-slate-900 mt-2">
-      {employeeCount}
-    </h2>
-
-    <div className="mt-4 h-1 rounded-full bg-blue-500" />
-  </div>
-
+</div>
 </div>
 
 {/* Import Center */}
