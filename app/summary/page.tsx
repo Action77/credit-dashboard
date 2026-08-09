@@ -700,20 +700,29 @@ const filteredData = data.filter((row) => {
 
 .sort((a: any, b: any) => {
 
-  const aVan = String(a[0]);
-  const bVan = String(b[0]);
+  const aVan = String(a[0]).trim();
+  const bVan = String(b[0]).trim();
 
-  if (aVan.includes("HFR"))
+  const aIsHFR =
+    aVan.includes("HFR");
+
+  const bIsHFR =
+    bVan.includes("HFR");
+
+  // HFR دائماً في الأخير
+  if (aIsHFR && !bIsHFR)
     return 1;
 
-  if (bVan.includes("HFR"))
+  if (!aIsHFR && bIsHFR)
     return -1;
 
+  // ترتيب أبجدي/رقمي داخل كل مجموعة
   return aVan.localeCompare(
     bVan,
     undefined,
     {
       numeric: true,
+      sensitivity: "base",
     }
   );
 
