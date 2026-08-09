@@ -1517,17 +1517,7 @@ const generateReportImage =
 
  };
 
-const today =
-  new Date().toLocaleDateString("en-US");
-const creditFileToday =
-  creditFileInfo.includes(today);
 
-const collectionFileToday =
-  collectionFileInfo.includes(today);
-
-const allFilesToday =
-  creditFileToday &&
-  collectionFileToday;  
 return (
 <>
   <div
@@ -2055,19 +2045,6 @@ await localStorage.setItem(
         {data.length > 0 && (
 
   <div className="bg-white border rounded-xl p-5 mb-6">
-{allFilesToday ? (
-
-  <div className="mb-4 bg-green-100 border border-green-500 text-green-700 rounded-lg p-4 text-center font-bold">
-    ✅ Files Updated Today
-  </div>
-
-) : (
-
-  <div className="mb-4 bg-red-100 border-2 border-red-500 text-red-700 rounded-lg p-4 text-center font-bold animate-shake">
-    🚨 Credit Or Collection File Is Not Updated Today
-  </div>
-
-)}
     <h3 className="font-bold text-lg mb-4">
       Import Status
     </h3>
