@@ -1518,24 +1518,16 @@ const generateReportImage =
  };
 
 const today =
-  new Date().toLocaleDateString("en-GB");
-
-const creditDate =
-  creditFileInfo.split("|").pop()?.trim() || "";
-
-const collectionDate =
-  collectionFileInfo.split("|").pop()?.trim() || "";
-
+  new Date().toLocaleDateString("en-US");
 const creditFileToday =
-  creditDate.includes(today);
+  creditFileInfo.includes(today);
 
 const collectionFileToday =
-  collectionDate.includes(today);
+  collectionFileInfo.includes(today);
 
 const allFilesToday =
   creditFileToday &&
-  collectionFileToday;
-  
+  collectionFileToday;  
 return (
 <>
   <div
