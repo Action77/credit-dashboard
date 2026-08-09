@@ -633,13 +633,22 @@ Van Code
 
 {
 filteredVans
-.sort((a:any,b:any)=>
-  String(a[0]).localeCompare(
-    String(b[0]),
-    undefined,
-    { numeric:true }
-  )
-)
+  .sort((a: any, b: any) => {
+    const vanA = String(a[0]).toUpperCase().trim();
+    const vanB = String(b[0]).toUpperCase().trim();
+
+    const isHFRA = vanA.startsWith("HFR");
+    const isHFRB = vanB.startsWith("HFR");
+
+    if (isHFRA && !isHFRB) return 1;
+    if (!isHFRA && isHFRB) return -1;
+
+    return vanA.localeCompare(
+      vanB,
+      undefined,
+      { numeric: true }
+    );
+  })
 .map(([van,info]:any)=>(
 
 <tr
