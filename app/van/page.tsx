@@ -37,127 +37,175 @@ const [selectedVans, setSelectedVans] =
 
   
 
-useEffect(()=>{
+useEffect(() => {
 
-const load = async()=>{
+  let cancelled = false;
 
+  const load = async () => {
 
-const currentUser =
-  await localStorage.getItem(
-    "currentUser"
+    const currentUser =
+      await localStorage.getItem("currentUser");
+
+    if (cancelled) return;
+
+    if (!currentUser) {
+
+      setIsLoggedIn(false);
+      setData([]);
+      setExceptions([]);
+      setCollectedInvoices([]);
+      setCreditRules([]);
+
+      return;
+    }
+
+    setIsLoggedIn(true);
+
+    const credit =
+      await fetch("/api/credit-data");
+
+    const creditData =
+      await credit.json();
+
+    if (cancelled) return;
+
+    setData(
+      creditData.data || []
+    );
+
+    const ex =
+      await fetch("/api/exceptions");
+
+    const exceptionsData =
+      await ex.json();
+
+    if (cancelled) return;
+
+    const today =
+      new Date();
+
+    today.setHours(
+      0,
+      0,
+      0,
+      0
+    );
+
+    const validExceptions =
+      exceptionsData.filter(
+        (item: any) => {
+
+          const tillDate =
+            new Date(
+              item.till_date
+            );
+
+          tillDate.setHours(
+            0,
+            0,
+            0,
+            0
+          );
+
+          return (
+            item.permanent ||
+            tillDate >= today
+          );
+
+        }
+      );
+
+    setExceptions(
+      validExceptions
+    );
+
+    const col =
+      await fetch(
+        "/api/collection-data"
+      );
+
+    const colData =
+      await col.json();
+
+    if (cancelled) return;
+
+    setCollectedInvoices(
+      colData.invoices || []
+    );
+
+    setIsYasser(
+      String(currentUser)
+        .trim()
+        .toLowerCase() === "yasser"
+    );
+
+    const { data: rules } =
+      await supabase
+        .from("credit_block_rules")
+        .select("*");
+
+    if (cancelled) return;
+
+    setCreditRules(
+      rules || []
+    );
+
+    const savedFilters =
+      await localStorage.getItem(
+        `savedFilters_${currentUser}`
+      );
+
+    if (cancelled) return;
+
+    if (
+      savedFilters &&
+      String(currentUser)
+        .trim()
+        .toLowerCase() !== "yasser"
+    ) {
+
+      const filters =
+        JSON.parse(
+          savedFilters
+        );
+
+      setSelectedRegions(
+        filters.regions || []
+      );
+
+      setSelectedCities(
+        filters.cities || []
+      );
+
+      setSelectedVans(
+        filters.vans || []
+      );
+
+    }
+
+  };
+
+  load();
+
+  const handleUserChanged = () => {
+    load();
+  };
+
+  window.addEventListener(
+    "user-changed",
+    handleUserChanged
   );
 
-if (!currentUser) {
-  setIsLoggedIn(false);
-  return;
-}
+  return () => {
 
-setIsLoggedIn(true);
-const credit =
-await fetch("/api/credit-data");
+    cancelled = true;
 
-const creditData =
-await credit.json();
+    window.removeEventListener(
+      "user-changed",
+      handleUserChanged
+    );
 
-setData(
- creditData.data || []
-);
-
-
-const ex =
-await fetch("/api/exceptions");
-
-const exceptionsData =
-await ex.json();
-
-
-const today = new Date();
-
-today.setHours(0,0,0,0);
-
-
-const validExceptions =
-exceptionsData.filter((item:any)=>{
-
-const tillDate =
-new Date(item.till_date);
-
-tillDate.setHours(0,0,0,0);
-
-
-return (
-item.permanent ||
-tillDate >= today
-);
-
-});
-
-
-setExceptions(validExceptions);
-
-
-
-const col =
-await fetch("/api/collection-data");
-
-const colData =
-await col.json();
-
-setCollectedInvoices(
- colData.invoices || []
-);
-
-
-
-
-if (currentUser) {
-
-  setIsYasser(
-  String(currentUser)
-    .trim()
-    .toLowerCase() === "yasser"
-  );
-
-}
-const { data: rules } =
-await supabase
-.from("credit_block_rules")
-.select("*");
-setCreditRules(
-  rules || []
-);
-const savedFilters =
-await localStorage.getItem(
-  `savedFilters_${currentUser}`
-);
-
-if (
-  savedFilters &&
-  String(currentUser)
-    .trim()
-    .toLowerCase() !== "yasser"
-) {
-
-  const filters =
-    JSON.parse(savedFilters);
-
-  setSelectedRegions(
-    filters.regions || []
-  );
-
-  setSelectedCities(
-    filters.cities || []
-  );
-
-  setSelectedVans(
-    filters.vans || []
-  );
-
-}
-
-};
-
-load();
+  };
 
 }, []);
 
