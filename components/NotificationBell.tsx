@@ -78,18 +78,12 @@ const creditResult =
 const fileDate =
   creditResult.fileDate || "";
 
-const saudiToday =
-  new Date(
-    new Date().toLocaleString(
-      "en-US",
-      {
-        timeZone: "Asia/Riyadh",
-      }
-    )
-  )
-    .toISOString()
-    .split("T")[0];
-
+const saudiToday = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Riyadh",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).format(new Date());
 setCreditAlert(
   fileDate !== saudiToday
 );
