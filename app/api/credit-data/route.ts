@@ -175,20 +175,26 @@ while (true) {
   }));
 
   return NextResponse.json({
-    data: formattedData,
-    fileInfo:
-      data?.length > 0
-        ? `${data[0].file_name} | ${data[0].file_date} | Uploaded By ${uploadedByName} | ${uploadTime?.toLocaleString(
-            "en-US",
-            {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: true,
-            }
-          )}`
-        : "",
-  });
+  data: formattedData,
+
+  fileInfo:
+    data?.length > 0
+      ? `${data[0].file_name} | ${data[0].file_date} | Uploaded By ${uploadedByName} | ${uploadTime?.toLocaleString(
+          "en-US",
+          {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }
+        )}`
+      : "",
+
+  fileDate:
+    data?.length > 0
+      ? data[0].file_date
+      : "",
+});
 }

@@ -75,20 +75,25 @@ const creditResponse =
 const creditResult =
   await creditResponse.json();
 
-const fileInfo =
-  creditResult.fileInfo || "";
+const fileDate =
+  creditResult.fileDate || "";
 
-const todaySaudi =
-  new Date().toLocaleDateString(
-    "en-US",
-    {
-      timeZone: "Asia/Riyadh",
-    }
-  );
+const saudiToday =
+  new Date(
+    new Date().toLocaleString(
+      "en-US",
+      {
+        timeZone: "Asia/Riyadh",
+      }
+    )
+  )
+    .toISOString()
+    .split("T")[0];
 
 setCreditAlert(
-  !fileInfo.includes(todaySaudi)
+  fileDate !== saudiToday
 );
+
 let filtered = data || [];
 
 if (settings) {
