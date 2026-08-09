@@ -6,10 +6,11 @@ import html2canvas from "html2canvas";
 import WhatsAppReport from "@/components/WhatsAppReport";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { storage as localStorage } from "@/utils/storage";
 
 export default function MobileSummaryPage() {
-  
+  const pathname = usePathname();  
   const [whatsAppVan, setWhatsAppVan] =
   useState("");
 
@@ -20,7 +21,7 @@ const [isSendingWhatsApp,
   useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+const [isCheckingUser, setIsCheckingUser] = useState(true);
 
 const [selectedRegions, setSelectedRegions] =
   useState<string[]>([]);
@@ -49,18 +50,18 @@ useEffect(() => {
     if (cancelled) return;
 
     if (!currentUser) {
+  setIsLoggedIn(false);
+  setData([]);
+  setExceptions([]);
+  setCollectedInvoices([]);
+  setCreditRules([]);
+  setIsCheckingUser(false);
 
-      setIsLoggedIn(false);
-      setData([]);
-      setExceptions([]);
-      setCollectedInvoices([]);
-      setCreditRules([]);
+  return;
+}
 
-      return;
-    }
-
-    setIsLoggedIn(true);
-
+setIsLoggedIn(true);
+setIsCheckingUser(false);
     const credit =
       await fetch("/api/credit-data");
 
@@ -207,13 +208,15 @@ useEffect(() => {
 
   };
 
-}, []);
+}, [pathname]);
+
+if (isCheckingUser) {
+  return null;
+}
 
 const filteredData = !isLoggedIn
   ? []
-  : data.filter((row)=>{
-
-
+  : data.filter((row) => {
 
 const normalize=(v:string)=>
 String(v||"")

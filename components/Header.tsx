@@ -39,9 +39,8 @@ export default function Header() {
 <button
   type="button"
   onClick={() => {
-    router.push("/van");
-    router.refresh();
-  }}
+  window.location.href = "/van";
+}}
   className="h-9 w-9 rounded-lg bg-blue-900 text-white hover:bg-blue-800 flex items-center justify-center"
   title="Van"
 >
