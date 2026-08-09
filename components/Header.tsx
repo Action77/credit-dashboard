@@ -36,14 +36,17 @@ export default function Header() {
           <div className="flex items-center gap-3">
             {!pathname.startsWith("/van") && (
               <>
-                <button
-                  type="button"
-                  onClick={() => router.push("/van")}
-                  className="h-9 w-9 rounded-lg bg-blue-900 text-white hover:bg-blue-800 flex items-center justify-center"
-                  title="Van"
-                >
-                  <SmartphoneCharging size={20} strokeWidth={2} />
-                </button>
+<button
+  type="button"
+  onClick={() => {
+    router.push("/van");
+    router.refresh();
+  }}
+  className="h-9 w-9 rounded-lg bg-blue-900 text-white hover:bg-blue-800 flex items-center justify-center"
+  title="Van"
+>
+  <SmartphoneCharging size={20} strokeWidth={2} />
+</button>
 
                 <button
                   type="button"
