@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import GlobalFilter from "@/components/GlobalFilter";
 import Header from "@/components/Header";
 import { Toaster } from "sonner";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -37,6 +38,8 @@ export default function RootLayout({
         />
 
         <Header />
+
+        <GlobalFilter />
 
         {children}
       </body>
