@@ -1746,118 +1746,369 @@ onClick={async () => {
         </div>
 
 {/* Alert */}
-        {data.length > 0 && (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
+        {showImportModal && (
+  <div
+    className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
+    onClick={() => {
+      if (isBusy) return;
+      setShowImportModal(false);
+    }}
+  >
+    <div
+      className="w-full max-w-3xl bg-white rounded-[28px] shadow-2xl overflow-hidden"
+      onClick={(e) => e.stopPropagation()}
+    >
 
-    <div className="flex items-center justify-between mb-5">
-      <div>
-        <h3 className="text-xl font-bold">
-          Import Center
-        </h3>
+      {/* Header */}
+      <div className="relative bg-gradient-to-br from-[#071d5c] via-[#0b2b7a] to-[#1244a0] px-7 py-7 text-white">
 
-        <p className="text-sm text-slate-500">
-          Latest imported files and system status
-        </p>
-      </div>
+        <div className="flex items-start justify-between">
 
-    </div>
+          <div className="flex items-center gap-4">
 
-    <div className="grid md:grid-cols-3 gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center backdrop-blur-sm">
+              <Upload size={27} strokeWidth={2.2} />
+            </div>
 
-      {/* Credit */}
-      <div className="border rounded-2xl p-4 bg-gradient-to-br from-blue-50 to-white">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">
+                Import Center
+              </h2>
 
-        <div className="flex items-center justify-between mb-3">
-          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-            <FileSpreadsheet
-              size={24}
-              className="text-blue-600"
-            />
+              <p className="text-blue-100 text-sm mt-1">
+                Import and update system data
+              </p>
+            </div>
+
           </div>
 
-          <CheckCircle
-            size={20}
-            className={
-              creditFileInfo
-                ? "text-green-500"
-                : "text-slate-300"
-            }
-          />
+          <button
+            disabled={isBusy}
+            onClick={() => {
+              if (isBusy) return;
+              setShowImportModal(false);
+            }}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition ${
+              isBusy
+                ? "opacity-40 cursor-not-allowed"
+                : "bg-white/10 hover:bg-white/20"
+            }`}
+          >
+            ✕
+          </button>
+
         </div>
 
-        <h4 className="font-semibold text-slate-800">
-          Credit File
-        </h4>
+        {/* Header bottom info */}
+        <div className="mt-6 flex items-center gap-2 text-xs text-blue-100">
 
-        <p className="text-sm text-slate-500 mt-2 break-words">
-          {creditFileInfo || "Not Imported"}
-        </p>
+          <div className="w-2 h-2 rounded-full bg-green-400" />
+
+          <span>
+            Supported formats: Excel .xlsx / .xls
+          </span>
+
+        </div>
 
       </div>
 
-      {/* Collection */}
-      <div className="border rounded-2xl p-4 bg-gradient-to-br from-green-50 to-white">
 
-        <div className="flex items-center justify-between mb-3">
-          <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-            <FileSpreadsheet
-              size={24}
-              className="text-green-600"
+      {/* Body */}
+      <div className="p-7">
+
+        <div className="mb-6">
+
+          <h3 className="text-lg font-bold text-slate-800">
+            Select Import Type
+          </h3>
+
+          <p className="text-sm text-slate-500 mt-1">
+            Choose the type of file you want to import into the system.
+          </p>
+
+        </div>
+
+
+        {/* Import Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+
+          {/* Credit */}
+          <label
+            className={`group relative overflow-hidden rounded-2xl border transition-all duration-200 ${
+              isUploadingCredit
+                ? "bg-slate-100 border-slate-200 cursor-not-allowed"
+                : "bg-white border-slate-200 hover:border-blue-400 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+            }`}
+          >
+
+            <div className="p-5">
+
+              <div className="flex items-start justify-between">
+
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    isUploadingCredit
+                      ? "bg-slate-200 text-slate-400"
+                      : "bg-blue-50 text-blue-600 group-hover:bg-blue-100"
+                  }`}
+                >
+                  {isUploadingCredit ? (
+                    <div className="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <FileSpreadsheet size={24} />
+                  )}
+                </div>
+
+                {!isUploadingCredit && (
+                  <Upload
+                    size={17}
+                    className="text-slate-300 group-hover:text-blue-500 transition"
+                  />
+                )}
+
+              </div>
+
+              <div className="mt-5">
+
+                <h4 className="font-bold text-slate-800">
+                  {isUploadingCredit
+                    ? "Uploading..."
+                    : "Credit File"}
+                </h4>
+
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Credit block and invoice data
+                </p>
+
+              </div>
+
+              <div className="mt-5 flex items-center gap-2">
+
+                <span
+                  className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${
+                    isUploadingCredit
+                      ? "bg-slate-200 text-slate-500"
+                      : "bg-blue-50 text-blue-600"
+                  }`}
+                >
+                  {isUploadingCredit
+                    ? "Processing"
+                    : "Excel File"}
+                </span>
+
+              </div>
+
+            </div>
+
+            {!isUploadingCredit && (
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
+            )}
+
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={handleCreditImport}
+              disabled={isUploadingCredit}
             />
-          </div>
 
-          <CheckCircle
-            size={20}
-            className={
-              collectionFileInfo
-                ? "text-green-500"
-                : "text-slate-300"
-            }
-          />
+          </label>
+
+
+          {/* Collection */}
+          <label
+            className={`group relative overflow-hidden rounded-2xl border transition-all duration-200 ${
+              isUploadingCollection
+                ? "bg-slate-100 border-slate-200 cursor-not-allowed"
+                : "bg-white border-slate-200 hover:border-green-400 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+            }`}
+          >
+
+            <div className="p-5">
+
+              <div className="flex items-start justify-between">
+
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    isUploadingCollection
+                      ? "bg-slate-200 text-slate-400"
+                      : "bg-green-50 text-green-600 group-hover:bg-green-100"
+                  }`}
+                >
+                  {isUploadingCollection ? (
+                    <div className="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <CheckCircle size={24} />
+                  )}
+                </div>
+
+                {!isUploadingCollection && (
+                  <Upload
+                    size={17}
+                    className="text-slate-300 group-hover:text-green-500 transition"
+                  />
+                )}
+
+              </div>
+
+              <div className="mt-5">
+
+                <h4 className="font-bold text-slate-800">
+                  {isUploadingCollection
+                    ? "Uploading..."
+                    : "Collection File"}
+                </h4>
+
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Collected invoices and payments
+                </p>
+
+              </div>
+
+              <div className="mt-5 flex items-center gap-2">
+
+                <span
+                  className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${
+                    isUploadingCollection
+                      ? "bg-slate-200 text-slate-500"
+                      : "bg-green-50 text-green-600"
+                  }`}
+                >
+                  {isUploadingCollection
+                    ? "Processing"
+                    : "Excel File"}
+                </span>
+
+              </div>
+
+            </div>
+
+            {!isUploadingCollection && (
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
+            )}
+
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={handleCollectionImport}
+              disabled={isUploadingCollection}
+            />
+
+          </label>
+
+
+          {/* Users */}
+          <label
+            className={`group relative overflow-hidden rounded-2xl border transition-all duration-200 ${
+              isImportingUsers
+                ? "bg-slate-100 border-slate-200 cursor-not-allowed"
+                : "bg-white border-slate-200 hover:border-purple-400 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+            }`}
+          >
+
+            <div className="p-5">
+
+              <div className="flex items-start justify-between">
+
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    isImportingUsers
+                      ? "bg-slate-200 text-slate-400"
+                      : "bg-purple-50 text-purple-600 group-hover:bg-purple-100"
+                  }`}
+                >
+                  {isImportingUsers ? (
+                    <div className="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Users size={24} />
+                  )}
+                </div>
+
+                {!isImportingUsers && (
+                  <Upload
+                    size={17}
+                    className="text-slate-300 group-hover:text-purple-500 transition"
+                  />
+                )}
+
+              </div>
+
+              <div className="mt-5">
+
+                <h4 className="font-bold text-slate-800">
+                  {isImportingUsers
+                    ? "Importing..."
+                    : "Users File"}
+                </h4>
+
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Users and Van mapping data
+                </p>
+
+              </div>
+
+              <div className="mt-5 flex items-center gap-2">
+
+                <span
+                  className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${
+                    isImportingUsers
+                      ? "bg-slate-200 text-slate-500"
+                      : "bg-purple-50 text-purple-600"
+                  }`}
+                >
+                  {isImportingUsers
+                    ? "Processing"
+                    : "Excel File"}
+                </span>
+
+              </div>
+
+            </div>
+
+            {!isImportingUsers && (
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-purple-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
+            )}
+
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={handleImport}
+              disabled={isImportingUsers}
+            />
+
+          </label>
+
         </div>
 
-        <h4 className="font-semibold text-slate-800">
-          Collection File
-        </h4>
 
-        <p className="text-sm text-slate-500 mt-2 break-words">
-          {collectionFileInfo || "Not Imported"}
-        </p>
+        {/* Bottom status */}
+        <div className="mt-6 px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
 
-      </div>
+          <div className="flex items-center gap-2">
 
-      {/* Statistics */}
-      <div className="border rounded-2xl p-4 bg-gradient-to-br from-purple-50 to-white">
-
-        <div className="flex items-center justify-between mb-3">
-
-          <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
             <Database
-              size={24}
-              className="text-purple-600"
+              size={16}
+              className="text-slate-400"
             />
+
+            <span className="text-xs text-slate-500">
+              Files are validated before processing
+            </span>
+
           </div>
 
-        </div>
+          <span className="text-xs font-semibold text-slate-400">
+            SECURE IMPORT
+          </span>
 
-        <h4 className="font-semibold text-slate-800">
-          Records Status
-        </h4>
-
-        <div className="mt-3">
-          <div className="text-3xl font-bold text-purple-700">
-            {blockedCount}
-          </div>
-
-          <div className="text-sm text-slate-500">
-            Active Credit Blocks
-          </div>
         </div>
 
       </div>
 
     </div>
-
   </div>
 )}
 
