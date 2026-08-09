@@ -42,7 +42,37 @@ console.time("READ_EXCEL");
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
 
-    const creditFileDate = worksheet["B3"]?.w || "";
+    const creditCell = worksheet["B3"];
+
+let creditFileDate = "";
+
+if (creditCell) {
+  if (typeof creditCell.v === "number") {
+    const parsed = XLSX.SSF.parse_date_code(
+      creditCell.v
+    );
+
+    creditFileDate =
+      `${parsed.y}-${String(parsed.m).padStart(2, "0")}-${String(parsed.d).padStart(2, "0")}`;
+  } else {
+    const rawDate = String(
+      creditCell.w || creditCell.v || ""
+    ).trim();
+
+    const match = rawDate.match(
+      /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/
+    );
+
+    if (match) {
+      const [, day, month, year] = match;
+
+      creditFileDate =
+        `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    } else {
+      creditFileDate = rawDate.slice(0, 10);
+    }
+  }
+}
 
     const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, {
       range: 5,

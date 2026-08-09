@@ -1745,23 +1745,7 @@ onClick={async () => {
         {/* Actions */}
         <div className="flex justify-end mb-6">
 
-  <div className="flex gap-3 relative">
-              <Search
-                size={18}
-                className="absolute left-3 top-3"
-              />
-
-<input
-  value={searchText}
-  onChange={(e) =>
-    setSearchText(e.target.value)
-  }
-  placeholder="Search Invoice, Van, Customer..."
-  className="bg-white border rounded-lg pl-10 py-3 pr-4"
-/>
-
-            </div>
-
+  
 
 
 <button
@@ -2101,17 +2085,32 @@ await localStorage.setItem(
     Invoices
   </h3>
 
-  <div className="flex gap-2">
+  <div className="flex gap-2 items-center">
+
+    <div className="relative">
+      <Search
+        size={18}
+        className="absolute left-3 top-3"
+      />
+
+      <input
+        value={searchText}
+        onChange={(e) =>
+          setSearchText(e.target.value)
+        }
+        placeholder="Search Invoice, Van, Customer..."
+        className="border rounded-lg pl-10 py-2 pr-4 w-72"
+      />
+    </div>
 
     <select
       value={whatsAppVan}
       onChange={(e) =>
-        setWhatsAppVan(
-          e.target.value
-        )
+        setWhatsAppVan(e.target.value)
       }
       className="border rounded-lg px-3 py-2"
     >
+
       <option value="">
         Select Van
       </option>
