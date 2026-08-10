@@ -867,14 +867,6 @@ return (
         </th>
 
         <th className="p-3">
-          Customer Code
-        </th>
-
-        <th className="p-3">
-          Customer Name
-        </th>
-
-        <th className="p-3">
           First Seen
         </th>
 
