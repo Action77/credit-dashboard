@@ -698,7 +698,7 @@ const requestUnblock = async () => {
       pointer-events-none
     "
   >
-    🚚
+    
   </div>
             <div className="font-bold text-blue-700 text-base">
               {row["Invoice #"]}
