@@ -1,5 +1,5 @@
 "use client";
-
+import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -203,15 +203,36 @@ const temporaryCount = loaded
 
             return (
               <div
-                key={index}
-                className="
-                  bg-white
-                  rounded-xl
-                  shadow
-                  p-4
-                "
-              >
-
+  key={index}
+  className="
+    relative
+    overflow-hidden
+    bg-white
+    rounded-xl
+    border
+    border-orange-300
+    shadow-sm
+    p-4
+    before:absolute
+    before:inset-1
+    before:rounded-lg
+    before:border
+    before:border-orange-100
+    before:pointer-events-none
+  "
+>
+  <div
+    className="
+      absolute
+      right-4
+      top-4
+      text-orange-200
+      opacity-30
+      pointer-events-none
+    "
+  >
+    <AlertCircle size={60} />
+  </div>
                 <div className="font-bold text-red-700 text-base">
                   {item.invoice}
                 </div>
@@ -224,8 +245,7 @@ const temporaryCount = loaded
                   {item.customer_code}
                 </div>
 
-                <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-
+                <div className="mt-3 pt-3 border-t border-orange-100 grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-slate-500">
                       Employee:
