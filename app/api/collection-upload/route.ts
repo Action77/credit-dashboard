@@ -196,6 +196,62 @@ await supabase
     title: "📦 Collection File Imported",
     message: `Collection ${uploadRecord.id} uploaded successfully by ${user?.full_name || uploadedBy}.`,
   });
+
+const previousUploadId =
+  uploadRecord.id - 1;
+
+if (previousUploadId > 0) {
+
+  const { data: previousInvoices } =
+    await supabase
+      .from("collection_invoices")
+      .select("invoice")
+      .eq(
+        "upload_id",
+        previousUploadId
+      );
+
+  const previousSet = new Set(
+    (previousInvoices || []).map(
+      (r: any) =>
+        String(r.invoice)
+          .trim()
+          .toUpperCase()
+    )
+  );
+
+  const currentSet = new Set(
+    recordsToInsert.map(
+      (r: any) =>
+        String(r.invoice)
+          .trim()
+          .toUpperCase()
+    )
+  );
+
+  const disappearedInvoices =
+    [...previousSet].filter(
+      invoice =>
+        !currentSet.has(invoice)
+    );
+
+  if (disappearedInvoices.length > 0) {
+
+    await supabase
+      .from("notifications")
+      .insert({
+        username: null,
+        title:
+          "🚨 Disappeared Invoice Alert",
+        message:
+          `${disappearedInvoices.length} invoice(s) disappeared from Collection ${uploadRecord.id}.`,
+        is_read: false,
+      });
+
+  }
+
+}
+
 const affectedInvoices =
   newlyCollectedInvoices;
 
