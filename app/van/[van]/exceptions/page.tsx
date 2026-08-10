@@ -1,5 +1,5 @@
 "use client";
-import { AlertCircle } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -231,7 +231,7 @@ const temporaryCount = loaded
       pointer-events-none
     "
   >
-    <AlertCircle size={60} />
+    <ShieldCheck size={60} />
   </div>
                 <div className="font-bold text-red-700 text-base">
                   {item.invoice}
