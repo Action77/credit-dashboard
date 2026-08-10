@@ -21,6 +21,8 @@ import { storage as localStorage } from "@/utils/storage";
 
 
 export default function ReportsPage() {
+  const [missingLoaded, setMissingLoaded] =
+  useState(false);
   const [isImportingUsers, setIsImportingUsers] =
   useState(false);
 
@@ -557,67 +559,75 @@ useEffect(() => {
   const loadMissingInvoices =
     async () => {
 
-      const response =
-        await fetch(
-          "/api/reports/missing"
-        );
+      try {
 
-      const data =
-        await response.json();
-
-      const currentUser =
-  await localStorage.getItem(
-    "currentUser"
-  );
-
-const filterKey = currentUser
-  ? `savedFilters_${currentUser}`
-  : "savedFilters_guest";
-
-const saved =
-  await localStorage.getItem(
-    filterKey
-  );
-      if (!saved) {
-
-        setMissingInvoices(data);
-        return;
-
-      }
-
-      const filters =
-        JSON.parse(saved);
-
-      const filtered =
-        data.filter((row: any) => {
-
-          const regionMatch =
-            filters.regions?.length === 0 ||
-            filters.regions?.includes(
-              row.region
-            );
-
-          const cityMatch =
-            filters.cities?.length === 0 ||
-            filters.cities?.includes(
-              row.city
-            );
-
-          const vanMatch =
-            filters.vans?.length === 0 ||
-            filters.vans?.includes(
-              row.van_code
-            );
-
-          return (
-            regionMatch &&
-            cityMatch &&
-            vanMatch
+        const response =
+          await fetch(
+            "/api/reports/missing"
           );
 
-        });
+        const data =
+          await response.json();
 
-      setMissingInvoices(filtered);
+        const currentUser =
+          await localStorage.getItem(
+            "currentUser"
+          );
+
+        const filterKey =
+          currentUser
+            ? `savedFilters_${currentUser}`
+            : "savedFilters_guest";
+
+        const saved =
+          await localStorage.getItem(
+            filterKey
+          );
+
+        if (!saved) {
+          setMissingInvoices(data);
+          return;
+        }
+
+        const filters =
+          JSON.parse(saved);
+
+        const filtered =
+          data.filter((row: any) => {
+
+            const regionMatch =
+              filters.regions?.length === 0 ||
+              filters.regions?.includes(
+                row.region
+              );
+
+            const cityMatch =
+              filters.cities?.length === 0 ||
+              filters.cities?.includes(
+                row.city
+              );
+
+            const vanMatch =
+              filters.vans?.length === 0 ||
+              filters.vans?.includes(
+                row.van_code
+              );
+
+            return (
+              regionMatch &&
+              cityMatch &&
+              vanMatch
+            );
+
+          });
+
+        setMissingInvoices(filtered);
+
+      } finally {
+
+        setMissingLoaded(true);
+
+      }
 
     };
 
@@ -839,85 +849,122 @@ return (
       <h1 className="text-3xl font-bold mb-6">
         Reports
       </h1>
-     <div
-  className="bg-white border rounded-xl p-5 mb-6 overflow-hidden"
-  style={{
-    maxWidth: "1200px"
-  }}
->
-  <div className="flex justify-between items-center mb-4">
+    {missingLoaded && (
+  <div
+    className="
+      bg-white
+      border
+      border-amber-200
+      rounded-2xl
+      shadow-sm
+      p-5
+      mb-6
+      overflow-hidden
+      max-w-[1200px]
+    "
+  >
+    <div className="flex justify-between items-center mb-4">
 
-    <h2 className="text-xl font-bold text-amber-700">
-      🚨 Disappeared Invoices
-    </h2>
+      <h2 className="text-xl font-bold text-amber-700">
+        🚨 Disappeared Invoices
+      </h2>
 
-    <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
-      {missingInvoices.length}
-    </span>
+      <span
+        className="
+          bg-amber-100
+          text-amber-700
+          px-3
+          py-1
+          rounded-full
+          text-sm
+          font-semibold
+        "
+      >
+        {missingInvoices.length}
+      </span>
 
-  </div>
+    </div>
 
-  <table className="w-full border">
+    <div className="overflow-x-auto">
+
+      <table className="w-full text-sm border-collapse">
+
         <thead>
+          <tr className="bg-amber-600 text-white">
 
-      <tr className="bg-amber-600 text-white">
+            <th className="p-3 text-left">
+              Invoice No
+            </th>
 
-        <th className="p-3">
-          Invoice No
-        </th>
+            <th className="p-3 text-left">
+              First Seen
+            </th>
 
-        <th className="p-3">
-          First Seen
-        </th>
-
-        <th className="p-3">
-          Missing From
-        </th>
-
-      </tr>
-
-    </thead>
-
-    <tbody>
-
-      {missingInvoices.map(
-        (row: any, index) => (
-
-          <tr
-            key={index}
-            className="bg-yellow-100 border-b"
-          >
-
-            <td className="p-2">
-              {row.invoice}
-            </td>
-
-            <td className="p-2">
-              {row.customer_code}
-            </td>
-
-            <td className="p-2">
-              {row.customer_name}
-            </td>
-
-            <td className="p-2">
-              Collection {row.first_seen}
-            </td>
-
-            <td className="p-2">
-              Collection {row.missing_from}
-            </td>
+            <th className="p-3 text-left">
+              Missing From
+            </th>
 
           </tr>
+        </thead>
 
-        )
-      )}
+<tbody>
 
-    </tbody>
+  {missingInvoices.length === 0 ? (
 
-  </table>
+    <tr>
+      <td
+        colSpan={3}
+        className="
+          text-center
+          py-8
+          text-slate-500
+        "
+      >
+        No disappeared invoices found
+      </td>
+    </tr>
 
-</div>
+  ) : (
+
+    missingInvoices.map(
+      (row: any, index) => (
+
+        <tr
+          key={index}
+          className="
+            border-b
+            border-amber-100
+            hover:bg-amber-50
+            transition-colors
+          "
+        >
+          <td className="p-3 font-semibold text-slate-800">
+            {row.invoice}
+          </td>
+
+          <td className="p-3">
+            Collection {row.first_seen}
+          </td>
+
+          <td className="p-3">
+            Collection {row.missing_from}
+          </td>
+        </tr>
+
+      )
+    )
+
+  )}
+
+</tbody>
+      </table>
+
+    </div>
+
+  </div>
+)}
+
+
 <div className="mb-4">
 
   <input
