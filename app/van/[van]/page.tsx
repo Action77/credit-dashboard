@@ -677,14 +677,14 @@ const requestUnblock = async () => {
     bg-white
     rounded-xl
     border
-    border-cyan-300
+    border-rose-300
     shadow-sm
     p-4
     before:absolute
     before:inset-1
     before:rounded-lg
     before:border
-    before:border-cyan-100
+    before:border-rose-100
     before:pointer-events-none
   "
 >
@@ -693,13 +693,14 @@ const requestUnblock = async () => {
       absolute
       right-4
       top-4
-      text-cyan-200
-      opacity-40
+      text-rose-200
+      opacity-30
       pointer-events-none
     "
   >
-    
+    <AlertCircle size={60} />
   </div>
+
             <div className="font-bold text-blue-700 text-base">
               {row["Invoice #"]}
             </div>
