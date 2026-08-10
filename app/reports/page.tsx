@@ -917,7 +917,7 @@ return (
 
   <tr>
     <td
-      colSpan={7}
+      colSpan={5}
       className="
         text-center
         py-8
@@ -942,14 +942,6 @@ return (
           "
         >
           <td className="p-2">
-  {row.region}
-</td>
-
-<td className="p-2">
-  {row.city}
-</td>
-
-<td className="p-2">
   {row.organization_code}
 </td>
 
