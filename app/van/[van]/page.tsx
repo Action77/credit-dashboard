@@ -669,11 +669,37 @@ const requestUnblock = async () => {
         {reportData.map(
           (row,index)=>(
 
-          <div
-            key={index}
-            className="bg-white rounded-xl shadow p-4"
-          >
-
+<div
+  key={index}
+  className="
+    relative
+    overflow-hidden
+    bg-white
+    rounded-xl
+    border
+    border-cyan-300
+    shadow-sm
+    p-4
+    before:absolute
+    before:inset-1
+    before:rounded-lg
+    before:border
+    before:border-cyan-100
+    before:pointer-events-none
+  "
+>
+  <div
+    className="
+      absolute
+      right-4
+      top-4
+      text-cyan-200
+      opacity-40
+      pointer-events-none
+    "
+  >
+    🚚
+  </div>
             <div className="font-bold text-blue-700 text-base">
               {row["Invoice #"]}
             </div>
@@ -690,8 +716,7 @@ const requestUnblock = async () => {
 
 
 
-            <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-
+            <div className="mt-3 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-sm">
 
               <div>
                 <span className="text-slate-500">
