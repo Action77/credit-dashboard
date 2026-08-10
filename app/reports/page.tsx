@@ -421,11 +421,19 @@ useEffect(() => {
 
   const loadFilters = async () => {
 
-    const saved =
-      await localStorage.getItem(
-        "summaryFilters"
-      );
+    const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
 
+const filterKey = currentUser
+  ? `savedFilters_${currentUser}`
+  : "savedFilters_guest";
+
+const saved =
+  await localStorage.getItem(
+    filterKey
+  );
     if (!saved) {
 
       setFilteredCreditData(
@@ -557,11 +565,19 @@ useEffect(() => {
       const data =
         await response.json();
 
-      const saved =
-        await localStorage.getItem(
-          "summaryFilters"
-        );
+      const currentUser =
+  await localStorage.getItem(
+    "currentUser"
+  );
 
+const filterKey = currentUser
+  ? `savedFilters_${currentUser}`
+  : "savedFilters_guest";
+
+const saved =
+  await localStorage.getItem(
+    filterKey
+  );
       if (!saved) {
 
         setMissingInvoices(data);
