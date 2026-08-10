@@ -76,13 +76,34 @@ const invoices = rows
       status === "completed"
     );
   })
-  .map((row: any) =>
-    String(row[1] || "")
+  .map((row: any) => ({
+    invoice: String(row[1] || "")
       .trim()
       .replace(/\s/g, "")
-      .toUpperCase()
-  )
-  .filter(Boolean);
+      .toUpperCase(),
+
+    organization_code:
+      String(row[11] || "").trim(),
+
+    organization_name:
+      String(row[12] || "").trim(),
+
+    customer_code:
+      String(row[16] || "").trim(),
+
+    customer_name:
+      String(row[17] || "").trim(),
+
+    region:
+      String(row[22] || "").trim(),
+
+    city:
+      String(row[23] || "").trim(),
+  }))
+  .filter(
+    (row: any) => row.invoice
+  );
+
     const { data: uploadRecord, error: uploadError } =
   await supabase
     .from("collection_uploads")
@@ -98,10 +119,32 @@ if (uploadError) {
 }
 
 const records = invoices.map(
-  (invoice) => ({
-    invoice,
-    uploaded_by: uploadedBy,
-    upload_id: uploadRecord.id,
+  (item) => ({
+    invoice: item.invoice,
+
+    organization_code:
+      item.organization_code,
+
+    organization_name:
+      item.organization_name,
+
+    customer_code:
+      item.customer_code,
+
+    customer_name:
+      item.customer_name,
+
+    region:
+      item.region,
+
+    city:
+      item.city,
+
+    uploaded_by:
+      uploadedBy,
+
+    upload_id:
+      uploadRecord.id,
   })
 );
 const { data: existingCollected } =
@@ -118,15 +161,14 @@ const existingCollectedSet =
           .toUpperCase()
     )
   );
-const uniqueInvoices = [
-  ...new Set(records.map(r => r.invoice))
-];
 const recordsToInsert =
-  uniqueInvoices.map(invoice => ({
-    invoice,
-    uploaded_by: uploadedBy,
-    upload_id: uploadRecord.id,
-  }));
+  records.filter(
+    (record, index, self) =>
+      index ===
+      self.findIndex(
+        r => r.invoice === record.invoice
+      )
+  );
 const newlyCollectedInvoices =
   recordsToInsert
     .map(r => r.invoice)

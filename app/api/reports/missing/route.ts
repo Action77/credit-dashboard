@@ -65,39 +65,44 @@ export async function GET() {
 
       if (!nextSet.has(invoice)) {
 
-const { data: creditRow } =
+const { data: collectionRow } =
   await supabase
-    .from("credit_data_full")
-            .select(
-  `
-  invoice,
-  customer_code,
-  customer_name,
-  region,
-  city,
-  van_code
-  `
-)
-            .eq(
-              "invoice",
-              invoice
-            )
-            .maybeSingle();
+    .from("collection_invoices")
+    .select(`
+      invoice,
+      region,
+      city,
+      organization_code,
+      organization_name
+    `)
+    .eq(
+      "invoice",
+      invoice
+    )
+    .eq(
+      "upload_id",
+      currentUpload.id
+    )
+    .maybeSingle();
 
-        results.push({
-  invoice,
-  customer_code:
-    creditRow?.customer_code || "",
-  customer_name:
-    creditRow?.customer_name || "",
+results.push({
   region:
-    creditRow?.region || "",
+    collectionRow?.region || "",
+
   city:
-    creditRow?.city || "",
-  van_code:
-    creditRow?.van_code || "",
+    collectionRow?.city || "",
+
+  organization_code:
+    collectionRow?.organization_code || "",
+
+  organization_name:
+    collectionRow?.organization_name || "",
+
+  invoice,
+
   first_seen:
     currentUpload.id,
+
   missing_from:
     nextUpload.id,
 });

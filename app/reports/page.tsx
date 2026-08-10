@@ -860,8 +860,7 @@ return (
       p-5
       mb-6
       overflow-hidden
-      max-w-[1200px]
-    "
+      max-w-full    "
   >
     <div className="flex justify-between items-center mb-4">
 
@@ -887,45 +886,59 @@ return (
 
     <div className="overflow-x-auto">
 
-      <table className="w-full text-sm border-collapse">
+  <table className="w-full text-xs border-collapse">
 
-        <thead>
-          <tr className="bg-amber-600 text-white">
+    <thead>
+      <tr className="bg-amber-600 text-white">
 
-            <th className="p-3 text-left">
-              Invoice No
-            </th>
+        <th className="p-2 text-left">
+          Region
+        </th>
 
-            <th className="p-3 text-left">
-              First Seen
-            </th>
+        <th className="p-2 text-left">
+          City
+        </th>
 
-            <th className="p-3 text-left">
-              Missing From
-            </th>
+        <th className="p-2 text-left">
+          Organization Code
+        </th>
 
-          </tr>
-        </thead>
+        <th className="p-2 text-left">
+          Organization Name
+        </th>
 
+        <th className="p-2 text-left">
+          Invoice No
+        </th>
+
+        <th className="p-2 text-left">
+          First Seen
+        </th>
+
+        <th className="p-2 text-left">
+          Missing From
+        </th>
+
+      </tr>
+    </thead>
 <tbody>
 
   {missingInvoices.length === 0 ? (
 
-    <tr>
-      <td
-        colSpan={3}
-        className="
-          text-center
-          py-8
-          text-slate-500
-        "
-      >
-        No disappeared invoices found
-      </td>
-    </tr>
+  <tr>
+    <td
+      colSpan={7}
+      className="
+        text-center
+        py-8
+        text-slate-500
+      "
+    >
+      No disappeared invoices found
+    </td>
+  </tr>
 
-  ) : (
-
+) : (
     missingInvoices.map(
       (row: any, index) => (
 
@@ -938,17 +951,36 @@ return (
             transition-colors
           "
         >
-          <td className="p-3 font-semibold text-slate-800">
-            {row.invoice}
-          </td>
+          <td className="p-2">
+  {row.region}
+</td>
 
-          <td className="p-3">
-            Collection {row.first_seen}
-          </td>
+<td className="p-2">
+  {row.city}
+</td>
 
-          <td className="p-3">
-            Collection {row.missing_from}
-          </td>
+<td className="p-2">
+  {row.organization_code}
+</td>
+
+<td
+  className="p-2 max-w-[220px] truncate"
+  title={row.organization_name}
+>
+  {row.organization_name}
+</td>
+
+<td className="p-2 font-semibold text-slate-800">
+  {row.invoice}
+</td>
+
+<td className="p-2">
+  Collection {row.first_seen}
+</td>
+
+<td className="p-2">
+  Collection {row.missing_from}
+</td>
         </tr>
 
       )
