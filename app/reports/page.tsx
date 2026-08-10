@@ -607,18 +607,10 @@ useEffect(() => {
                 row.city
               );
 
-            const vanMatch =
-              filters.vans?.length === 0 ||
-              filters.vans?.includes(
-                row.van_code
-              );
-
             return (
-              regionMatch &&
-              cityMatch &&
-              vanMatch
-            );
-
+  regionMatch &&
+  cityMatch
+);
           });
 
         setMissingInvoices(filtered);
