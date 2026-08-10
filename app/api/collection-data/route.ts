@@ -7,25 +7,25 @@ const supabase = createClient(
 );
 
 export async function GET() {
-  
+
   let allInvoices: any[] = [];
   let from = 0;
   const batchSize = 1000;
 
+  const { data: latestUpload } = await supabase
+    .from("collection_uploads")
+    .select("*")
+    .order("id", { ascending: false })
+    .limit(1)
+    .single();
+
   while (true) {
     const { data: batch, error } = await supabase
-  .from("collection_invoices")
-  .select(
-    "invoice, uploaded_by, created_at"
-  )
-  .range(from, from + batchSize - 1);
-const { data: latestUpload } = await supabase
-  .from("collection_uploads")
-  .select("*")
-  .order("id", { ascending: false })
-  .limit(1)
-  .single();
-
+      .from("collection_invoices")
+      .select(
+        "invoice, uploaded_by, created_at"
+      )
+      .range(from, from + batchSize - 1);
 
     if (error) {
       return NextResponse.json({
@@ -49,27 +49,27 @@ const { data: latestUpload } = await supabase
 
   let fullName = "";
 
-  if (allInvoices.length > 0) {
+  if (latestUpload?.uploaded_by) {
     const { data: user } = await supabase
       .from("app_users")
       .select("full_name")
       .eq(
         "username",
-        allInvoices[0].uploaded_by
+        latestUpload.uploaded_by
       )
       .single();
 
     fullName =
       user?.full_name ||
-      allInvoices[0].uploaded_by ||
+      latestUpload.uploaded_by ||
       "Unknown";
   }
 
   const uploadTime =
-    allInvoices.length > 0
+    latestUpload?.created_at
       ? new Date(
           new Date(
-            allInvoices[0].created_at
+            latestUpload.created_at
           ).getTime() +
             3 * 60 * 60 * 1000
         )
@@ -81,7 +81,7 @@ const { data: latestUpload } = await supabase
     ),
 
     fileInfo:
-      allInvoices.length > 0
+      latestUpload
         ? `Uploaded By ${fullName} | ${uploadTime?.toLocaleString(
             "en-US",
             {
