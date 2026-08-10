@@ -670,69 +670,93 @@ const requestUnblock = async () => {
           (row,index)=>(
 
           <div
-            key={index}
-            className="bg-white rounded-xl shadow p-4"
-          >
+  key={index}
+  className="
+    bg-white
+    rounded-2xl
+    shadow-sm
+    border
+    border-slate-200
+    p-4
+  "
+>
+  <div className="flex items-start justify-between">
+    <div>
+      <div className="font-bold text-blue-700 text-base">
+        {row["Invoice #"]}
+      </div>
 
-            <div className="font-bold text-blue-700 text-base">
-              {row["Invoice #"]}
-            </div>
+      <div className="mt-1 font-medium text-slate-800">
+        {row["Customer Name"]}
+      </div>
 
+      <div className="text-xs text-slate-500">
+        {row["Customer Code"]}
+      </div>
+    </div>
 
-            <div className="mt-2 font-medium">
-              {row["Customer Name"]}
-            </div>
+    <div className="
+      bg-red-50
+      text-red-700
+      text-xs
+      font-semibold
+      px-2
+      py-1
+      rounded-full
+      whitespace-nowrap
+    ">
+      {row["Credit_Days"]} Days
+    </div>
+  </div>
 
+  <div className="
+    mt-4
+    grid
+    grid-cols-2
+    gap-2
+    text-sm
+  ">
+    <div className="
+      bg-slate-50
+      rounded-lg
+      p-2
+    ">
+      <div className="text-xs text-slate-500">
+        Pending CIM
+      </div>
+      <div className="font-semibold">
+        {row["Pending CIM"]}
+      </div>
+    </div>
 
-            <div className="text-sm text-slate-500">
-              {row["Customer Code"]}
-            </div>
+    <div className="
+      bg-slate-50
+      rounded-lg
+      p-2
+    ">
+      <div className="text-xs text-slate-500">
+        Rejected
+      </div>
+      <div className="font-semibold">
+        {row["Total Rejected Count"]}
+      </div>
+    </div>
 
-
-
-            <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-
-
-              <div>
-                <span className="text-slate-500">
-                  Days:
-                </span>{" "}
-                {row["Credit_Days"]}
-              </div>
-
-
-
-              <div>
-                <span className="text-slate-500">
-                  CIM:
-                </span>{" "}
-                {row["Pending CIM"]}
-              </div>
-
-
-
-              <div>
-                <span className="text-slate-500">
-                  Payment:
-                </span>{" "}
-                {row["Payment Term"]}
-              </div>
-
-
-
-              <div>
-                <span className="text-slate-500">
-                  Rejected:
-                </span>{" "}
-                {row["Total Rejected Count"]}
-              </div>
-
-
-            </div>
-
-
-          </div>
-
+    <div className="
+      bg-slate-50
+      rounded-lg
+      p-2
+      col-span-2
+    ">
+      <div className="text-xs text-slate-500">
+        Payment Term
+      </div>
+      <div className="font-semibold break-words">
+        {row["Payment Term"]}
+      </div>
+    </div>
+  </div>
+</div>
         ))}
 
 
