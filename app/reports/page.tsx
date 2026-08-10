@@ -884,38 +884,28 @@ return (
 
     </div>
 
-    <div className="overflow-x-auto">
-
-  <table className="w-full text-xs border-collapse">
-
+    <div className="overflow-hidden">
+  <table className="w-full text-xs table-fixed border-collapse">
     <thead>
       <tr className="bg-amber-600 text-white">
 
-        <th className="p-2 text-left">
-          Region
-        </th>
+<th className="w-[110px] p-2 text-left">
+  Organization Code
+</th>
 
-        <th className="p-2 text-left">
-          City
-        </th>
+<th className="w-[200px] p-2 text-left">
+  Organization Name
+</th>
 
-        <th className="p-2 text-left">
-          Organization Code
-        </th>
+<th className="w-[140px] p-2 text-left">
+  Invoice No
+</th>
 
-        <th className="p-2 text-left">
-          Organization Name
-        </th>
+<th className="w-[100px] p-2 text-left">
+  First Seen
+</th>
 
-        <th className="p-2 text-left">
-          Invoice No
-        </th>
-
-        <th className="p-2 text-left">
-          First Seen
-        </th>
-
-        <th className="p-2 text-left">
+        <th className="w-[100px] p-2 text-left">
           Missing From
         </th>
 
@@ -964,7 +954,7 @@ return (
 </td>
 
 <td
-  className="p-2 max-w-[220px] truncate"
+  className="p-2 truncate"
   title={row.organization_name}
 >
   {row.organization_name}
