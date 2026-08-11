@@ -339,17 +339,6 @@ if (uploadError) {
   throw uploadError;
 }
 
-// حفظ الحالة الحالية للفانات كما هي معروضة بالجدول
-const oldMap: any = {};
-
-vans.forEach(([van, info]: any) => {
-  oldMap[van] = {
-    remaining: info.remaining,
-    exceptions: info.exceptions,
-  };
-});
-
-
 await fetch(
   "/api/collection-upload",
   {
@@ -364,116 +353,6 @@ await fetch(
       originalName: file.name,
     }),
   }
-);
-
-// جلب البيانات الجديدة بعد رفع الملف
-const creditResponse =
-  await fetch("/api/credit-data");
-
-const creditResult =
-  await creditResponse.json();
-
-const collectionResponse =
-  await fetch("/api/collection-data");
-
-const collectionResult =
-  await collectionResponse.json();
-
-const newCollectedInvoices =
-  collectionResult.invoices || [];
-
-// حساب الحالة الجديدة
-const newVanStatus = Object.entries(
-  (creditResult.data || []).reduce(
-    (acc: any, row: any) => {
-
-      const van = row["Van Code."];
-
-      if (!acc[van]) {
-        acc[van] = {
-          remaining: 0,
-          exceptions: 0,
-        };
-      }
-
-      const invoice = String(
-        row["Invoice #"]
-      )
-        .replace(/\s/g, "")
-        .toUpperCase();
-
-      const isException =
-        exceptions.some(
-          (e: any) =>
-            String(e.invoice)
-              .replace(/\s/g, "")
-              .toUpperCase() === invoice
-        );
-
-      const isCollected =
-        newCollectedInvoices.some(
-          (i: string) =>
-            String(i)
-              .replace(/\s/g, "")
-              .toUpperCase() === invoice
-        );
-
-      if (isException) {
-        acc[van].exceptions++;
-      } else if (!isCollected) {
-        acc[van].remaining++;
-      }
-
-      return acc;
-
-    },
-    {}
-  )
-);
-
-// تحويل الحالة الجديدة إلى Map
-const newMap: any = {};
-
-newVanStatus.forEach(
-  ([van, info]: any) => {
-    newMap[van] = info;
-  }
-);
-
-const changedVans: string[] = [];
-
-// يشمل الفانات القديمة والجديدة حتى لو اختفى فان بعد التحصيل
-const allVans = new Set([
-  ...Object.keys(oldMap),
-  ...Object.keys(newMap),
-]);
-
-allVans.forEach((van) => {
-
-  const oldRemaining =
-    oldMap[van]?.remaining || 0;
-
-  const oldExceptions =
-    oldMap[van]?.exceptions || 0;
-
-  const newRemaining =
-    newMap[van]?.remaining || 0;
-
-  const newExceptions =
-    newMap[van]?.exceptions || 0;
-
-  if (
-    oldRemaining !== newRemaining ||
-    oldExceptions !== newExceptions
-  ) {
-    changedVans.push(van);
-  }
-
-});
-// استبدال القائمة القديمة بالكامل
-await localStorage.setItem(
-  "lastUpdatedVans",
-  JSON.stringify(changedVans)
 );
 
 let fullName = "";
@@ -497,10 +376,10 @@ await addLog(
   "IMPORT_COLLECTION",
   file.name
 );
+    setShowImportModal(false);
 
-setShowImportModal(false);
+    window.location.reload();
 
-window.location.reload();
   } finally {
 
     setIsUploadingCollection(
