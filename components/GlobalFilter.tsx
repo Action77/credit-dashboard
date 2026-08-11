@@ -127,8 +127,8 @@ const getRegion = (row: any) => {
     const map = new Map<string, Set<string>>();
 
     data.forEach((row) => {
-      const region = row["Region"];
-      const city = row["City"];
+      const region = getRegion(row);
+            const city = row["City"];
 
       if (!region || !city) return;
 
