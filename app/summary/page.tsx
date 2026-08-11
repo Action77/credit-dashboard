@@ -620,16 +620,6 @@ const filteredData = data.filter((row) => {
   );
 
 });
-const getRegion = (row: any) => {
-  if (
-    String(row["City"]).trim() ===
-    "Hafer Al Batin"
-  ) {
-    return "East";
-  }
-
-  return row["Region"];
-};
   const vans = Object.entries(
   filteredData.reduce((acc: any, row) => {
 
@@ -795,8 +785,8 @@ const regionSummary = Object.entries(
   regionSummaryData.reduce(
         (acc: any, row) => {
 
-      const region =
-  getRegion(row) || "Unknown";
+const region =
+  row["Region"] || "Unknown";
       if (!acc[region]) {
         acc[region] = {
           invoices: 0,
