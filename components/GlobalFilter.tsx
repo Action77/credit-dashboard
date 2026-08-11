@@ -16,6 +16,16 @@ export default function GlobalFilter() {
 
   const [expandedRegions, setExpandedRegions] = useState<string[]>([]);
   const [expandedCities, setExpandedCities] = useState<string[]>([]);
+const getRegion = (row: any) => {
+  if (
+    String(row["City"]).trim() ===
+    "Hafer Al Batin"
+  ) {
+    return "East";
+  }
+
+  return row["Region"];
+};
 
   // Toggle global filter
   useEffect(() => {
@@ -105,7 +115,7 @@ export default function GlobalFilter() {
   const regions = useMemo(() => {
     return [
       ...new Set(
-        data.map((row) => row["Region"])
+        data.map((row) => getRegion(row))
       ),
     ]
       .filter(Boolean)
@@ -137,16 +147,9 @@ export default function GlobalFilter() {
     const map = new Map<string, Set<string>>();
 
     data.forEach((row) => {
-      let region = row["Region"];
-
-if (
-  String(row["City"]).trim() ===
-  "Hafer Al Batin"
-) {
-  region = "East";
-}
-      const city = row["City"];
-      const van = row["Van Code."];
+  const region = getRegion(row);
+  const city = row["City"];
+        const van = row["Van Code."];
 
       if (!region || !city || !van) return;
 
@@ -195,16 +198,15 @@ if (
               );
 
               const regionVans = data
-                .filter(
-                  (row) =>
-                    row["Region"] === region
-                )
-                .map(
-                  (row) =>
-                    row["Van Code."]
-                )
-                .filter(Boolean);
-
+  .filter(
+    (row) =>
+      getRegion(row) === region
+  )
+  .map(
+    (row) =>
+      row["Van Code."]
+  )
+  .filter(Boolean);
               return (
                 <div
                   key={region}
