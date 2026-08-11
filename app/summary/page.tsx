@@ -389,9 +389,7 @@ await addLog(
   }
 
 };
-  const [lastUpdatedVans,
-  setLastUpdatedVans] =
-  useState<string[]>([]);
+  
 const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 const [showLoginModal, setShowLoginModal] = useState(false);
@@ -454,11 +452,6 @@ if (
   return;
 }
 
-const savedUpdatedVans =
-  await localStorage.getItem(
-    "lastUpdatedVans"
-  );
-
     const filterKey =
   currentUser
     ? `savedFilters_${currentUser}`
@@ -504,12 +497,7 @@ setPermissions(
   mappedPermissions
 );
     
-    if (savedUpdatedVans) {
-      setLastUpdatedVans(
-        JSON.parse(savedUpdatedVans)
-      );
-    }
-
+    
     if (currentUser) {
   setCurrentUser(currentUser);
   setIsLoggedIn(true);
@@ -547,33 +535,20 @@ useEffect(() => {
 
 }, []);
   const getStatusStyle = (
-remaining: number,
-ex: number,
-updated: boolean
+  remaining: number,
+  ex: number
 ) => {
+  if (remaining === 0) {
+    return "bg-yellow-100 text-yellow-800";
+  }
 
+  if (remaining > 0 && ex === 0) {
+    return "bg-pink-100 text-pink-700";
+  }
 
-if (remaining === 0 && ex === 0) {
-
-return "bg-green-100 text-green-700";
-
-}
-
-if (remaining > 0 && ex === 0) {
-
-return "bg-pink-100 text-pink-700";
-
-}
-
-if (remaining === 0 && ex > 0) {
-
-return "bg-orange-100 text-orange-700";
-
-}
-
-return "bg-orange-200 text-orange-900";
-
+  return "bg-orange-100 text-orange-700";
 };
+
 const filteredData = data.filter((row) => {
 
   const regionMatch =
@@ -1383,19 +1358,18 @@ onClick={async () => {
       <tr
   key={van}
   className={`
-    transition-all
-    duration-200
-    ${
-      lastUpdatedVans.some(
-        (v) =>
-          String(v).trim() ===
-          String(van).trim()
-      )
-        ? "bg-yellow-50"
-        : "hover:bg-slate-50"
-    }
-  `}
->
+  transition-all
+  duration-200
+  ${
+    permissions[van]
+  ? "bg-green-100"
+  : status === "All Collected" ||
+    status === "Ex & All Collected"
+  ? "bg-yellow-100"
+  : "hover:bg-slate-50"
+  }
+`}
+  >
 
             <td className="px-4 py-3 text-center border-r border-b border-slate-300">
 
@@ -1433,14 +1407,9 @@ onClick={async () => {
       text-xs
       font-semibold
       ${getStatusStyle(
-        info.remaining,
-        info.exceptions,
-        lastUpdatedVans.some(
-          (v) =>
-            String(v).trim() ===
-            String(van).trim()
-        )
-      )}
+  info.remaining,
+  info.exceptions
+)}
     `}
   >
     {status}
