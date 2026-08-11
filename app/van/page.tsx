@@ -35,6 +35,8 @@ const [selectedVans, setSelectedVans] =
   const [exceptions,setExceptions] = useState<any[]>([]);
   const [collectedInvoices,setCollectedInvoices] = useState<string[]>([]);
   const [creditRules,setCreditRules] = useState<any[]>([]);
+  const [permissions, setPermissions] =
+  useState<any>({});
 
   
 
@@ -148,14 +150,32 @@ setIsCheckingUser(false);
     if (cancelled) return;
 
     setCreditRules(
-      rules || []
-    );
+  rules || []
+);
 
-    const savedFilters =
-      await localStorage.getItem(
-        `savedFilters_${currentUser}`
-      );
+const { data: permissionData } =
+  await supabase
+    .from("van_permissions")
+    .select("*");
 
+const mappedPermissions: any = {};
+
+(permissionData || []).forEach(
+  (item: any) => {
+    mappedPermissions[
+      item.van_code
+    ] = item.is_unblocked;
+  }
+);
+
+setPermissions(
+  mappedPermissions
+);
+
+const savedFilters =
+  await localStorage.getItem(
+    `savedFilters_${currentUser}`
+  );
     if (cancelled) return;
 
     if (
@@ -653,9 +673,23 @@ filteredVans
 
 <tr
 key={van}
-className="
+className={`
 border-b
-"
+${
+  permissions[van]
+    ? "bg-green-100"
+    : getStatus(
+        info.remaining,
+        info.exceptions
+      ) === "All Collected" ||
+      getStatus(
+        info.remaining,
+        info.exceptions
+      ) === "Ex & All Collected"
+    ? "bg-yellow-50"
+    : ""
+}
+`}
 >
 
 
