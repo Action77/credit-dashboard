@@ -1363,9 +1363,6 @@ onClick={async () => {
   ${
     permissions[van]
   ? "bg-green-100"
-  : status === "All Collected" ||
-    status === "Ex & All Collected"
-  ? "bg-amber-50"
   : "hover:bg-slate-50"
   }
 `}
