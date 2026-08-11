@@ -17,13 +17,18 @@ export default function GlobalFilter() {
   const [expandedRegions, setExpandedRegions] = useState<string[]>([]);
   const [expandedCities, setExpandedCities] = useState<string[]>([]);
 const getRegion = (row: any) => {
-  if (
-    String(row["City"]).trim() ===
-    "Hafer Al Batin"
-  ) {
-    return "East";
-  }
+  const city = String(
+  row["City"] || ""
+)
+  .trim()
+  .toUpperCase();
 
+if (
+  city.includes("HAFAR") &&
+  city.includes("BATIN")
+) {
+  return "East";
+}
   return row["Region"];
 };
 
