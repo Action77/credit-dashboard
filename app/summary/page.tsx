@@ -555,11 +555,10 @@ useEffect(() => {
 const filteredData = data.filter((row) => {
 
   const regionMatch =
-    filters.regions.length === 0 ||
-    filters.regions.includes(
-      row["Region"]
-    );
-
+  filters.regions.length === 0 ||
+  filters.regions.includes(
+    row["Region"]
+  );
   const cityMatch =
     filters.cities.length === 0 ||
     filters.cities.includes(
@@ -621,6 +620,16 @@ const filteredData = data.filter((row) => {
   );
 
 });
+const getRegion = (row: any) => {
+  if (
+    String(row["City"]).trim() ===
+    "Hafer Al Batin"
+  ) {
+    return "East";
+  }
+
+  return row["Region"];
+};
   const vans = Object.entries(
   filteredData.reduce((acc: any, row) => {
 
@@ -787,8 +796,7 @@ const regionSummary = Object.entries(
         (acc: any, row) => {
 
       const region =
-        row["Region"] || "Unknown";
-
+  getRegion(row) || "Unknown";
       if (!acc[region]) {
         acc[region] = {
           invoices: 0,
