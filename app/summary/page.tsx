@@ -1365,7 +1365,7 @@ onClick={async () => {
   ? "bg-green-100"
   : status === "All Collected" ||
     status === "Ex & All Collected"
-  ? "bg-yellow-100"
+  ? "bg-amber-50"
   : "hover:bg-slate-50"
   }
 `}
