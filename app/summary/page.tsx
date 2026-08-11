@@ -1400,20 +1400,21 @@ onClick={async () => {
 
   <span
     className={`
-      inline-flex
-      items-center
-      justify-center
-      min-w-[130px]
-      px-3
-      py-1
-      rounded-full
-      text-xs
-      font-semibold
-      ${getStatusStyle(
-  info.remaining,
-  info.exceptions
-)}
-    `}
+  inline-flex
+  items-center
+  justify-center
+  min-w-[130px]
+  px-3
+  py-1
+  rounded-full
+  text-xs
+  font-semibold
+  border border-black/10
+  ${getStatusStyle(
+    info.remaining,
+    info.exceptions
+  )}
+`}
   >
     {status}
   </span>
