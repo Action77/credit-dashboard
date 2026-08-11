@@ -137,7 +137,14 @@ export default function GlobalFilter() {
     const map = new Map<string, Set<string>>();
 
     data.forEach((row) => {
-      const region = row["Region"];
+      let region = row["Region"];
+
+if (
+  String(row["City"]).trim() ===
+  "Hafer Al Batin"
+) {
+  region = "East";
+}
       const city = row["City"];
       const van = row["Van Code."];
 
