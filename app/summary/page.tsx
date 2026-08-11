@@ -538,17 +538,20 @@ useEffect(() => {
   remaining: number,
   ex: number
 ) => {
-  if (remaining === 0) {
-    return "bg-yellow-100 text-yellow-800";
+  if (remaining === 0 && ex === 0) {
+    return "bg-green-100 text-green-700";
   }
 
   if (remaining > 0 && ex === 0) {
     return "bg-pink-100 text-pink-700";
   }
 
-  return "bg-orange-100 text-orange-700";
-};
+  if (remaining === 0 && ex > 0) {
+    return "bg-orange-100 text-orange-700";
+  }
 
+  return "bg-orange-200 text-orange-900";
+};
 const filteredData = data.filter((row) => {
 
   const regionMatch =
@@ -1361,14 +1364,13 @@ onClick={async () => {
   transition-all
   duration-200
   ${
-    permissions[van]
-  ? "bg-green-100"
-  : status === "All Collected"
-  ? "bg-green-50"
-  : status === "Ex & All Collected"
-  ? "bg-green-50"
-  : "hover:bg-slate-50"
-  }
+  permissions[van]
+    ? "bg-green-100"
+    : status === "All Collected" ||
+      status === "Ex & All Collected"
+    ? "bg-yellow-50"
+    : "hover:bg-slate-50"
+}
 `}
   >
 
