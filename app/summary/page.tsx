@@ -454,10 +454,6 @@ if (
   return;
 }
 
-const savedUpdatedVans =
-  await localStorage.getItem(
-    "lastUpdatedVans"
-  );
 
     const filterKey =
   currentUser
@@ -483,6 +479,9 @@ setCollectedInvoices(
   collectionData.invoices || []
 );
 
+setLastUpdatedVans(
+  collectionData.affectedVans || []
+);
 const { data: permissionData } =
   await supabase
     .from("van_permissions")
@@ -504,12 +503,7 @@ setPermissions(
   mappedPermissions
 );
     
-    if (savedUpdatedVans) {
-      setLastUpdatedVans(
-        JSON.parse(savedUpdatedVans)
-      );
-    }
-
+    
     if (currentUser) {
   setCurrentUser(currentUser);
   setIsLoggedIn(true);
@@ -1386,12 +1380,8 @@ onClick={async () => {
     transition-all
     duration-200
     ${
-      lastUpdatedVans.some(
-        (v) =>
-          String(v).trim() ===
-          String(van).trim()
-      )
-        ? "bg-yellow-50"
+      lastUpdatedVans.includes(van)
+        ? "bg-yellow-100 border-l-4 border-yellow-500"
         : "hover:bg-slate-50"
     }
   `}
