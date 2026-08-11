@@ -225,66 +225,67 @@ export default function GlobalFilter() {
                         region
                       )}
                       onChange={(e) => {
-                        if (
-                          e.target.checked
-                        ) {
-                          setSelectedRegions(
-                            (prev) => [
-                              ...new Set([
-                                ...prev,
-                                region,
-                              ]),
-                            ]
-                          );
+  const isEast = region === "East";
 
-                          setSelectedCities(
-                            (prev) => [
-                              ...new Set([
-                                ...prev,
-                                ...regionCities,
-                              ]),
-                            ]
-                          );
+  const haferVans = data
+    .filter(
+      (row) =>
+        row["Region"] === "North" &&
+        row["City"] === "Hafer Al Batin"
+    )
+    .map((row) => row["Van Code."])
+    .filter(Boolean);
 
-                          setSelectedVans(
-                            (prev) => [
-                              ...new Set([
-                                ...prev,
-                                ...regionVans,
-                              ]),
-                            ]
-                          );
-                        } else {
-                          setSelectedRegions(
-                            (prev) =>
-                              prev.filter(
-                                (r) =>
-                                  r !==
-                                  region
-                              )
-                          );
+  if (e.target.checked) {
+    setSelectedRegions((prev) => [
+      ...new Set([
+        ...prev,
+        region,
+        ...(isEast ? ["North"] : []),
+      ]),
+    ]);
 
-                          setSelectedCities(
-                            (prev) =>
-                              prev.filter(
-                                (city) =>
-                                  !regionCities.includes(
-                                    city
-                                  )
-                              )
-                          );
+    setSelectedCities((prev) => [
+      ...new Set([
+        ...prev,
+        ...regionCities,
+        ...(isEast ? ["Hafer Al Batin"] : []),
+      ]),
+    ]);
 
-                          setSelectedVans(
-                            (prev) =>
-                              prev.filter(
-                                (van) =>
-                                  !regionVans.includes(
-                                    van
-                                  )
-                              )
-                          );
-                        }
-                      }}
+    setSelectedVans((prev) => [
+      ...new Set([
+        ...prev,
+        ...regionVans,
+        ...(isEast ? haferVans : []),
+      ]),
+    ]);
+  } else {
+    setSelectedRegions((prev) =>
+      prev.filter(
+        (r) =>
+          r !== region &&
+          !(isEast && r === "North")
+      )
+    );
+
+    setSelectedCities((prev) =>
+      prev.filter(
+        (city) =>
+          !regionCities.includes(city) &&
+          !(isEast && city === "Hafer Al Batin")
+      )
+    );
+
+    setSelectedVans((prev) =>
+      prev.filter(
+        (van) =>
+          !regionVans.includes(van) &&
+          !(isEast && haferVans.includes(van))
+      )
+    );
+  }
+}}
                     />
 
                     <span className="font-medium">
