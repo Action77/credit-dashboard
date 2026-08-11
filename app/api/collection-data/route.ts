@@ -76,26 +76,23 @@ export async function GET() {
       : null;
 
   return NextResponse.json({
-  invoices: allInvoices.map(
-    (row: any) => row.invoice
-  ),
+    invoices: allInvoices.map(
+      (row: any) => row.invoice
+    ),
 
-  affectedVans:
-    latestUpload?.affected_vans || [],
-
-  fileInfo:
-    latestUpload
-      ? `Uploaded By ${fullName} | ${uploadTime?.toLocaleString(
-          "en-US",
-          {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }
-        )}`
-      : "",
-});
+    fileInfo:
+      latestUpload
+        ? `Uploaded By ${fullName} | ${uploadTime?.toLocaleString(
+            "en-US",
+            {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            }
+          )}`
+        : "",
+  });
 }

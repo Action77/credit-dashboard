@@ -320,14 +320,31 @@ if (a1 !== "Collection Submit Time") {
   return;
 }
 
-    const currentUser =
+const currentUser =
   await localStorage.getItem(
     "currentUser"
   );
 
+// حفظ حالة الـVans قبل رفع Collection الجديد
+const currentStatuses: Record<string, string> = {};
+
+vans.forEach(([van, info]: any) => {
+  const vanCode = String(van).trim();
+
+  currentStatuses[vanCode] = getStatus(
+    info.remaining,
+    info.exceptions
+  );
+});
+
+window.localStorage.setItem(
+  "vanStatusesBeforeCollection",
+  JSON.stringify(currentStatuses)
+);
+
 const fileName =
   `${Date.now()}-${file.name}`;
-
+  
 const { error: uploadError } =
   await supabase.storage
     .from("imports")
@@ -389,10 +406,9 @@ await addLog(
   }
 
 };
-  const [lastUpdatedVans,
-  setLastUpdatedVans] =
+  const [changedStatusVans, setChangedStatusVans] =
   useState<string[]>([]);
-const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -479,9 +495,7 @@ setCollectedInvoices(
   collectionData.invoices || []
 );
 
-setLastUpdatedVans(
-  collectionData.affectedVans || []
-);
+// Removed: status changes are detected locally
 const { data: permissionData } =
   await supabase
     .from("van_permissions")
@@ -541,33 +555,25 @@ useEffect(() => {
 
 }, []);
   const getStatusStyle = (
-remaining: number,
-ex: number,
-updated: boolean
+  remaining: number,
+  ex: number
 ) => {
+  if (remaining === 0 && ex === 0) {
+    return "bg-green-100 text-green-700";
+  }
 
+  if (remaining > 0 && ex === 0) {
+    return "bg-pink-100 text-pink-700";
+  }
 
-if (remaining === 0 && ex === 0) {
+  if (remaining === 0 && ex > 0) {
+    return "bg-orange-100 text-orange-700";
+  }
 
-return "bg-green-100 text-green-700";
-
-}
-
-if (remaining > 0 && ex === 0) {
-
-return "bg-pink-100 text-pink-700";
-
-}
-
-if (remaining === 0 && ex > 0) {
-
-return "bg-orange-100 text-orange-700";
-
-}
-
-return "bg-orange-200 text-orange-900";
-
+  return "bg-orange-200 text-orange-900";
 };
+
+
 const filteredData = data.filter((row) => {
 
   const regionMatch =
@@ -749,6 +755,76 @@ const filteredData = data.filter((row) => {
   return "All Collected";
 
 };
+useEffect(() => {
+  if (!vans.length) return;
+
+  const previousStatusesRaw =
+    window.localStorage.getItem(
+      "vanStatusesBeforeCollection"
+    );
+
+  // أول تحميل بدون Collection جديد
+  if (!previousStatusesRaw) {
+    const currentStatuses: Record<string, string> = {};
+
+    vans.forEach(([van, info]: any) => {
+      const vanCode = String(van).trim();
+
+      currentStatuses[vanCode] = getStatus(
+        info.remaining,
+        info.exceptions
+      );
+    });
+
+    window.localStorage.setItem(
+      "vanStatuses",
+      JSON.stringify(currentStatuses)
+    );
+
+    setChangedStatusVans([]);
+
+    return;
+  }
+
+  const previousStatuses =
+    JSON.parse(previousStatusesRaw);
+
+  const currentStatuses: Record<string, string> = {};
+  const changedVans: string[] = [];
+
+  vans.forEach(([van, info]: any) => {
+    const vanCode = String(van).trim();
+
+    const currentStatus = getStatus(
+      info.remaining,
+      info.exceptions
+    );
+
+    currentStatuses[vanCode] = currentStatus;
+
+    if (
+      previousStatuses[vanCode] !== undefined &&
+      previousStatuses[vanCode] !== currentStatus
+    ) {
+      changedVans.push(vanCode);
+    }
+  });
+
+  // فقط الـ Vans التي تغيرت في آخر Collection
+  setChangedStatusVans(changedVans);
+
+  // حفظ الحالة الجديدة للمقارنة القادمة
+  window.localStorage.setItem(
+    "vanStatuses",
+    JSON.stringify(currentStatuses)
+  );
+
+  // انتهت مقارنة عملية Collection الحالية
+  window.localStorage.removeItem(
+    "vanStatusesBeforeCollection"
+  );
+
+}, [vans]);
 const regionSummaryData = data.filter((row) => {
 
   const isNotCentral =
@@ -1374,13 +1450,13 @@ onClick={async () => {
 
         return (
 
-      <tr
+     <tr
   key={van}
   className={`
     transition-all
     duration-200
     ${
-      lastUpdatedVans.includes(van)
+      changedStatusVans.includes(String(van).trim())
         ? "bg-yellow-100 border-l-4 border-yellow-500"
         : "hover:bg-slate-50"
     }
@@ -1423,14 +1499,9 @@ onClick={async () => {
       text-xs
       font-semibold
       ${getStatusStyle(
-        info.remaining,
-        info.exceptions,
-        lastUpdatedVans.some(
-          (v) =>
-            String(v).trim() ===
-            String(van).trim()
-        )
-      )}
+  info.remaining,
+  info.exceptions
+)}
     `}
   >
     {status}

@@ -310,14 +310,6 @@ const affectedVans = [
       .filter(Boolean)
   ),
 ];
-
-await supabase
-  .from("collection_uploads")
-  .update({
-    affected_vans: affectedVans,
-  })
-  .eq("id", uploadRecord.id);
-
 const collectedPerVan: Record<string, number> = {};
 
 (affectedCreditRows || []).forEach(
