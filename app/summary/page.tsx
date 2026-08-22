@@ -591,7 +591,6 @@ const filteredData = data.filter((row) => {
     value: string
   ) =>
     String(value || "")
-      .replace(/^ATS\s+/i, "")
       .replace(/\s+/g, " ")
       .trim()
       .toUpperCase();
@@ -754,7 +753,6 @@ const regionSummaryData = data.filter((row) => {
     value: string
   ) =>
     String(value || "")
-      .replace(/^ATS\s+/i, "")
       .replace(/\s+/g, " ")
       .trim()
       .toUpperCase();
