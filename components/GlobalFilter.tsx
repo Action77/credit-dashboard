@@ -18,6 +18,80 @@ export default function GlobalFilter() {
   const [expandedCities, setExpandedCities] = useState<string[]>([]);
 
   // Toggle global filter
+useEffect(() => {
+  const syncVans = async () => {
+    if (!data.length) return;
+
+    const user =
+      await localStorage.getItem(
+        "currentUser"
+      );
+
+    const filterKey = user
+      ? `savedFilters_${user}`
+      : "savedFilters_guest";
+
+    const saved =
+      await localStorage.getItem(
+        filterKey
+      );
+
+    if (!saved) return;
+
+    const filters = JSON.parse(saved);
+
+    const vans = data
+      .filter((row) => {
+        const regionMatch =
+          filters.regions?.length === 0 ||
+          filters.regions?.includes(
+            row["Region"]
+          );
+
+        const cityMatch =
+          filters.cities?.length === 0 ||
+          filters.cities?.includes(
+            row["City"]
+          );
+
+        return (
+          regionMatch &&
+          cityMatch
+        );
+      })
+      .map((row) => row["Van Code."])
+      .filter(Boolean);
+const updatedFilters = {
+  regions: filters.regions || [],
+  cities: filters.cities || [],
+  vans: [...new Set(vans)],
+};
+
+await localStorage.setItem(
+  filterKey,
+  JSON.stringify(updatedFilters)
+);
+
+if (user) {
+  await supabase
+    .from("user_filters")
+    .upsert({
+      username: user,
+      regions: updatedFilters.regions,
+      cities: updatedFilters.cities,
+      vans: updatedFilters.vans,
+    });
+}
+
+setSelectedRegions(updatedFilters.regions);
+setSelectedCities(updatedFilters.cities);
+setSelectedVans(updatedFilters.vans);
+    
+  };
+
+  syncVans();
+}, [data]);
+
   useEffect(() => {
     const handleToggleFilters = () => {
       setShowFilters((prev) => !prev);
@@ -87,10 +161,7 @@ export default function GlobalFilter() {
           filters.cities || []
         );
 
-        setSelectedVans(
-          filters.vans || []
-        );
-      } catch (error) {
+              } catch (error) {
         console.error(
           "Failed to load saved filters:",
           error
