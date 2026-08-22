@@ -605,9 +605,9 @@ const filteredData = data.filter((row) => {
     Number(row["Credit_Days"]) || 0;
 
   const showInvoice =
-    rule
-      ? creditDays >= rule.block_at_day
-      : false;
+  rule
+    ? creditDays >= rule.block_at_day
+    : creditDays >= 1;
 
   return (
     isNotCentral &&
@@ -767,9 +767,9 @@ const regionSummaryData = data.filter((row) => {
     Number(row["Credit_Days"]) || 0;
 
   const showInvoice =
-    rule
-      ? creditDays >= rule.block_at_day
-      : false;
+  rule
+    ? creditDays >= rule.block_at_day
+    : creditDays >= 1;
 
   return (
     isNotCentral &&
