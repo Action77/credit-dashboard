@@ -1166,7 +1166,22 @@ const whatsappVanCodes = useMemo(() => {
         .map((row) => row["Van Code."])
         .filter(Boolean)
     ),
-  ].sort();
+  ].sort((a, b) => {
+    const aIsHFR = String(a).includes("HFR");
+    const bIsHFR = String(b).includes("HFR");
+
+    if (aIsHFR && !bIsHFR) return 1;
+    if (!aIsHFR && bIsHFR) return -1;
+
+    return String(a).localeCompare(
+      String(b),
+      undefined,
+      {
+        numeric: true,
+        sensitivity: "base",
+      }
+    );
+  });
 }, [blockedInvoicesData]);
 useEffect(() => {
   if (
