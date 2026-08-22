@@ -471,7 +471,11 @@ for (const van of vans) {
       0
     );
 
-const canRequestUnblock = !isLoading && !isRouteUnblocked && reportData.length <= 3;
+const canRequestUnblock =
+  !isLoading &&
+  isLoggedIn &&
+  !isRouteUnblocked &&
+  reportData.length <= 3;
 const requestUnblock = async () => {
 
   const key =
