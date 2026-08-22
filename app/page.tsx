@@ -546,8 +546,35 @@ useEffect(() => {
     );
 
   if (changed) {
-    setSelectedVans(updatedVans);
+
+  setSelectedVans(updatedVans);
+
+  const filterData = {
+    regions: selectedRegions,
+    cities: selectedCities,
+    vans: updatedVans,
+  };
+
+  const filterKey = currentUser
+    ? `savedFilters_${currentUser}`
+    : "savedFilters_guest";
+
+  await localStorage.setItem(
+    filterKey,
+    JSON.stringify(filterData)
+  );
+
+  if (currentUser) {
+    await supabase
+      .from("user_filters")
+      .upsert({
+        username: currentUser,
+        regions: selectedRegions,
+        cities: selectedCities,
+        vans: updatedVans,
+      });
   }
+}
 
 }, [
   data,
